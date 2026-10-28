@@ -39,7 +39,7 @@ It runs for Romania, where the packages come from, and for Spain, the provisiona
 
 Out of scope: choosing products, visual search, finishes, checking whether equipment physically fits in the room, and approving anything on the reviewer's behalf.
 
-[O] Doors. Luca would like them in, but we haven't worked out how yet; the feature spec leaves them out for now.
+[O] Doors. Luca would like them in, but they are on hold since 29 Oct until we know how.
 
 [O] The next families. Fire dampers and valves would bring in the construction products regulation; pipes and meters are frequent in the register.
 

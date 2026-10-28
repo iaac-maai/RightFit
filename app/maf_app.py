@@ -5,6 +5,7 @@ read, copy the answer. Everything is a draft; the reviewer decides.
 """
 import json
 import sys
+from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -32,6 +33,9 @@ VALUE_NAMES = {"used_for": "Used for (form)", "duty_flow": "Required flow (form)
                "hrs_efficiency": "Heat recovery efficiency", "sfp_int": "SFPint", "sfp_int_limit": "SFPint limit",
                "gwp": "GWP", "seer": "SEER", "scop": "SCOP", "dx_refrigerant": "DX coil refrigerant"}
 VERDICT = {"pass": "OK", "flag": "Problem", "unclear": "Question", "info": "Info"}
+STATUS_RULE = {"A": "Every check passed or is only for information.",
+               "B": "Nothing sends the package back, but there is at least one problem or open question.",
+               "C": "A product has no data sheet that names it, or a blocking checklist item is missing."}
 
 st.set_page_config(page_title="RightFit · MAF review", layout="wide")
 
@@ -94,7 +98,7 @@ questions = [r for r in results if r["would_be"] == "unclear"]
 dismissed = [r for r in results if r.get("dismissed")]
 readings = [x for i in pkg["items"] for x in i["values"].values()] + pkg["documents"]
 to_confirm = sum(x["status"] != "verified" for x in readings)
-letter, _ = draft_status(results, "would_be")
+letter, status_reasons = draft_status(results, "would_be")
 
 # ---------------------------------------------------------------- the draft answer
 colour = {"A": "green", "B": "orange", "C": "red"}[letter]
@@ -108,6 +112,15 @@ with st.container(border=True):
     if to_confirm:
         st.caption("This draft rests on what the AI read. Confirm the readings in step 2: a check only counts as "
                    "passed once the values behind it are confirmed.")
+    with st.expander(f"Why {letter}?"):
+        st.write(STATUS_RULE[letter])
+        if letter == "C":
+            for reason in status_reasons:
+                st.markdown(f"- {reason}")
+        counts = Counter(f"{VERDICT[r['would_be']]} · {CHECK_NAMES[r['check']]}" for r in problems + questions)
+        for text, n in counts.items():
+            st.markdown(f"- {text}: {n}")
+        st.caption("What each reason means and where it comes from: docs/maf_status_reasons.md")
 
 step1, step2, step3, everything = st.tabs(["1 · Problems found", "2 · Confirm what the AI read",
                                             "3 · Answer to send", "Everything that was checked"])

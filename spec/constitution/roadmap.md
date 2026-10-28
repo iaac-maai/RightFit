@@ -46,6 +46,8 @@ The hood features (image search, keyword baseline, re-ranking from a designer's 
 | MAF-08 | Comparison with the reference answers | A small script and a table | First pass done on unverified values |
 | MAF-09 | MCP server with the checks | Integration | Planned for 12 Nov |
 | MAF-10 | Rule watch: a rule goes back to "to confirm" when its source changes | Scheduled check | Idea only [O] |
+| MAF-11 | Declarations library. When a package lacks a declaration, the AI looks for it on the manufacturer's official site (Grundfos, Wilo, FläktGroup, Hisense, Danfoss, Siemens and so on) and records the models it covers, the directives, the date and the link. A person confirms each entry once, and later projects reuse it. The review then says whether the declaration exists and was only left out | AI searches and reads; a rule compares | Next step; first test on the three declarations missing from P01 and P02 |
+| MAF-12 | Certification dossier for BREEAM, LEED or VERDE, built from the confirmed values, with what is still missing for each credit (the outdoor units' GWP, for one) | AI drafts from confirmed values | Idea; [O] which credits, with Sahil or Jeff |
 
 A feature is done when it has a spec, passing tests and a review against the spec.
 

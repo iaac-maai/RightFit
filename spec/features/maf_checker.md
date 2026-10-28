@@ -72,11 +72,13 @@ Results: pass, flag, unclear, info. A check passes only on verified values; extr
 | R | Location reminders | the location's delivery documents (RO: declaration, quality certificate, guarantee; ES: CTE 7.2 and RITE 20) as info | RO-PRACTICE-DELIVERY, ES-CTE-7-2, ES-RITE-20 |
 
 ## 7. Draft status (written rules, not a model; Luca confirms or changes them)
-- Revizie și retransmitere (C): an item has no data sheet, or its data sheet does not show the submitted model, or a checklist item marked blocking is missing;
-- Aprobat conform notații (B): no C condition, but at least one flag or unclear; one note per flag or unclear;
-- Aprobat (A): everything pass or info;
-- Neaprobat and Se solicită mostră: only the reviewer chooses them;
-- the app always shows "draft, the reviewer decides" and the reason for the status.
+- Revise and resubmit (C): an item has no data sheet, or its data sheet does not show the submitted model, or a checklist item marked blocking is missing;
+- Approved as noted (B): no C condition, but at least one flag or unclear; one note per flag or unclear;
+- Approved (A): everything pass or info;
+- Not approved and Sample requested: only the reviewer chooses them;
+- the app always shows "draft, the reviewer decides" and the reason for the status; every reason is explained in docs/maf_status_reasons.md.
+
+A missing declaration stays B until the reviewer approves it by hand (Luca, 29 Oct 2026).
 
 In the earlier register, missing declarations led to a reminder for the delivery, not to a C (three such MAFs were approved). That is why a missing declaration is a flag (B), not a C.
 
