@@ -46,3 +46,12 @@ def test_no_name_from_the_local_names_list():
     for path in PACKAGES:
         text = path.read_text().lower()
         assert not [n for n in names if n in text], path.name
+
+
+def test_library_entries_keep_link_page_short_quote_and_status():
+    lib = json.loads((ROOT / "data/maf/library.json").read_text())
+    for e in lib["documents"]:
+        assert e["url"].startswith("https://") and e["page"] and e["found_on"], e["title"]
+        assert len(e["quote"].split()) <= 15, e["title"]
+        assert e["status"] in ("extracted", "verified") and e["doc_type"] in DOC_TYPES
+        assert e["local_file"].startswith("data/raw/"), "copies stay outside Git"

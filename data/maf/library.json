@@ -1,0 +1,53 @@
+{
+  "about": "Manufacturer documents found by the AI reader on official manufacturer sites (MAF-11). Only links and short quotes are kept here; the downloaded copies stay in data/raw/library/, outside Git. Every entry starts as extracted until a person confirms it.",
+  "documents": [
+    {
+      "brand": "Grundfos",
+      "doc_type": "eu_declaration_of_conformity",
+      "title": "Hydro Multi-E installation and operating instructions (publication 96485976 0915), EC declaration of conformity",
+      "covers": ["Hydro Multi-E"],
+      "cites": ["2006/42/EC", "2004/108/EC"],
+      "standards": ["EN 809:1998", "EN 60204-1:2006", "EN 61000-6-2:2005", "EN 61000-6-3:2007"],
+      "issue_date": "2011-12-15",
+      "valid_until": null,
+      "url": "https://api.grundfos.com/literature/Grundfosliterature-3568377.pdf",
+      "local_file": "data/raw/library/grundfos/Grundfosliterature-3568377.pdf",
+      "page": 24,
+      "quote": "We, Grundfos, declare under our sole responsibility that the products Hydro Multi-E",
+      "found_by": "AI reader",
+      "found_on": "2026-10-29",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": "Cites the EMC Directive 2004/108/EC, which 2014/30/EU replaced in April 2016. A newer manual for systems with CME pumps exists (Grundfos literature 5235376) but its link returned 404 on 29 Oct 2026."
+    },
+    {
+      "brand": "Grundfos",
+      "doc_type": "eu_declaration_of_conformity",
+      "title": "DPK, DPK.V safety instructions and other important information (document 99347040), EU declaration of conformity",
+      "covers": ["DPK", "DWK"],
+      "cites": ["2006/42/EC", "(EU) 2023/1230", "2011/65/EU", "2015/863/EU", "(EU) 2025/40"],
+      "standards": ["EN 809:1998 + A1:2009", "EN IEC 63000:2018"],
+      "issue_date": "2026-06-12",
+      "valid_until": null,
+      "url": "https://api.grundfos.com/literature/Grundfosliterature-6119624.pdf",
+      "local_file": "data/raw/library/grundfos/Grundfosliterature-6119624.pdf",
+      "page": 11,
+      "quote": "2006/42/EC (Machinery Directive), (EU) 2023/1230 (Machinery Regulation)",
+      "found_by": "AI reader",
+      "found_on": "2026-10-29",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": "For products with CE marking on the nameplate; refers to Grundfos documents 99347040 and 92658289. It does not cite the Low Voltage or EMC directives. Grundfos also published a correction to the UK declaration in the same document."
+    }
+  ],
+  "not_found": [
+    {
+      "brand": "FläktGroup",
+      "doc_type": "eu_declaration_of_conformity",
+      "covers": ["CAIRplus"],
+      "searched_on": "2026-10-29",
+      "where": "flaktgroup.com, including the certification page (it lists the Eurovent and hygiene certificates for CAIRplus, no declaration)",
+      "notes": "Ask the manufacturer or the contractor."
+    }
+  ]
+}

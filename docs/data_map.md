@@ -19,6 +19,7 @@ Unlike the hood version, which started from data we still had to collect, the MA
 | DS9 | Review times, by hand and with the tool | Luca | Luca | In DS8 for now | By hand: about 10 min (P01, figures only) and 3 h (P02) | | Evaluation |
 | DS10 | Overrides and approved values | Exported by the app | Reviewer | CSV | Created when used | Stay local unless anonymised | O&M file, certification consultant |
 | DS11 | More packages | Luca's practice | Luca | As DS1 | [O] which ones, and how we anonymise them | As DS1 | Evaluation on unseen packages |
+| DS13 | Manufacturer documents library | Official manufacturer sites, found by the AI | Luca confirms | JSON (`data/maf/library.json`) + copies in `data/raw/library/` | Started: 2 Grundfos declarations, 1 FläktGroup search without result | Links and short quotes only in Git; copies stay local | D1: a missing document the manufacturer publishes |
 | DS12 | Interviews with reviewers and contractors | Us | Sahil | Notes | [O] not planned in detail | Consent, anonymised | Problem evidence, who would pay |
 
 The hood version listed "79 MEP approval forms" from the v1 research. We use DS2 instead, because it is the copy we can open.

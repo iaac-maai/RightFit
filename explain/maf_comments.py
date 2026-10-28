@@ -9,6 +9,8 @@ DOC_NAMES = {"data_sheet": "data sheet", "eu_declaration_of_conformity": "EU dec
 
 TEMPLATES = {
     "D1.missing": "The {doc} for {item} is missing; please attach it.",
+    "D1.published": "The {doc} for {item} is missing; the manufacturer publishes it in {where} ({url}), "
+                    "please attach it.",
     "D2.no_match": "The declaration of conformity attached for {covers} matches no product in the MAF; "
                    "please attach the declarations for {items}.",
     "D2.extra": "The declaration of conformity attached for {covers} matches no product in the MAF; "

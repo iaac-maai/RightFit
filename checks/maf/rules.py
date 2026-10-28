@@ -3,6 +3,7 @@
 How rules are picked is described in docs/jurisdictions.md.
 """
 import csv
+import json
 from datetime import date
 from pathlib import Path
 
@@ -15,6 +16,12 @@ CHAINS = {"RO": ["EU", "RO", "ANY"], "ES": ["EU", "ES", "ANY"]}
 def load(name):
     with open(DATA / name, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
+
+
+def library():
+    """Manufacturer documents found on official sites (MAF-11), or an empty library."""
+    path = DATA / "library.json"
+    return json.loads(path.read_text()) if path.exists() else {"documents": [], "not_found": []}
 
 
 def tables():

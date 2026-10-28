@@ -12,7 +12,7 @@ Each check returns result dicts:
 import re
 from datetime import date
 
-from checks.maf.rules import CHAINS, active_ids, documents_for, for_family, rules_for, tables
+from checks.maf.rules import CHAINS, active_ids, documents_for, for_family, library, rules_for, tables
 
 DECL = "eu_declaration_of_conformity"
 MAF_STAGES = ("maf", "maf_and_delivery")
@@ -30,12 +30,12 @@ DOC_LABELS = {
 }
 
 
-def context(location, review_date, delivery_date, requirements=None, data=None):
-    """Everything a check needs besides the package. data = (rules, family_docs, checklist) for tests."""
+def context(location, review_date, delivery_date, requirements=None, data=None, lib=None):
+    """Everything a check needs besides the package. data = (rules, family_docs, checklist) and lib for tests."""
     rules, family_docs, checklist = data or tables()
     return {"location": location, "review_date": review_date, "delivery_date": delivery_date,
             "requirements": requirements or {}, "rules": rules, "family_docs": family_docs,
-            "checklist": checklist}
+            "checklist": checklist, "library": lib if lib is not None else library()}
 
 
 def result(check, verdict, reason, inputs=(), item=None, doc=None, rules=(), code=None, params=None,
@@ -97,10 +97,34 @@ def d1_required_documents(pkg, ctx):
                 out.append(result("D1", "pass", f"{label(row['document'])}: {', '.join(d['file'] for d in found)}",
                                   found, item=item["id"], rules=ids, blocking=blocking))
             else:
-                out.append(result("D1", "flag", f"no {label(row['document'])} names {item['model']}",
-                                  pkg["documents"], item=item["id"], rules=ids, code="D1.missing",
-                                  params={"item": item["model"], "doc_type": row["document"]}, blocking=blocking))
+                out.append(missing_document(pkg, ctx, item, row["document"], ids, blocking))
     return out
+
+
+def same_brand(entry, item):
+    return norm(entry["brand"]) == norm(item["brand"])
+
+
+def missing_document(pkg, ctx, item, doc_type, ids, blocking):
+    """A required document is not in the package. Say whether the manufacturer publishes it (MAF-11)."""
+    reason = f"no {label(doc_type)} names {item['model']}"
+    params = {"item": item["model"], "doc_type": doc_type}
+    published = [e for e in ctx["library"]["documents"]
+                 if e["doc_type"] == doc_type and same_brand(e, item) and covers(e, item)]
+    searched = [e for e in ctx["library"]["not_found"]
+                if e["doc_type"] == doc_type and same_brand(e, item) and covers(e, item)]
+    if published:
+        e = published[0]
+        reason += f"; the manufacturer publishes one, left out of the package: {e['title']}, p. {e['page']} ({e['url']})"
+        if e.get("notes"):
+            reason += f". Note: {e['notes']}"
+        return result("D1", "flag", reason, pkg["documents"] + published, item=item["id"], rules=ids,
+                      code="D1.published", params={**params, "where": e["title"], "url": e["url"]},
+                      blocking=blocking)
+    if searched:
+        reason += f"; not found on the manufacturer's site either (searched {searched[0]['searched_on']})"
+    return result("D1", "flag", reason, pkg["documents"], item=item["id"], rules=ids, code="D1.missing",
+                  params=params, blocking=blocking)
 
 
 def d2_declarations_match(pkg, ctx):

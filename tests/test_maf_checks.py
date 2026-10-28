@@ -216,3 +216,39 @@ def test_run_all_attaches_the_rule_status():
     results = c.run_all(pkg([PUMP], [SHEET, DECL]), ctx())
     d1 = next(r for r in results if r["check"] == "D1" and "EU-LVD-DOC" in r["rules"])
     assert d1["rule_status"]["EU-LVD-DOC"] == "to_confirm"
+
+
+# ---------------------------------------------------------------- MAF-11: manufacturer documents library
+
+LIB = {"documents": [{"brand": "Grundfos", "doc_type": "eu_declaration_of_conformity", "title": "DPK safety instructions",
+                      "covers": ["DPK"], "url": "https://example.org/dpk.pdf", "page": 11, "status": "extracted",
+                      "notes": None}],
+       "not_found": [{"brand": "FläktGroup", "doc_type": "eu_declaration_of_conformity", "covers": ["CAIRplus"],
+                      "searched_on": "2026-10-29"}]}
+
+
+def d1_declaration(item_):
+    context = c.context("RO", date(2026, 3, 16), date(2026, 4, 6), lib=LIB)
+    return next(r for r in c.d1_required_documents(pkg([item_], []), context)
+                if r["params"].get("doc_type") == "eu_declaration_of_conformity")
+
+
+def test_d1_says_when_the_manufacturer_publishes_the_missing_document():
+    dpk = item("I12", "pump", "DPK15803050D", "DPK")
+    dpk["brand"] = "Grundfos"
+    r = d1_declaration(dpk)
+    assert (r["would_be"], r["code"]) == ("flag", "D1.published")  # still a problem until it is attached
+    assert "https://example.org/dpk.pdf" in r["reason"]
+
+
+def test_d1_library_needs_the_same_brand():
+    other = item("I13", "pump", "DPK-1000", "DPK")
+    other["brand"] = "Wilo"
+    assert d1_declaration(other)["code"] == "D1.missing"
+
+
+def test_d1_says_when_the_manufacturer_site_was_searched_without_result():
+    ahu = item("I14", "ahu", "Z096096GBVA", "CAIRplus")
+    ahu["brand"] = "FläktGroup"
+    r = d1_declaration(ahu)
+    assert r["code"] == "D1.missing" and "searched 2026-10-29" in r["reason"]
