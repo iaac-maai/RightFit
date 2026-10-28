@@ -111,7 +111,8 @@ for r in results:
 problems = [r for r in results if r["would_be"] == "flag"]
 questions = [r for r in results if r["would_be"] == "unclear"]
 dismissed = [r for r in results if r.get("dismissed")]
-readings = [x for i in pkg["items"] for x in i["values"].values()] + pkg["documents"]
+pairs = [(d, m) for d in pkg["documents"] for m in d.get("matches", [])]
+readings = [x for i in pkg["items"] for x in i["values"].values()] + pkg["documents"] + [m for _, m in pairs]
 to_confirm = sum(x["status"] != "verified" for x in readings)
 ai_findings = pkg.get("ai_findings", [])
 accepted = [f for f in ai_findings if f["status"] == "accepted"]
@@ -217,6 +218,15 @@ with step2:
             "Listed in the form as": d["listed_as"] or "(not listed)", "Valid until": d["valid_until"] or "",
             "Pages": d["pages"], "Read from": d["method"]} for d in pkg["documents"]])
         docs_edit = st.data_editor(docs, hide_index=True, disabled=list(docs.columns[1:]), key=f"docs_{name}")
+        st.markdown("**Which document covers which product**")
+        st.caption("Matched by the AI. A range is enough for a declaration but not for a data sheet; "
+                   "'related' means the document is about the product without covering it.")
+        match_rows = pd.DataFrame([{
+            "Correct?": m["status"] == "verified", "Document": d["file"], "Product": items.get(m["item"], m["item"]),
+            "How": m["kind"], "Page": m["page"], "Quote from the document": m["quote"]} for d, m in pairs],
+            columns=["Correct?", "Document", "Product", "How", "Page", "Quote from the document"])
+        matches_edit = st.data_editor(match_rows, hide_index=True, disabled=list(match_rows.columns[1:]),
+                                      key=f"matches_{name}")
         edits = {}
         for item in pkg["items"]:
             st.markdown(f"**{items[item['id']]}**")
@@ -230,6 +240,8 @@ with step2:
         if st.form_submit_button(f"Save what I confirmed (as {REVIEWER})", type="primary"):
             for d, ok in zip(pkg["documents"], docs_edit["Correct?"]):
                 set_verified(d, bool(ok))
+            for (_, m), ok in zip(pairs, matches_edit["Correct?"]):
+                set_verified(m, bool(ok))
             for item in pkg["items"]:
                 for k, ok in zip(item["values"], edits[item["id"]]["Correct?"]):
                     set_verified(item["values"][k], bool(ok))

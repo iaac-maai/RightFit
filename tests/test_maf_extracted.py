@@ -68,3 +68,13 @@ def test_ai_findings_rest_on_cited_pages(path):
         assert set(f["items"]) <= items and f["evidence"] and f["suggested_comment"], f["id"]
         for e in f["evidence"]:
             assert e["source"] and e["page"] and len(e["quote"].split()) <= 15, f["id"]
+
+
+@pytest.mark.parametrize("path", PACKAGES, ids=lambda p: p.stem)
+def test_matches_name_real_items_with_a_cited_page(path):
+    pkg = json.loads(path.read_text())
+    items = {i["id"] for i in pkg["items"]}
+    for d in pkg["documents"]:
+        for m in d.get("matches", []):
+            assert m["item"] in items and m["kind"] in ("exact model", "range table row", "range", "related")
+            assert m["page"] and len(m["quote"].split()) <= 15, d["file"]

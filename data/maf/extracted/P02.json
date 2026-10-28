@@ -107,7 +107,17 @@
       "listed_as": "FISA TEHNICA CTA",
       "status": "extracted",
       "checked_by": null,
-      "notes": "one double-deck unit (1 pc), supply 9000 m3/h and return 7000 m3/h; printed with LPlus 5.72.0.8; page 30 is a separate humidifier casing drawing (3500 m3/h, LPlus 5.71.9.4, 2025-08-11); the header block of every page names people: keep it out of quotes"
+      "notes": "one double-deck unit (1 pc), supply 9000 m3/h and return 7000 m3/h; printed with LPlus 5.72.0.8; page 30 is a separate humidifier casing drawing (3500 m3/h, LPlus 5.71.9.4, 2025-08-11); the header block of every page names people: keep it out of quotes",
+      "matches": [
+        {
+          "item": "P02-1",
+          "kind": "exact model",
+          "page": 29,
+          "quote": "Type XES#AHUEZ096096GBVAA096096GBVA",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
@@ -133,7 +143,17 @@
       "listed_as": "FT UNITATE EXTERNA",
       "status": "extracted",
       "checked_by": null,
-      "notes": "range table; covers lists the brochure page 32 table only, page 31 shows another range table; image only, read from a rendered page"
+      "notes": "range table; covers lists the brochure page 32 table only, page 31 shows another range table; image only, read from a rendered page",
+      "matches": [
+        {
+          "item": "P02-2",
+          "kind": "range table row",
+          "page": 1,
+          "quote": "AVW-54HKFHH2",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Declaration of Conformity_ All Products_for 202403.pdf",
@@ -176,7 +196,25 @@
       "listed_as": null,
       "status": "extracted",
       "checked_by": null,
-      "notes": "covers transcribes only the L+ series (page 4) and the AHU kit HZX-BEJ line (page 8) of a 9-page model list; not listed in the form"
+      "notes": "covers transcribes only the L+ series (page 4) and the AHU kit HZX-BEJ line (page 8) of a 9-page model list; not listed in the form",
+      "matches": [
+        {
+          "item": "P02-2",
+          "kind": "exact model",
+          "page": 4,
+          "quote": "AVW-48HKFHH2, AVW-54HKFHH2",
+          "status": "extracted",
+          "checked_by": null
+        },
+        {
+          "item": "P02-3",
+          "kind": "exact model",
+          "page": 8,
+          "quote": "HZX-2BEJ, HZX-4BEJ, HZX-6BEJ, HZX-10BEJ, HZX-20BEJ, HZX-30BEJ",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Declaration of Conformity_Hisense AC_EN+IT - 20220506.pdf",
@@ -206,7 +244,8 @@
       "listed_as": "Declaratie conformitate HISENSE",
       "status": "extracted",
       "checked_by": null,
-      "notes": "matched to the form label by its page count (10); date printed on page 5, the file name says 20220506"
+      "notes": "matched to the form label by its page count (10); date printed on page 5, the file name says 20220506",
+      "matches": []
     },
     {
       "file": "AHU KIT HZX-6BEJ.pdf",
@@ -232,7 +271,17 @@
       "listed_as": "FT KIT AHU HISENSE",
       "status": "extracted",
       "checked_by": null,
-      "notes": "range table; image only"
+      "notes": "range table; image only",
+      "matches": [
+        {
+          "item": "P02-3",
+          "kind": "range table row",
+          "page": 1,
+          "quote": "HZX-6 BEJ",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "TUV.pdf",
@@ -255,7 +304,17 @@
       "listed_as": "TUV CTA",
       "status": "extracted",
       "checked_by": null,
-      "notes": "certifies the selection software, not the units"
+      "notes": "certifies the selection software, not the units",
+      "matches": [
+        {
+          "item": "P02-1",
+          "kind": "related",
+          "page": 1,
+          "quote": "RLT-Geräte-Auslegungs-Software „LPlus“",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "FG_Eurovent certificate for CAIRplus_certificates_en (1).pdf",
@@ -279,7 +338,17 @@
       "listed_as": "CERTIFICAT EUROVENT CTA",
       "status": "extracted",
       "checked_by": null,
-      "notes": "certificate 07.02.469, range CAIRplus; certified software LPlus 5.71.9.6/105, the data sheet was printed with LPlus 5.72.0.8"
+      "notes": "certificate 07.02.469, range CAIRplus; certified software LPlus 5.71.9.6/105, the data sheet was printed with LPlus 5.72.0.8",
+      "matches": [
+        {
+          "item": "P02-1",
+          "kind": "range",
+          "page": 1,
+          "quote": "Range Name / Nom de Gamme : CAIRplus",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "19.03 DX project +6C.pdf",
@@ -301,7 +370,25 @@
       "listed_as": "RAPORT DE SIMULARE 6grC",
       "status": "extracted",
       "checked_by": null,
-      "notes": "winter outdoor 6 °C DB"
+      "notes": "winter outdoor 6 °C DB",
+      "matches": [
+        {
+          "item": "P02-2",
+          "kind": "exact model",
+          "page": 4,
+          "quote": "54HKFHH2 Hisense pc 2 L+ Series(Eurovent)",
+          "status": "extracted",
+          "checked_by": null
+        },
+        {
+          "item": "P02-3",
+          "kind": "exact model",
+          "page": 4,
+          "quote": "HZX-6BEJ Hisense pc 2",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "19.03 DX project -15C.pdf",
@@ -323,7 +410,25 @@
       "listed_as": "RAPORT DE SIMULARE -15grC",
       "status": "extracted",
       "checked_by": null,
-      "notes": "winter outdoor -15 °C DB"
+      "notes": "winter outdoor -15 °C DB",
+      "matches": [
+        {
+          "item": "P02-2",
+          "kind": "exact model",
+          "page": 4,
+          "quote": "54HKFHH2 Hisense pc 2 L+ Series(Eurovent)",
+          "status": "extracted",
+          "checked_by": null
+        },
+        {
+          "item": "P02-3",
+          "kind": "exact model",
+          "page": 4,
+          "quote": "HZX-6BEJ Hisense pc 2",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     }
   ],
   "items": [

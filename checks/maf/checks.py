@@ -57,10 +57,32 @@ def norm(text):
     return re.sub(r"[^A-Z0-9]", "", str(text).upper())
 
 
-def covers(doc, item):
-    """True when a document names the item: one of its covers sits inside the item's model or range."""
+# How a document can cover a product (ingest/prompts/matching.md). "related" is not covering.
+COVERING = ("exact model", "range table row", "range")
+MARKED = ("exact model", "range table row")
+
+
+def matches(doc, item):
+    """How the document covers the item, as the AI matched it and the reviewer confirms it.
+
+    Documents the AI hasn't matched yet (library entries, new packages) fall back to comparing text:
+    one of the document's covers sits inside the item's model or range.
+    """
+    if "matches" in doc:
+        return [m for m in doc["matches"] if m["item"] == item["id"] and m["kind"] in COVERING]
     names = [norm(item["model"])] + ([norm(item["range"])] if item.get("range") else [])
-    return any(c and any(c in n for n in names) for c in map(norm, doc.get("covers", [])))
+    if any(c and any(c in n for n in names) for c in map(norm, doc.get("covers", []))):
+        return [{"item": item["id"], "kind": "exact model", "status": doc.get("status", "extracted")}]
+    return []
+
+
+def covers(doc, item):
+    return bool(matches(doc, item))
+
+
+def with_matches(docs, item):
+    """The documents plus their matches for the item: both must be confirmed before a check passes."""
+    return docs + [m for d in docs for m in matches(d, item)]
 
 
 def val(item, key):
@@ -95,7 +117,7 @@ def d1_required_documents(pkg, ctx):
             blocking = row["document"] == "data_sheet"
             if found:
                 out.append(result("D1", "pass", f"{label(row['document'])}: {', '.join(d['file'] for d in found)}",
-                                  found, item=item["id"], rules=ids, blocking=blocking))
+                                  with_matches(found, item), item=item["id"], rules=ids, blocking=blocking))
             else:
                 out.append(missing_document(pkg, ctx, item, row["document"], ids, blocking))
     return out
@@ -136,9 +158,11 @@ def d2_declarations_match(pkg, ctx):
     ids = active_ids("EU-MACH-DOC;EU-MACH-REG;EU-LVD-DOC", ctx["rules"], ctx["review_date"])
     out = []
     for d in decls:
-        named = [i["model"] for i in pkg["items"] if covers(d, i)]
+        named = [i for i in pkg["items"] if covers(d, i)]
         if named:
-            out.append(result("D2", "pass", f"{d['file']} names {', '.join(named)}", [d], doc=d["file"], rules=ids))
+            inputs = [d] + [m for i in named for m in matches(d, i)]
+            out.append(result("D2", "pass", f"{d['file']} names {', '.join(i['model'] for i in named)}", inputs,
+                              doc=d["file"], rules=ids))
             continue
         reason = f"{d['file']} names {', '.join(d['covers'])}, none of the submitted items"
         if without:
@@ -342,8 +366,14 @@ def e1_ecodesign(pkg, ctx):
 
 def _cl01(item, pkg, ctx):
     sheets = [d for d in pkg["documents"] if d["doc_type"] == "data_sheet" and covers(d, item)]
+    marked = [(d, m) for d in sheets for m in matches(d, item) if m["kind"] in MARKED]
+    if marked:
+        d, m = marked[0]
+        return "pass", f"{m['kind']} in {d['file']}", [d, m], {}
     if sheets:
-        return "pass", f"named in {sheets[0]['file']}", sheets, {}
+        # The register returned a data sheet for a whole range with nothing marked (R01).
+        return "missing", f"{sheets[0]['file']} covers only the range; the model is not marked", \
+            with_matches(sheets, item), {}
     return "missing", "no data sheet names the model", pkg["documents"], {}
 
 

@@ -42,7 +42,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | ID | Task | Type | Who | Status |
 |---|---|---|---|---|
 | 2.1 | List every file with pages, text layer and language | Data | AI reader | Done (`data/maf/packages.csv`) |
-| 2.2 | Say what each document is and which models it names, never from the file name | AI + Human | AI reader, Luca checks | Read, not verified |
+| 2.2 | Say what each document is and which products it covers, and how (exact model, range table, range), never from the file name | AI + Human | AI reader, Luca checks | Read and matched, not verified |
 | 2.3 | Read the values each family needs, with page and a short quote | AI + Human | AI reader, Luca checks | Read, not verified |
 | 2.4 | Mark a value that isn't there as `unclear`, with where we looked | Rule | AI reader | Done |
 | 2.5 | Verify each value in the app | Human | Luca | Not started |

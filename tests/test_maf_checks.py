@@ -252,3 +252,31 @@ def test_d1_says_when_the_manufacturer_site_was_searched_without_result():
     ahu["brand"] = "FläktGroup"
     r = d1_declaration(ahu)
     assert r["code"] == "D1.missing" and "searched 2026-10-29" in r["reason"]
+
+
+# ---------------------------------------------------------------- AI matching of documents to products
+
+def matched(doc_, item_id, kind, status="verified"):
+    return {**doc_, "matches": [{"item": item_id, "kind": kind, "page": 1, "quote": "", "status": status}]}
+
+
+def test_ai_matches_replace_text_matching():
+    # The text would match ("Unilift AP" is the range), but the AI says it is only related.
+    assert not c.covers(matched(DECL, "I1", "related"), PUMP)
+    assert c.covers(matched(doc("x.pdf", "eu_declaration_of_conformity", []), "I1", "range"), PUMP)
+    assert c.covers(SHEET, PUMP)  # no AI matches yet: falls back to the text
+
+
+def test_a_data_sheet_for_the_range_only_is_flagged_by_the_checklist():
+    range_sheet = matched(SHEET, "I1", "range")
+    r = checklist_row(c.c_checklist(pkg([PUMP], [range_sheet]), ctx()), "CL-01")
+    assert r["result"] == "flag" and "covers only the range" in r["reason"]
+    table_sheet = matched(SHEET, "I1", "range table row")
+    assert checklist_row(c.c_checklist(pkg([PUMP], [table_sheet]), ctx()), "CL-01")["result"] == "pass"
+
+
+def test_a_match_waits_for_the_reviewer_like_any_value():
+    unconfirmed = matched(SHEET, "I1", "exact model", status="extracted")
+    d1 = c.d1_required_documents(pkg([PUMP], [unconfirmed, DECL]), ctx())
+    sheet = next(r for r in d1 if "data sheet" in r["reason"])
+    assert (sheet["result"], sheet["would_be"]) == ("unclear", "pass")

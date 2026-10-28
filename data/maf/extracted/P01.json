@@ -97,7 +97,8 @@
       "listed_as": "Declaratie de conformitate SLV1",
       "status": "extracted",
       "checked_by": null,
-      "notes": "image only (no text layer); 2 pages, the form says 1; LVD part applies below 2.2 kW rated power; valid only as part of the safety instructions (publication 98938948)"
+      "notes": "image only (no text layer); 2 pages, the form says 1; LVD part applies below 2.2 kW rated power; valid only as part of the safety instructions (publication 98938948)",
+      "matches": []
     },
     {
       "file": "Declaration of conformity_Unilift AP.PDF",
@@ -125,7 +126,25 @@
       "listed_as": "Declaratie de conformitate Unilift AP",
       "status": "extracted",
       "checked_by": null,
-      "notes": "2 pages, the form says 1; LVD part applies only to pumps with at least 10 m supply cable; valid only as part of the safety instructions (publication 99084629 0719)"
+      "notes": "2 pages, the form says 1; LVD part applies only to pumps with at least 10 m supply cable; valid only as part of the safety instructions (publication 99084629 0719)",
+      "matches": [
+        {
+          "item": "P01-3",
+          "kind": "range",
+          "page": 1,
+          "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
+          "status": "extracted",
+          "checked_by": null
+        },
+        {
+          "item": "P01-4",
+          "kind": "range",
+          "page": 1,
+          "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
@@ -147,7 +166,17 @@
       "listed_as": "FT UNILIFT_AP1240063",
       "status": "extracted",
       "checked_by": null,
-      "notes": null
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-4",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "UNILIFT AP12.40.06.3",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
@@ -169,7 +198,17 @@
       "listed_as": "FT UNILIFT_AP1250113",
       "status": "extracted",
       "checked_by": null,
-      "notes": null
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-3",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "UNILIFT AP12.50.11.3",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
@@ -191,7 +230,17 @@
       "listed_as": "FT Hydro Multi-E 2 CME 15-2 U2",
       "status": "extracted",
       "checked_by": null,
-      "notes": null
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-1",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     },
     {
       "file": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
@@ -213,7 +262,17 @@
       "listed_as": "FT DPK15803050D",
       "status": "extracted",
       "checked_by": null,
-      "notes": "pages 5 and 10 show a control panel wiring diagram"
+      "notes": "pages 5 and 10 show a control panel wiring diagram",
+      "matches": [
+        {
+          "item": "P01-2",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "DPK.15.80.30.5.0D",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
     }
   ],
   "items": [
