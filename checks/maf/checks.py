@@ -41,7 +41,10 @@ def context(location, review_date, delivery_date, requirements=None, data=None):
 def result(check, verdict, reason, inputs=(), item=None, doc=None, rules=(), code=None, params=None,
            blocking=False):
     r = {"check": check, "item": item, "doc": doc, "result": verdict, "would_be": verdict, "reason": reason,
-         "rules": list(rules), "code": code, "params": params or {}, "blocking": blocking}
+         "rules": list(rules), "code": code, "params": params or {}, "blocking": blocking,
+         # Where the reviewer can look: pages of the values used, or the documents when there are only a few.
+         "sources": sorted({f"{i['source']}, p. {i['page']}" for i in inputs if i.get("source")}
+                           | ({i["file"] for i in inputs if "file" in i} if len(inputs) <= 3 else set()))}
     # AGENTS.md rule 3: pass or flag only on verified inputs; otherwise unclear until someone verifies.
     if verdict in ("pass", "flag") and any(i.get("status") != "verified" for i in inputs):
         r["result"] = "unclear"

@@ -1,6 +1,7 @@
-"""RightFit MAF checker: a draft review of a material approval form. The reviewer decides.
+"""RightFit MAF review page. Run from the repository root:  streamlit run app/maf_app.py
 
-Run from the repository root:  streamlit run app/maf_app.py
+The page follows the reviewer's work: read the draft answer, go through the problems, confirm what the AI
+read, copy the answer. Everything is a draft; the reviewer decides.
 """
 import json
 import sys
@@ -12,16 +13,35 @@ import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from checks.maf.checks import context, run_all  # noqa: E402
+from checks.maf.checks import DOC_LABELS, context, run_all  # noqa: E402
 from checks.maf.status import LABELS, draft_status  # noqa: E402
 from explain.maf_comments import comment  # noqa: E402
 
 EXTRACTED = ROOT / "data/maf/extracted"
-# shortcut: one reviewer name for every verification; add a login when more reviewers use the app.
+# shortcut: one reviewer name for every confirmation; add a login when more reviewers use the app.
 REVIEWER = "Luca"
-GROUPS = {"D": "Documents", "V": "Values", "E": "Ecodesign", "C": "Checklist", "R": "Location reminders"}
+CHECK_NAMES = {"D1": "Required documents", "D2": "Declaration matches the products", "D3": "Certificate in date",
+               "D4": "Attachment is what the form says", "V1": "Duty point", "V2": "Pressure rating",
+               "E1": "Ecodesign", "C": "Reviewers' checklist", "R": "Delivery reminder"}
+VALUE_NAMES = {"used_for": "Used for (form)", "duty_flow": "Required flow (form)", "duty_head": "Required head (form)",
+               "duty_airflow_supply": "Required supply airflow (form)",
+               "duty_airflow_extract": "Required extract airflow (form)", "flow": "Flow at the duty point",
+               "head": "Head at the duty point", "power": "Motor power", "max_pressure": "Max working pressure",
+               "controller_included": "Controller or panel included", "bms_included": "BMS module included",
+               "bms_protocol": "BMS protocols", "hrs_type": "Heat recovery type",
+               "hrs_efficiency": "Heat recovery efficiency", "sfp_int": "SFPint", "sfp_int_limit": "SFPint limit",
+               "gwp": "GWP", "seer": "SEER", "scop": "SCOP", "dx_refrigerant": "DX coil refrigerant"}
+VERDICT = {"pass": "OK", "flag": "Problem", "unclear": "Question", "info": "Info"}
 
-st.set_page_config(page_title="RightFit · MAF checker", layout="wide")
+st.set_page_config(page_title="RightFit · MAF review", layout="wide")
+
+
+def value_name(key):
+    return VALUE_NAMES.get(key, key.replace("_", " ").capitalize())
+
+
+def key_of(r):
+    return "|".join(str(x) for x in (r["check"], r["item"], r["doc"], ",".join(r["rules"]), r["code"]))
 
 
 def save(pkg):
@@ -29,7 +49,7 @@ def save(pkg):
 
 
 def set_verified(entry, verified):
-    """Mark a value or document verified by the reviewer, or put it back to what the reader left."""
+    """Mark a value or document as confirmed by the reviewer, or put it back to what the AI left."""
     if verified == (entry["status"] == "verified"):
         return
     has_value = entry.get("value") not in (None, "") if "value" in entry else True
@@ -38,126 +58,152 @@ def set_verified(entry, verified):
     entry["verified_on"] = date.today().isoformat() if verified else None
 
 
-def key(r):
-    return "|".join(str(x) for x in (r["check"], r["item"], r["doc"], ",".join(r["rules"]), r["code"]))
+# ---------------------------------------------------------------- choose the package
+packages = {p.stem: json.loads(p.read_text()) for p in sorted(EXTRACTED.glob("*.json"))}
 
-
-# ---------------------------------------------------------------- settings
-names = sorted(p.stem for p in EXTRACTED.glob("*.json"))
-pkg = json.loads((EXTRACTED / f"{st.sidebar.selectbox('Package', names)}.json").read_text())
-form = pkg["form"]
-location = st.sidebar.radio("Location", ["RO", "ES"], horizontal=True)
+st.title("MAF review")
+st.caption("The AI read the documents, fixed rules checked them, and you decide. Nothing here is approved until "
+           "you sign.")
+name = st.radio("Which package?", list(packages), horizontal=True, format_func=lambda n: (
+    f"{n} · form {packages[n]['form']['form_no']} rev {packages[n]['form']['revision']} · "
+    + ", ".join(i["name"] for i in packages[n]["items"])))
+pkg, form = packages[name], packages[name]["form"]
 form_date = date.fromisoformat(form["date"])
-review = st.sidebar.date_input("Review date", form_date)
-delivery = st.sidebar.date_input("Delivery date", form_date + timedelta(weeks=form["delivery_weeks"] or 0),
-                                 help=f"Form: {form['delivery_raw']}")
-overrides = st.session_state.setdefault("overrides", {})
 
+with st.expander("Location and dates"):
+    c1, c2, c3 = st.columns(3)
+    location = c1.radio("Project location", ["RO", "ES"], horizontal=True,
+                        format_func={"RO": "Romania", "ES": "Spain"}.get)
+    review = c2.date_input("Review date", form_date)
+    delivery = c3.date_input("Expected delivery", form_date + timedelta(weeks=form["delivery_weeks"] or 0),
+                             help=f"From the form: {form['delivery_raw']}")
+
+# ---------------------------------------------------------------- run the checks
 results = run_all(pkg, context(location, review, delivery))
-item_names = {i["id"]: f"{i['id']} {i['model']}" for i in pkg["items"]}
-
-# ---------------------------------------------------------------- header
-st.title(f"MAF {form['form_no']} rev {form['revision']} · {', '.join(i['name'] for i in pkg['items'])}")
-st.caption(f"Form date {form['date']} · sample sent: {form['sample_sent']} · signers (roles): "
-           f"{', '.join(form['signers'])} · discipline, works group and BOQ line as written on the form: "
-           f"{form['discipline']} / {form['works_group']} / {form['boq_ref']}")
-status_box = st.container(border=True)
-
-# ---------------------------------------------------------------- documents and values
-st.subheader("Documents")
-st.caption("Read by the AI reader (AI output). Document types and values stay 'extracted' until the reviewer "
-           "verifies them; checks pass or flag only on verified inputs. Quotes stay in the language of the source "
-           "document.")
-with st.form("verify"):
-    docs = pd.DataFrame([{"verified": d["status"] == "verified", "file": d["file"], "type found": d["doc_type"],
-                          "listed as": d["listed_as"] or "(not listed)", "covers": ", ".join(d["covers"]),
-                          "valid until": d["valid_until"] or "", "pages": d["pages"], "method": d["method"],
-                          "notes": d["notes"] or ""} for d in pkg["documents"]])
-    docs_edit = st.data_editor(docs, hide_index=True, disabled=list(docs.columns[1:]), key=f"docs_{pkg['package']}")
-
-    st.subheader("Values per item")
-    value_edits = {}
-    for item in pkg["items"]:
-        st.markdown(f"**{item_names[item['id']]}** · {item['name']} · {item['family']} · {item['brand']}")
-        rows = pd.DataFrame([{"verified": x["status"] == "verified", "value name": k,
-                              "value": "" if x["value"] is None else str(x["value"]), "unit": x["unit"] or "",
-                              "source": x["source"] or "", "page": str(x["page"] or ""), "quote": x["quote"] or "",
-                              "status": x["status"], "note": x["note"] or ""} for k, x in item["values"].items()])
-        value_edits[item["id"]] = st.data_editor(rows, hide_index=True, disabled=list(rows.columns[1:]),
-                                                 key=f"values_{item['id']}")
-    if st.form_submit_button(f"Save verifications (checked_by {REVIEWER})"):
-        for d, verified in zip(pkg["documents"], docs_edit["verified"]):
-            set_verified(d, bool(verified))
-        for item in pkg["items"]:
-            for k, verified in zip(item["values"], value_edits[item["id"]]["verified"]):
-                set_verified(item["values"][k], bool(verified))
-        save(pkg)
-        st.rerun()
-
-with st.expander("Reader's notes outside the checks (AI output, for the reviewer to judge)"):
-    for note in pkg.get("notes_for_reviewer", []):
-        st.markdown(f"- {note}")
-
-# ---------------------------------------------------------------- checks
-st.subheader("Checks")
-for group, title in GROUPS.items():
-    rows = [r for r in results if r["check"][0] == group]
-    if not rows:
-        continue
-    st.markdown(f"**{group} · {title}**")
-    table = pd.DataFrame([{
-        "key": f"{pkg['package']}|{key(r)}", "check": r["check"],
-        "about": item_names.get(r["item"]) or r["doc"] or "package",
-        "result": r["result"] if r["result"] == r["would_be"] else f"{r['result']} (would be {r['would_be']})",
-        "reason": r["reason"],
-        "rules": ", ".join(f"{i} ({r['rule_status'].get(i, 'checklist')})" for i in r["rules"]),
-        "override": overrides.get(f"{pkg['package']}|{key(r)}", {}).get("override", ""),
-        "note": overrides.get(f"{pkg['package']}|{key(r)}", {}).get("note", ""),
-    } for r in rows])
-    edited = st.data_editor(
-        table, hide_index=True, key=f"checks_{pkg['package']}_{location}_{group}",
-        disabled=["check", "about", "result", "reason", "rules"],
-        column_config={"key": None, "override": st.column_config.SelectboxColumn(
-            options=["", "pass", "flag", "unclear", "info"])})
-    for row in edited.itertuples():
-        if row.override or row.note:
-            overrides[row.key] = {"override": row.override, "note": row.note}
-        else:
-            overrides.pop(row.key, None)
-
-# Overrides apply after the tables are read, so the status and comments see this run's edits.
+items = {i["id"]: f"{i['name']} ({i['model']})" for i in pkg["items"]}
 for r in results:
-    o = overrides.get(f"{pkg['package']}|{key(r)}")
-    if o and o["override"]:
-        r["result"] = r["would_be"] = o["override"]
-        r["reason"] += f" [override: {o['note']}]"
+    r["key"] = f"dismiss|{name}|{key_of(r)}"
+    # A problem the reviewer marked "not a problem" counts as OK from here on, with the reason kept.
+    if st.session_state.get(r["key"]):
+        r["result"] = r["would_be"] = "pass"
+        r["reason"] += f" [not a problem for the reviewer: {st.session_state.get(r['key'] + '|why') or 'no reason'}]"
+        r["dismissed"] = True
 
-# ---------------------------------------------------------------- draft status (filled at the top)
-with status_box:
-    now, reasons = draft_status(results)
-    later, _ = draft_status(results, "would_be")
-    st.markdown(f"### Draft status: {now} · {LABELS[now]}")
-    st.caption("Draft, the reviewer decides. 'Not approved' and 'Sample requested' are the reviewer's choice only.")
-    if later != now:
-        st.warning(f"Once the extracted values are verified as read: {later} · {LABELS[later]}")
-    with st.expander(f"Why {now} ({len(reasons)} reasons)"):
-        for reason in reasons:
-            st.markdown(f"- {reason}")
+problems = [r for r in results if r["would_be"] == "flag"]
+questions = [r for r in results if r["would_be"] == "unclear"]
+dismissed = [r for r in results if r.get("dismissed")]
+readings = [x for i in pkg["items"] for x in i["values"].values()] + pkg["documents"]
+to_confirm = sum(x["status"] != "verified" for x in readings)
+letter, _ = draft_status(results, "would_be")
 
-# ---------------------------------------------------------------- comments and exports
-st.subheader("Draft comments")
-lines = list(dict.fromkeys(c for c in (comment(r) for r in results) if c))
-st.caption("Built from templates and the values above; a language model may only rephrase them.")
-st.code("\n".join(f"{n}. {line}" for n, line in enumerate(lines, 1)) or "(no comments)", language=None,
-        wrap_lines=True)
+# ---------------------------------------------------------------- the draft answer
+colour = {"A": "green", "B": "orange", "C": "red"}[letter]
+with st.container(border=True):
+    st.markdown(f"## Draft answer: :{colour}[{letter} · {LABELS[letter]}]")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Problems to fix", len(problems))
+    m2.metric("Questions for the contractor", len(questions))
+    m3.metric("Checks passed", sum(r["would_be"] == "pass" for r in results))
+    m4.metric("Readings to confirm", f"{to_confirm} of {len(readings)}")
+    if to_confirm:
+        st.caption("This draft rests on what the AI read. Confirm the readings in step 2: a check only counts as "
+                   "passed once the values behind it are confirmed.")
 
-st.subheader("Exports")
-mine = [{"key": k, **v} for k, v in overrides.items() if k.startswith(f"{pkg['package']}|")]
-st.download_button("overrides.csv", pd.DataFrame(mine, columns=["key", "override", "note"]).to_csv(index=False),
-                   f"{pkg['package']}_overrides.csv")
-approved = [{"item": item_names[i["id"]], "value name": k, "value": x["value"], "unit": x["unit"],
-             "source": x["source"], "page": x["page"]}
-            for i in pkg["items"] for k, x in i["values"].items() if x["status"] == "verified"]
-st.download_button("approved_values.csv",
-                   pd.DataFrame(approved, columns=["item", "value name", "value", "unit", "source", "page"])
-                   .to_csv(index=False), f"{pkg['package']}_approved_values.csv")
+step1, step2, step3, everything = st.tabs(["1 · Problems found", "2 · Confirm what the AI read",
+                                            "3 · Answer to send", "Everything that was checked"])
+
+# ---------------------------------------------------------------- step 1: problems
+with step1:
+    if not problems and not questions:
+        st.success("No problems and no questions.")
+    for item_id in [*items, None]:
+        mine = [r for r in problems + questions if r["item"] == item_id]
+        if not mine:
+            continue
+        st.subheader(items.get(item_id, "Documents of the package"))
+        for r in mine:
+            with st.container(border=True):
+                left, right = st.columns([5, 1])
+                tag = ":red[**Problem**]" if r["would_be"] == "flag" else ":orange[**Question**]"
+                left.markdown(f"{tag} · {CHECK_NAMES[r['check']]}")
+                left.markdown(comment(r) or r["reason"])
+                rules = ", ".join(f"{i} ({r['rule_status'].get(i, 'checklist')})" for i in r["rules"])
+                left.caption(f"Why: {r['reason']}"
+                             + (f" · Look at: {'; '.join(r['sources'])}" if r["sources"] else "")
+                             + (f" · Rule: {rules}" if rules else ""))
+                right.checkbox("Not a problem", key=r["key"])
+    if dismissed:
+        st.subheader("Marked as not a problem")
+        for r in dismissed:
+            with st.container(border=True):
+                left, right = st.columns([5, 1])
+                left.markdown(f"~~{CHECK_NAMES[r['check']]}: {items.get(r['item'], r['doc'] or '')}~~")
+                left.text_input("Why is it not a problem?", key=r["key"] + "|why")
+                right.checkbox("Not a problem", key=r["key"])
+
+    notes = pkg.get("notes_for_reviewer", [])
+    if notes:
+        st.subheader("The AI also noticed")
+        st.caption("No rule checks these. They are the AI's reading, for you to judge.")
+        for note in notes:
+            st.markdown(f"- {note}")
+
+# ---------------------------------------------------------------- step 2: confirm the reading
+with step2:
+    st.write("Tick each line you have checked against the document. Unticked lines stay as the AI read them.")
+    with st.form("confirm"):
+        st.markdown("**Documents**")
+        docs = pd.DataFrame([{
+            "Correct?": d["status"] == "verified", "Document": d["file"],
+            "What it is": DOC_LABELS.get(d["doc_type"], d["doc_type"]), "Names": ", ".join(d["covers"]),
+            "Listed in the form as": d["listed_as"] or "(not listed)", "Valid until": d["valid_until"] or "",
+            "Pages": d["pages"], "Read from": d["method"]} for d in pkg["documents"]])
+        docs_edit = st.data_editor(docs, hide_index=True, disabled=list(docs.columns[1:]), key=f"docs_{name}")
+        edits = {}
+        for item in pkg["items"]:
+            st.markdown(f"**{items[item['id']]}**")
+            rows = pd.DataFrame([{
+                "Correct?": x["status"] == "verified", "What": value_name(k),
+                "Value": "not found" if x["value"] in (None, "") else str(x["value"]), "Unit": x["unit"] or "",
+                "Page": str(x["page"] or ""), "Quote from the document": x["quote"] or "",
+                "File": x["source"] or "", "Note": x["note"] or ""} for k, x in item["values"].items()])
+            edits[item["id"]] = st.data_editor(rows, hide_index=True, disabled=list(rows.columns[1:]),
+                                               key=f"values_{item['id']}")
+        if st.form_submit_button(f"Save what I confirmed (as {REVIEWER})", type="primary"):
+            for d, ok in zip(pkg["documents"], docs_edit["Correct?"]):
+                set_verified(d, bool(ok))
+            for item in pkg["items"]:
+                for k, ok in zip(item["values"], edits[item["id"]]["Correct?"]):
+                    set_verified(item["values"][k], bool(ok))
+            save(pkg)
+            st.rerun()
+
+# ---------------------------------------------------------------- step 3: the answer
+with step3:
+    lines = list(dict.fromkeys(c for c in (comment(r) for r in results) if c))
+    answer = (f"MAF {form['form_no']} rev {form['revision']}: {LABELS[letter]} ({letter})\n\n"
+              + ("\n".join(f"{n}. {line}" for n, line in enumerate(lines, 1)) or "No comments."))
+    st.write("Copy the answer with the button in the top right corner of the box, or download it.")
+    st.code(answer, language=None, wrap_lines=True)
+    c1, c2, c3 = st.columns(3)
+    c1.download_button("Download the answer", answer, f"{name}_answer.txt")
+    approved = [{"item": items[i["id"]], "value": value_name(k), "reading": x["value"], "unit": x["unit"],
+                 "file": x["source"], "page": x["page"]}
+                for i in pkg["items"] for k, x in i["values"].items() if x["status"] == "verified"]
+    c2.download_button("Download confirmed values", pd.DataFrame(
+        approved, columns=["item", "value", "reading", "unit", "file", "page"]).to_csv(index=False),
+        f"{name}_approved_values.csv", help="For the certification consultant and the O&M file")
+    c3.download_button("Download what I marked as not a problem", pd.DataFrame(
+        [{"check": r["check"], "about": items.get(r["item"], r["doc"]),
+          "why": st.session_state.get(r["key"] + "|why", "")} for r in dismissed],
+        columns=["check", "about", "why"]).to_csv(index=False), f"{name}_overrides.csv")
+
+# ---------------------------------------------------------------- everything
+with everything:
+    st.caption("Every check the tool ran on this package. It does not check coordination with the architecture, "
+               "whether the design is approved, the client's brand preferences, or whether the equipment fits on "
+               "site.")
+    st.dataframe(pd.DataFrame([{
+        "Check": CHECK_NAMES[r["check"]], "About": items.get(r["item"], r["doc"] or "package"),
+        "Result": VERDICT[r["would_be"]] + ("" if r["result"] == r["would_be"] else " (reading not confirmed)"),
+        "Why": r["reason"], "Rule": ", ".join(r["rules"])} for r in results]), hide_index=True)
