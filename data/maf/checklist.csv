@@ -1,0 +1,13 @@
+id,family,item,how_to_check,if_missing,blocking,source_rows,note
+CL-01,all,the data sheet marks the exact model or range,"the data sheet names the form model, or marks it in a range table",Flag,no,R01,
+CL-02,all,certificates and technical approvals are in date on the review date and at delivery,valid_until against the review and delivery dates (check D3),Flag,no,R04,
+CL-03,all,the MAF says where each product is used,form field used_for filled for every item,Flag,no,R09,the reviewer also asked for the designer's written opinion
+CL-04,all,"every component of the BOQ line is submitted, accessories included",items against the BOQ line; no BOQ given: Unclear,Flag,no,R31;R66,
+CL-05,pipe,maximum working pressure stated and at least the design pressure,PN in the data sheet against the requirement,Flag,no,R10,
+CL-06,support,fixed points for vertical and horizontal runs,a fixed point solution in the package,Flag,yes,R11;R12,
+CL-07,roof_drain_heated,defrost design and control diagram,both in the package,Flag,yes,R68,
+CL-08,pump;ahu;meter,"BMS communication stated and included, not optional",protocol or module named as included,Flag,no,R59;R52,
+CL-09,pump,a control panel listed for pump groups that need one,a controller or panel among the items or in the data sheet as included,Flag,no,R59,Luca says which pump groups need one
+CL-10,visible_item,colour and position approved by the architect,visible items are routed to the architect,Info,no,R05;R08;R50;R51,
+CL-11,all,delivery documents reminder for the location,always shown for RO and ES,Info,no,R03;R04;R07;R10;R11;R13,"see RO-PRACTICE-DELIVERY, ES-CTE-7-2, ES-RITE-20"
+CL-12,pump;ahu;fan,"electrical data stated: voltage, power, starting method",values present in the data sheet,Flag,no,R34,the reviewer asked for the starting method of the jet fans
