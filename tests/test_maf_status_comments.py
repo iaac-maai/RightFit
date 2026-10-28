@@ -38,3 +38,11 @@ def test_no_comment_for_a_pass_waiting_for_verification_but_one_for_a_flag():
 
 def test_no_comment_without_a_template():
     assert comment(result("E1", "unclear", "no rule for this location")) is None
+
+
+def test_an_accepted_ai_suggestion_makes_an_a_into_a_b():
+    results = [result("V1", "pass", "x"), result("R", "info", "y")]
+    assert draft_status(results, accepted=["Refrigerant differs"]) == (
+        "B", ["AI suggestion added to the answer: Refrigerant differs"])
+    blocking = [result("D1", "flag", "no data sheet", blocking=True)]
+    assert draft_status(blocking, accepted=["x"])[0] == "C"

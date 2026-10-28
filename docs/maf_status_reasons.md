@@ -34,6 +34,7 @@ Every reason below stays in the draft until the reviewer marks it as not a probl
 | Not every component of the BOQ line is submitted | C, CL-04 | R31, R66. With no BOQ line given, this stays an open question. | Confirm that the accessories are included |
 | A value the AI read isn't confirmed yet | any | A check can't pass on a value nobody has checked (principle 3). | Nothing; the reviewer confirms the reading |
 | A value isn't in the documents | any | The tool never guesses a missing value. | Send the value, or the document that has it |
+| An AI suggestion you added to your answer | AI | The second AI reviewer only proposes; once you add a suggestion it is your note, so the package can't be A. | Answer the comment |
 
 ## Information only, no effect on the status
 

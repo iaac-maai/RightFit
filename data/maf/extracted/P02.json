@@ -850,14 +850,156 @@
     }
   ],
   "notes_for_reviewer": [
-    "The form lists Z096096GBVA 9000 m3/h and A096096GBVA 7000 m3/h like two AHUs; the data sheet shows one double-deck unit (1 pc) with supply 9000 and return 7000 m3/h. Luca confirmed it is one unit.",
-    "Refrigerant: the AHU DX coil is selected for R32 (data sheet p. 18); the outdoor unit sheet and both DX reports give R410A.",
-    "DX heating: the coil target is 38.2 kW at -15 °C outdoor (p. 18, after heat recovery); the -15 °C report gives 12.67 kW per outdoor unit. The sheet also lists an electrical reheater (p. 4).",
-    "The steam humidifier (p. 23) is 'not suitable for outdoor installation'; the unit is for outdoor installation (p. 5). Page 30 is a separate humidifier casing (3500 m3/h) dated 2025-08-11.",
-    "The 10-page HISENSE declaration listed in the form is a 2021 declaration for residential splits; the 9-page 2024 declaration that names AVW-54HKFHH2 and HZX-6BEJ is in the package but not in the form.",
-    "TÜV.pdf certifies the LPlus selection software (valid until 30.06.2026), not the units.",
-    "Eurovent certificate valid until 30.09.2026; certified software LPlus 5.71.9.6/105, the data sheet was printed with LPlus 5.72.0.8.",
-    "DX kit: allowed heat exchanger volume 1.92-3.89 dm3 per kit; the coil holds 5 l over 2 circuits (p. 17).",
-    "No EU declaration of conformity for the AHU."
+    "The form lists Z096096GBVA 9000 m3/h and A096096GBVA 7000 m3/h like two AHUs; the data sheet shows one double-deck unit (1 pc) with supply 9000 and return 7000 m3/h. Luca confirmed it is one unit."
+  ],
+  "ai_findings": [
+    {
+      "id": "P02-AI1",
+      "items": [
+        "P02-1",
+        "P02-2"
+      ],
+      "kind": "problem",
+      "title": "Refrigerant differs between the AHU coil and the outdoor units",
+      "finding": "The AHU data sheet sizes the DX coil for R32; the outdoor unit sheet and both DX reports use R410A.",
+      "evidence": [
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 18,
+          "quote": "type of refrigerant R32"
+        },
+        {
+          "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
+          "page": 1,
+          "quote": "Refrigerant Type R410A"
+        },
+        {
+          "source": "19.03 DX project +6C.pdf",
+          "page": 5,
+          "quote": "REFRIG.：R410A"
+        }
+      ],
+      "suggested_comment": "The DX coil is selected for R32 while the outdoor units use R410A; please send a coil selection for R410A or confirm the refrigerant.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P02-AI2",
+      "items": [
+        "P02-1",
+        "P02-2"
+      ],
+      "kind": "question",
+      "title": "DX heating at -15 °C below the coil target",
+      "finding": "The coil needs 38.2 kW in heating at the winter design point; the -15 °C report gives 12.67 kW per outdoor unit, 25.3 kW for the two. The AHU also has an electric reheater, which may cover the rest.",
+      "evidence": [
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 18,
+          "quote": "Target kW 38.2"
+        },
+        {
+          "source": "19.03 DX project -15C.pdf",
+          "page": 5,
+          "quote": "System actual heating capacity (W) 12666"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 4,
+          "quote": "Electrical reheater Yes"
+        }
+      ],
+      "suggested_comment": "Please show how the heating demand of the AHU is met at -15 °C (DX capacity and electric reheater).",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P02-AI3",
+      "items": [
+        "P02-1"
+      ],
+      "kind": "question",
+      "title": "Steam humidifier on an outdoor unit",
+      "finding": "The AHU is for outdoor installation, but the steam humidifier must be indoors or in a weatherproof casing. A separate humidifier casing (3500 m³/h, dated 2025) is on the last page and not in the form.",
+      "evidence": [
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 5,
+          "quote": "Installation site: Outdoor installation"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 23,
+          "quote": "Humidifier is not suitable for outdoor installation, must be installed in a nearby room"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 30,
+          "quote": "Z096128VBVA 3500 m³/h"
+        }
+      ],
+      "suggested_comment": "Please state where the steam humidifier is installed and whether the humidifier casing on the last page of the data sheet is part of the supply.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P02-AI4",
+      "items": [
+        "P02-1"
+      ],
+      "kind": "question",
+      "title": "Selection software newer than the certified version",
+      "finding": "The Eurovent certificate lists LPlus 5.71.9.6/105; the AHU data sheet was printed with LPlus 5.72.0.8.",
+      "evidence": [
+        {
+          "source": "FG_Eurovent certificate for CAIRplus_certificates_en (1).pdf",
+          "page": 2,
+          "quote": "LPlus 5.71.9.6/105"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 2,
+          "quote": "LPlus V.5.72.0.8/3/19/2026"
+        }
+      ],
+      "suggested_comment": "Please confirm that the AHU selection is covered by the Eurovent certified software version.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P02-AI5",
+      "items": [
+        "P02-1",
+        "P02-3"
+      ],
+      "kind": "question",
+      "title": "DX coil volume against the AHU kit range",
+      "finding": "Each HZX-6BEJ kit accepts a heat exchanger volume of 1.92 to 3.89 dm³; the coil holds 5 l over two circuits. The split between the circuits is not given.",
+      "evidence": [
+        {
+          "source": "AHU KIT HZX-6BEJ.pdf",
+          "page": 1,
+          "quote": "Heat Exchanger Volume Min Max"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 17,
+          "quote": "water content l 5"
+        },
+        {
+          "source": "Fisa tehnica CTA 19.03.2026.pdf",
+          "page": 18,
+          "quote": "Direct evaporator with 2 circuits"
+        }
+      ],
+      "suggested_comment": "Please confirm that each DX circuit's volume is within the 1.92 to 3.89 dm³ range of the HZX-6BEJ kit.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    }
   ]
 }

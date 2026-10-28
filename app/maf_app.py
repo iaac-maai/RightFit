@@ -33,6 +33,7 @@ VALUE_NAMES = {"used_for": "Used for (form)", "duty_flow": "Required flow (form)
                "hrs_efficiency": "Heat recovery efficiency", "sfp_int": "SFPint", "sfp_int_limit": "SFPint limit",
                "gwp": "GWP", "seer": "SEER", "scop": "SCOP", "dx_refrigerant": "DX coil refrigerant"}
 VERDICT = {"pass": "OK", "flag": "Problem", "unclear": "Question", "info": "Info"}
+DECISIONS = {"suggested": "Not decided", "accepted": "Add to my answer", "rejected": "Not relevant"}
 STATUS_RULE = {"A": "Every check passed or is only for information.",
                "B": "Nothing sends the package back, but there is at least one problem or open question.",
                "C": "A product has no data sheet that names it, or a blocking checklist item is missing."}
@@ -60,6 +61,20 @@ def set_verified(entry, verified):
     entry["status"] = "verified" if verified else ("extracted" if has_value else "unclear")
     entry["checked_by"] = REVIEWER if verified else None
     entry["verified_on"] = date.today().isoformat() if verified else None
+
+
+def decide(name, finding_id, field, widget_key):
+    """Save the reviewer's decision (or note) on an AI suggestion straight into the package file."""
+    path = EXTRACTED / f"{name}.json"
+    data = json.loads(path.read_text())
+    finding = next(f for f in data["ai_findings"] if f["id"] == finding_id)
+    value = st.session_state[widget_key]
+    if field == "status":
+        finding["status"] = {v: k for k, v in DECISIONS.items()}[value]
+        finding["decided_by"] = None if finding["status"] == "suggested" else REVIEWER
+    else:
+        finding["note"] = value or None
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 
 
 # ---------------------------------------------------------------- choose the package
@@ -98,7 +113,10 @@ questions = [r for r in results if r["would_be"] == "unclear"]
 dismissed = [r for r in results if r.get("dismissed")]
 readings = [x for i in pkg["items"] for x in i["values"].values()] + pkg["documents"]
 to_confirm = sum(x["status"] != "verified" for x in readings)
-letter, status_reasons = draft_status(results, "would_be")
+ai_findings = pkg.get("ai_findings", [])
+accepted = [f for f in ai_findings if f["status"] == "accepted"]
+undecided = sum(f["status"] == "suggested" for f in ai_findings)
+letter, status_reasons = draft_status(results, "would_be", [f["title"] for f in accepted])
 
 # ---------------------------------------------------------------- the draft answer
 colour = {"A": "green", "B": "orange", "C": "red"}[letter]
@@ -112,18 +130,22 @@ with st.container(border=True):
     if to_confirm:
         st.caption("This draft rests on what the AI read. Confirm the readings in step 2: a check only counts as "
                    "passed once the values behind it are confirmed.")
+    if undecided:
+        st.caption(f"{undecided} AI suggestions are waiting for your decision in the AI suggestions tab.")
     with st.expander(f"Why {letter}?"):
         st.write(STATUS_RULE[letter])
         if letter == "C":
             for reason in status_reasons:
                 st.markdown(f"- {reason}")
         counts = Counter(f"{VERDICT[r['would_be']]} · {CHECK_NAMES[r['check']]}" for r in problems + questions)
+        counts.update({"AI suggestion you added to the answer": len(accepted)} if accepted else {})
         for text, n in counts.items():
             st.markdown(f"- {text}: {n}")
         st.caption("What each reason means and where it comes from: docs/maf_status_reasons.md")
 
-step1, step2, step3, everything = st.tabs(["1 · Problems found", "2 · Confirm what the AI read",
-                                            "3 · Answer to send", "Everything that was checked"])
+step1, ai_tab, step2, step3, everything = st.tabs([
+    "1 · Problems found", f"AI suggestions ({undecided} to decide)" if undecided else "AI suggestions",
+    "2 · Confirm what the AI read", "3 · Answer to send", "Everything that was checked"])
 
 # ---------------------------------------------------------------- step 1: problems
 with step1:
@@ -154,16 +176,39 @@ with step1:
                 left.text_input("Why is it not a problem?", key=r["key"] + "|why")
                 right.checkbox("Not a problem", key=r["key"])
 
-    notes = pkg.get("notes_for_reviewer", [])
-    if notes:
-        st.subheader("The AI also noticed")
-        st.caption("No rule checks these. They are the AI's reading, for you to judge.")
-        for note in notes:
-            st.markdown(f"- {note}")
+# ---------------------------------------------------------------- AI suggestions, kept apart from the rules
+with ai_tab:
+    if not ai_findings:
+        st.info("The second AI reviewer has not run on this package yet.")
+    else:
+        st.caption("A second AI reviewer read the whole package and proposes these. No rule checks them, and they "
+                   "change no check result. Add the ones you agree with to your answer.")
+        for f in ai_findings:
+            with st.container(border=True):
+                st.markdown(f":violet[**AI suggestion**] · {f['kind'].capitalize()} · "
+                            f"{', '.join(items.get(i, i) for i in f['items'])}")
+                st.markdown(f"**{f['title']}.** {f['finding']}")
+                for e in f["evidence"]:
+                    st.caption(f"{e['source']}, p. {e['page']}: \"{e['quote']}\"")
+                st.markdown(f"Suggested comment: *{f['suggested_comment']}*")
+                key = f"ai|{name}|{f['id']}"
+                st.radio("Your decision", list(DECISIONS.values()), horizontal=True, key=key,
+                         index=list(DECISIONS).index(f["status"]), on_change=decide,
+                         args=(name, f["id"], "status", key))
+                if f["status"] == "rejected":
+                    st.text_input("Why is it not relevant?", value=f["note"] or "", key=key + "|note",
+                                  on_change=decide, args=(name, f["id"], "note", key + "|note"))
 
 # ---------------------------------------------------------------- step 2: confirm the reading
 with step2:
     st.write("Tick each line you have checked against the document. Unticked lines stay as the AI read them.")
+    notes = pkg.get("notes_for_reviewer", [])
+    if notes:
+        st.markdown("**Reading notes**")
+        st.caption("How the AI read the package, for you to check.")
+        for note in notes:
+            st.markdown(f"- {note}")
+
     with st.form("confirm"):
         st.markdown("**Documents**")
         docs = pd.DataFrame([{
@@ -193,7 +238,8 @@ with step2:
 
 # ---------------------------------------------------------------- step 3: the answer
 with step3:
-    lines = list(dict.fromkeys(c for c in (comment(r) for r in results) if c))
+    lines = list(dict.fromkeys([c for c in (comment(r) for r in results) if c]
+                               + [f["suggested_comment"] for f in accepted]))
     answer = (f"MAF {form['form_no']} rev {form['revision']}: {LABELS[letter]} ({letter})\n\n"
               + ("\n".join(f"{n}. {line}" for n, line in enumerate(lines, 1)) or "No comments."))
     st.write("Copy the answer with the button in the top right corner of the box, or download it.")

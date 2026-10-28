@@ -74,6 +74,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | 5.3 | Ecodesign of air handling units: heat recovery, SFPint, filter warning | Rule | E1 | Done |
 | 5.4 | The reviewers' checklist for the family | Rule | C | Done |
 | 5.5 | What the location asks for at delivery, as a reminder | Rule | R | Done |
+| 5.6 | Issues no rule covers, proposed with page evidence and decided by the reviewer | AI + Human | Second AI reviewer | First run on P01 and P02 |
 
 ### 6. Draft the answer
 
@@ -96,7 +97,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 
 ## 3. Where the AI is
 
-The AI reads the attachments (2.2, 2.3) and makes a first pass at the rules (3.4). A person checks all of it. Everything in groups 4 to 6 is fixed rules and templates, and no model can change their result. People choose the location and dates, set the requirements, verify values, override, and sign.
+The AI reads the attachments (2.2, 2.3), makes a first pass at the rules (3.4) and, as a second reviewer, proposes issues no rule covers (5.6). A person checks all of it. Everything in groups 4 to 6 is fixed rules and templates, and no model can change their result. People choose the location and dates, set the requirements, verify values, override, and sign.
 
 ## 4. What runs today
 

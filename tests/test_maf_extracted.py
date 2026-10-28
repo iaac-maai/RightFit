@@ -55,3 +55,16 @@ def test_library_entries_keep_link_page_short_quote_and_status():
         assert len(e["quote"].split()) <= 15, e["title"]
         assert e["status"] in ("extracted", "verified") and e["doc_type"] in DOC_TYPES
         assert e["local_file"].startswith("data/raw/"), "copies stay outside Git"
+
+
+@pytest.mark.parametrize("path", PACKAGES, ids=lambda p: p.stem)
+def test_ai_findings_rest_on_cited_pages(path):
+    pkg = json.loads(path.read_text())
+    findings = pkg.get("ai_findings", [])
+    items = {i["id"] for i in pkg["items"]}
+    assert len({f["id"] for f in findings}) == len(findings)
+    for f in findings:
+        assert f["kind"] in ("problem", "question") and f["status"] in ("suggested", "accepted", "rejected")
+        assert set(f["items"]) <= items and f["evidence"] and f["suggested_comment"], f["id"]
+        for e in f["evidence"]:
+            assert e["source"] and e["page"] and len(e["quote"].split()) <= 15, f["id"]

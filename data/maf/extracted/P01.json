@@ -930,10 +930,85 @@
   ],
   "notes_for_reviewer": [
     "The model cell lists 4 models and the name cell 3 names; the item split follows the 'A se folosi la' rows.",
-    "No declaration of conformity names the Hydro Multi-E booster set or the DPK pumps; the SL1/SLV one names neither.",
     "Both declarations have 2 pages; the form lists 1 page each.",
-    "Unilift sheets: built-in motor protection none, thermal protection external (page 4); the form lists no panel or protection for them.",
-    "DPK sheet pages 5 and 10 show a control panel wiring diagram; the form lists no panel for the stormwater pumps.",
     "Data sheets are dated 11.03.2026, before the form date 16.03.2026."
+  ],
+  "ai_findings": [
+    {
+      "id": "P01-AI1",
+      "items": [
+        "P01-3",
+        "P01-4"
+      ],
+      "kind": "problem",
+      "title": "Drainage pumps need external motor protection",
+      "finding": "Both Unilift sheets say the motor has no built-in protection and the thermal protection is external. Nothing in the package provides it.",
+      "evidence": [
+        {
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 4,
+          "quote": "Protecţie încorporată în motor: FĂRĂ"
+        },
+        {
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 4,
+          "quote": "Protecţie termică: extern"
+        },
+        {
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 4,
+          "quote": "Protecţie încorporată în motor: FĂRĂ"
+        }
+      ],
+      "suggested_comment": "The Unilift AP12.50.11.3 and AP12.40.06.3 data sheets require external thermal protection; please state how the motors are protected.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P01-AI2",
+      "items": [
+        "P01-2"
+      ],
+      "kind": "question",
+      "title": "Stormwater pumps: duty and standby not stated",
+      "finding": "The form lists P1/P2 without saying whether they run as duty and standby; the data sheet curve shows one of the two pumps running at the duty point.",
+      "evidence": [
+        {
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 4,
+          "quote": "2 x DPK.15.80.30.5.0D, 50Hz"
+        },
+        {
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 4,
+          "quote": "n = 1 x 100 %"
+        }
+      ],
+      "suggested_comment": "Please confirm how the stormwater pumps P1/P2 operate (duty and standby, or alternating).",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P01-AI3",
+      "items": [
+        "P01-1"
+      ],
+      "kind": "question",
+      "title": "Booster set needs a positive inlet pressure",
+      "finding": "The manufacturer's manual says Hydro Multi-E systems with CME pumps need a positive inlet pressure. The package doesn't say how the booster set is fed (mains or break tank). The manual found is the 2015 edition.",
+      "evidence": [
+        {
+          "source": "Grundfosliterature-3568377.pdf (manufacturer manual, library)",
+          "page": 4,
+          "quote": "Hydro Multi-E systems with CME pumps require a positive inlet pressure during start-up and operation"
+        }
+      ],
+      "suggested_comment": "Please confirm that the booster set has a positive inlet pressure, as the manufacturer requires for CME pumps.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    }
   ]
 }
