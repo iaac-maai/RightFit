@@ -1,130 +1,101 @@
 # Tech Stack — RightFit
 
-Version 0.1 (draft) · 28 Oct 2026 · Full version due 12 Nov 2026
+Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet. Open questions are marked [O].
 
-Tags: **[C]** agreed in team discussion; formal approval of this v0.1 draft is pending · **[P]** proposed, awaiting approval · **[O]** open question
+## 1. Tools
 
-Nothing listed as [P] is installed or tested yet. Each choice is confirmed only after a small test in this repository.
+We work in Python, with Git and GitHub (`iaac-maai/RightFit`, private), VS Code and Markdown, as agreed for the hood version. For the MAF checker we have installed and used:
 
-## 1. Confirmed tools [C]
-
-| Tool | Use |
+| Tool | What we use it for |
 |---|---|
-| Python | Main programming language |
-| Git + GitHub (`iaac-maai/RightFit`, private) | Version control and collaboration |
-| VS Code | Editor |
-| Markdown | Documentation and specifications |
+| xlrd | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`) |
+| pytest | Tests for every check (`tests/`) |
+| Streamlit, with pandas | The review page (`app/maf_app.py`) |
+| An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
 
-## 2. Proposed components [P]
+Still planned: the official MCP Python SDK, to expose the checks as tools an agent can call (12 Nov).
 
-| Component | Candidate | Why | Alternative |
-|---|---|---|---|
-| Image/text matching | Pretrained SigLIP or CLIP model, used as-is (no training) | Matches words and images to product photos without hand-written rules | Keyword search only |
-| Similarity search | NumPy (small catalogue); FAISS if needed | A few hundred products fit easily in memory | A vector database (likely unnecessary at this size) |
-| Keyword baseline | BM25 (e.g. `rank_bm25`) | Standard non-AI comparison | Simple text matching |
-| PDF reading | `pdfplumber` or PyMuPDF | Extract text and tables from data sheets with page numbers | Manual entry |
-| Data-sheet extraction | A language model returning values with page citations, checked by a person | Data sheets are formatted differently by each manufacturer | Manual entry only |
-| Attribute tagging | A vision-language model (colour, finish, mounting type), confirmed by Jeff | Avoids tagging hundreds of images by hand | Manual tagging |
-| Engineering checks | Plain Python functions | Must be exact, explainable and testable | none (no AI allowed here) |
-| Interface | Streamlit | Simple, Python-only, already known by Luca | Gradio |
-| Tests | pytest | Standard and simple | `unittest` |
-| MCP | Official MCP Python SDK | Expose search and checks as tools to AI agents | none decided |
+The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
 
-## 3. Data sources
+## 2. Data sources
 
-| Source | Use | Status |
+| Source | What for | Where it stands |
 |---|---|---|
-| Manufacturer catalogues and product images | Visual and text search | [C] planned, not yet collected |
-| Manufacturer data sheets | Airflow, dimensions, noise, power | [C] planned, not yet collected |
-| Installation manuals | Duct diameter, mounting heights, required voids, duct length limits | [P] availability to be audited |
-| EPREL (EU energy label registry), public product pages | Cross-check of airflow, noise and efficiency values | [P] to be tested |
-| Engineering standards for the testing context | Requirements the checks apply | [O] Spain provisional; Luca to confirm which standards apply |
-| Team's past projects, anonymised | Real rooms and conflicts for test briefs | [C] planned; anonymisation required |
-| v1 data: 79 MEP approval forms | Evidence of interior/MEP conflicts | [C] held; confidential; stays outside Git |
-| Designer picks and rejections in the tool | Re-ranking | [C] created during testing |
+| The two MAF packages (form and attachments) | Everything the checks read | Held; originals in `data/raw/`, outside Git |
+| The register of 80 MAFs from Luca's last project | Evidence for the problem, and the source of the checklist | Held; anonymised, outside Git; counts in `docs/maf_register_findings.md` |
+| EU texts on EUR-Lex (machinery, low voltage, construction products, ecodesign of ventilation units) | Rules for documents and ecodesign | Partly read; several rows still "to confirm" |
+| Romanian law (Law 10/1995) and Spanish CTE and RITE | National rules and delivery reminders | Read on secondary sites; [O] official journals before the midterm |
+| Manufacturer data sheets and declarations | Values per product | Only those inside the packages |
 
-Full details are in `docs/data_map.md`.
+The full list is in `docs/data_map.md`.
 
-## 4. Architecture [P]
+## 3. How the pieces fit
 
 ```text
-Designer input (text or image + room description)
+MAF form (.xls) + attachments (PDF)
         |
         v
-1. Retrieval (AI)            search/   -> ranked candidates with similarity scores
+ingest/      the form is read in Python, roles only;     -> data/maf/extracted/<package>.json
+             the attachments are read by the AI agent       every value: source, page, quote, status
+        |
+        v  (a person verifies the values in the app)
+checks/maf/  plain Python, no AI, rules from data/maf/   -> pass / flag / unclear / info per check
         |
         v
-2. Engineering checks        checks/   -> pass / flag / unclear per check, with sources
-   (deterministic, no AI)
+explain/     comments filled from templates              -> one sentence per issue
         |
         v
-3. Explanation (template)    explain/  -> trade-offs built only from verified values
-        |
-        v
-4. Interface                 app/      -> results; AI output and checks shown separately
+app/         Streamlit review page                       -> draft status, overrides, exports
 ```
 
-**Boundary rule [C]:** no code in `checks/` may import or call an AI model.
+Nothing in `checks/` may import or call an AI model.
 
-## 5. Data rule [C]
+## 4. Data rule
 
-Every technical value is stored with:
+Every value is stored as:
 
 | Field | Meaning |
 |---|---|
-| `value` | The number or text, or empty if missing |
-| `unit` | e.g. m³/h, mm, dB(A) |
-| `source` | URL or file name |
-| `page` | Page number in the source, if applicable |
-| `status` | `verified`, `extracted` or `unclear` |
-| `checked_by` | Team member who verified it, if verified |
+| `value` | The number or text, or empty if it wasn't found |
+| `unit` | m³/h, l/s, m, bar, kW, %, Pa... |
+| `source` | The file it was read from |
+| `page` | The page in that file |
+| `quote` | At most 15 words from the page, never a name |
+| `status` | `extracted`, `verified` or `unclear` |
+| `checked_by` | Who verified it |
+| `note` | Where we looked, when the value is missing |
 
-The exact file format (CSV, JSON or JSONL) is [O].
+We settled the format question from the hood version: one JSON file per package in `data/maf/extracted/`. The rules, the documents each family needs and the checklist are CSV files in `data/maf/`, so that someone who doesn't program can edit them.
 
-## 6. Planned repository structure [P]
+## 5. Repository
 
 ```text
 RightFit/
-|-- AGENTS.md
-|-- README.md
+|-- AGENTS.md, README.md, requirements.txt, pytest.ini
 |-- spec/
-|   |-- constitution/     mission, roadmap, tech stack
-|   `-- features/         one specification per feature
-|-- docs/                 segmentation tree, data map, decisions
+|   |-- constitution/      mission, roadmap, tech stack
+|   `-- features/          maf_checker.md
+|-- docs/                  problem tree, data map, decisions, register findings, rules
 |-- data/
-|   |-- raw/              images and PDFs (git-ignored)
-|   `-- catalogue/        catalogue files with sourced values
-|-- ingest/               data-sheet and EPREL extraction
-|-- search/               AI retrieval and keyword baseline
-|-- checks/               deterministic MEP checks
-|-- explain/              templated explanations
-|-- app/                  interface
-|-- eval/
-|   |-- dev/              development briefs
-|   |-- test/             locked test briefs
-|   `-- results/          dated evaluation results
-`-- tests/                automated tests
+|   |-- raw/               original packages and register (git-ignored)
+|   `-- maf/               rules, checklist, inventory, extracted/, reference/
+|-- ingest/                form reader
+|-- checks/maf/            the checks and the draft status
+|-- explain/               comment templates
+|-- app/                   Streamlit page
+`-- tests/                 tests
 ```
 
-Folders are created only when work in them starts.
+We create a folder only when work in it starts.
 
-## 7. Open technical questions [O]
+## 6. Open questions [O]
 
-- Python version and environment manager (conda or venv).
-- Which language model provider for extraction, its cost, and whether data may be sent to it.
-- Whether a laptop CPU is fast enough for SigLIP/CLIP on the full catalogue (to be measured, not assumed).
-- Licences of the chosen pretrained models.
-- Catalogue file format.
-- Where the interface runs for the final demo (local or hosted).
+- The Python version and environment manager. We have tested with Python 3.14 so far.
+- Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not.
+- Where the page runs for the final demo, on a laptop or hosted.
 
-## 8. Dependency policy [C]
+## 7. Dependencies
 
-- Use the fewest dependencies possible.
-- Each new dependency is recorded in `docs/decisions.md` with the reason.
-- Exact versions are pinned once the environment is chosen.
+We keep them few. Each new one goes in `docs/decisions.md` with the reason, and we pin exact versions once we have chosen the environment.
 
-## 9. Change log
-
-| Date | Change | Agreed by |
-|---|---|---|
-| 28 Oct 2026 | v0.1 draft created | pending: Sahil, Jeff, Luca |
+Changes to this file are recorded in `docs/decisions.md`.

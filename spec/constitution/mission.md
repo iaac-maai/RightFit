@@ -1,102 +1,80 @@
 # Mission — RightFit
 
-Version 0.1 (draft) · 28 Oct 2026 · Full version due 12 Nov 2026
-
-Tags: **[C]** agreed in team discussion; formal approval of this v0.1 draft is pending · **[P]** proposed, awaiting approval · **[O]** open question
+Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet; the full version is due on 12 Nov. Open questions are marked [O].
 
 ## 1. Problem
 
-**[C]** Interior architects choose visible products (kitchen hoods, lights, grilles, radiators, sanitaryware) mainly by appearance during design development (roughly LOD 200–300). The MEP engineer reviews the choice later and may find it needs a larger duct, a lower ceiling, a new route, or does not meet requirements. The design is then revised, re-specified and re-submitted, when changes are more expensive.
+Before MEP equipment is ordered, the contractor sends a material approval form (MAF; in Romania, "fișă pentru transmitere și aprobare materiale") with the data sheets, declarations and certificates behind it. Several people sign the same form: the site supervisor, the designer, one or two consultants, the client. Each of them opens the same PDFs, often in three or four languages, and looks for much the same things. Is this the model on the form? Does the declaration name it? Is the certificate still valid? Does the pump reach the duty point?
 
-**Who is affected [C]**
-- Interior architect: design compromised late (bulkheads, dropped ceilings, grilles in visible places).
-- MEP engineer: reworks layouts to fit choices made without them.
-- Client: pays for rework and waits.
+If something is missing, the form goes back and comes in again. Luca keeps the register of the last project he worked on (80 MEP forms, anonymised, outside Git; details in `docs/maf_register_findings.md`):
 
-**Evidence held [C]**
-- From v1 research on one residential tower in Bucharest: 16 of 79 MEP approval forms were sent back.
-- A recurring reviewer comment: "visible items need the architect's approval".
+- 66 forms got an answer: 44 approved, 17 approved with notes, 5 sent back for resubmission. 14 have no status.
+- 17 forms needed at least one revision, and one of them needed six.
+- A form usually came back after about 12 days (median). Once the last reviewer had answered, it still waited a median of 7 days before it went back to the contractor.
+- 8 of the 22 returns were gaps in the package: a data sheet for a whole range with nothing marked, a technical approval past its date, pump panels without the BMS module.
 
-**Evidence still to collect [O]**
-- Number and stage of design changes caused by MEP conflicts in our past projects.
-- Interviews with 3–5 interior designers on how long finding a suitable product takes today.
-- Luca's ranked list of the most frequent interior/MEP conflicts in practice.
+The second package in the prototype, an air handling unit with outdoor units, is at revision 4. Revisions 0 to 3 weren't turned down for anything technical: the client wanted FläktGroup and accepted only its own house brands. No document check would have caught that, unless the client's brand list had been written down as a requirement.
 
-## 2. Users and stakeholders
+The hood version quoted "16 of 79 forms sent back" from the v1 research. We now use the register, which is the copy we can actually open: 22 returns out of 80.
 
-| Role | Uses RightFit to | Responsible for | Status |
-|---|---|---|---|
-| Interior architect | Find products that fit the look and the room | The design choice | [C] primary user |
-| MEP engineer | See choices early, review flags | Engineering sign-off | [C] |
-| Client | Get fewer late changes | Approving the final selection | [C] |
-| Manufacturers | Be found by look, not only keyword | Accuracy of their data | [C] |
+The contractor waits, sends again and sometimes orders late. Reviewers read the same documents again at each revision. The client pays for the time.
 
-**Paying customer [O]:** a hypothesis to test through interviews. No market or revenue claims are made.
+## 2. Users
 
-## 3. Vision
+The main user is whoever signs the MAF, and most of the time that is the consultant. Site supervisors and designers sign too. A contractor can run the same check before sending, to catch the obvious gaps first.
 
-**[C]** From checking what was submitted to helping choose what gets specified.
+Manufacturers don't use the tool, but the result depends on how clear their documents are. When a value is missing from them, RightFit says so and asks for it.
+
+[O] Who would pay for this. For now it is only a question; we would need to talk to reviewers and contractors.
+
+## 3. In one line
+
+AI reads, rules decide, a person signs.
 
 ## 4. Scope
 
-**In scope [C]**
-- One product family: kitchen extraction hoods.
-- AEC Phase 1, Design & Pre-Construction, at the product-selection moment.
-- Text and reference-image search, deterministic MEP checks, explained trade-offs.
+The prototype covers MEP equipment at the MAF stage of Design & Pre-Construction, after the design is done and before anything is ordered. We start with pumps and air handling units (with their outdoor units and DX kits), because those are the two complete packages we hold.
 
-**Out of scope [C]**
-- Generating designs.
-- Training large models.
-- Certifying products or claiming regulatory compliance.
-- Other product families (lighting, grilles): future work only.
+It runs for Romania, where the packages come from, and for Spain, the provisional testing context of the course. EU product rules are the same for both. Luca checks which national rules apply; until a rule is verified on the official text, nothing in RightFit is presented as regulatory compliance, and every rule shows its status next to the result.
 
-**Undecided [O]**
-- Whether hob-integrated downdraft extractors are included.
-- Whether the v1 approval-form check returns as a later phase.
-- A predictive feature for installation or approval concerns: exploratory only, not committed.
+Out of scope: choosing products, visual search, finishes, checking whether equipment physically fits in the room, and approving anything on the reviewer's behalf.
 
-**Jurisdiction [O]:** Spain is the provisional testing context because the prototype is developed in Barcelona. Luca must validate which engineering standards apply. Until then, no check is presented as verified regulatory compliance.
+[O] Doors. Luca would like them in, but we haven't worked out how yet; the feature spec leaves them out for now.
+
+[O] The next families. Fire dampers and valves would bring in the construction products regulation; pipes and meters are frequent in the register.
+
+[O] Which LEED, BREEAM or VERDE values belong in each family's checklist (Sahil or Jeff).
 
 ## 5. Principles
 
-These apply to every specification, line of code, test and presentation.
+These apply to every spec, line of code, test and presentation.
 
-1. **Evidence first.** No technical value, catalogue datum, test result, AI performance figure or regulatory statement is ever invented or estimated from "typical" values.
-2. **Every value is sourced.** Each value records its source (URL or file and page) and a status: `verified` (checked by a team member), `extracted` (read automatically, unchecked) or `unclear` (missing or ambiguous).
-3. **Unclear stays unclear.** Missing evidence is shown to the user as `unclear`. Checks only `pass` on `verified` inputs.
-4. **AI and engineering are separate.** AI handles perception and interpretation: matching looks, reading inconsistent data sheets, learning preferences. Engineering checks are deterministic, explainable and auditable. No AI model produces or overrides an engineering result.
-5. **Predictions are not warnings.** Any predictive output is labelled as a prediction and kept apart from engineering checks.
-6. **Humans decide.** The designer chooses, the MEP engineer signs off, the client approves. RightFit never certifies. Every result states what was and was not checked.
-7. **Honest validation.** Metrics are fixed before results are seen. Test data is never used for tuning or preference learning. All results are reported, including negative ones. No claim of accuracy without stored results.
-8. **Privacy and rights.** No confidential client documents, names, prices or personal data in the repository. Manufacturer images and PDFs stay outside Git.
-9. **Simplicity.** Pretrained models, few dependencies, small tested features first.
-10. **Shared decisions.** Decisions are recorded in the repository. Principles change only with agreement from all three team members.
+1. We don't invent data. No value, result or legal statement comes from "typical" figures or from memory.
+2. Every value keeps its source file, page and status: `extracted` (read by the AI and not checked), `verified` (checked by one of us) or `unclear` (missing or ambiguous).
+3. A check passes or flags only on verified values. Anything else shows as `unclear`, together with the result it would give.
+4. AI and engineering stay apart. The AI reads documents; the checks in `checks/` are plain Python with no model, and no model can change their result. Anything predictive is labelled as a prediction and never shown as a check.
+5. Comments are filled in from templates with checked values. A language model may rephrase them but never add a value.
+6. The reviewer decides and signs. Every result says what was checked and what wasn't.
+7. Reference answers are written before anyone sees the tool's output, and they are never used to tune it. We report every result, including the bad ones.
+8. No client, project, company or personal names, no prices and no original documents in Git. Manufacturer names and model codes are fine.
+9. Small tested steps, few dependencies.
+10. Decisions go in `docs/decisions.md`. The principles change only if all three of us agree.
 
-## 6. Success metrics
+## 6. How we will know it works
 
-**[P]** From Concept v2. Targets are set only after baselines are measured.
+For each package Luca first writes his own review: what he would flag, the status he would give, and how long it took. Then we run the tool and count three things: what both found, what only the tool found (and whether it was real), and what the tool missed. We also compare the draft status with his, and his time by hand with his time checking the tool's draft.
 
-| Metric | How it is measured |
-|---|---|
-| Look relevance | Of the top 5 results, how many Jeff (and, if possible, outside designers) rate as a good match |
-| MEP correctness | Of products passed by the checks, how many Luca confirms work in the room |
-| Time to a valid shortlist | Timed, RightFit vs. baseline, same briefs |
-| Ranking improvement | Relevance before vs. after learning from picks (if implemented) |
+We don't set targets before we have these first numbers. If the draft doesn't save Luca time on new packages, or misses things he thinks matter, we will say so and change course.
 
-**Baselines [C]:** keyword search on the same catalogue, and a designer's usual manual process.
+The checklist comes from the register's comments, so we never evaluate it on the register; that would only show it can repeat itself. A first reading of the register suggests the checks could have caught 8 of the 22 returns for certain, and up to 13 if the specification states every value.
 
-**Stop criterion [C]:** if RightFit does not beat the keyword baseline on look relevance or MEP correctness on the test set, we report it and reconsider the approach.
+## 7. Known limits
 
-## 7. Known limitations
+- RightFit checks what the documents say. A correct data sheet doesn't mean a correct installation.
+- A value the manufacturer doesn't publish stays missing.
+- Scanned PDFs without a text layer are read from the page image and need a closer look.
+- Some returns no check can catch: coordination with the architecture, a design that isn't approved yet, a reviewer asking for a sample.
+- A rule is only as current as its last check, so each one keeps its source and the date it was checked.
+- Two packages make a demonstration, not an evaluation. [O] More packages from Luca's practice, anonymised.
 
-- **[C]** Image search matches appearance, not build quality or durability.
-- **[C]** A value missing from manufacturer documents stays missing.
-- **[C]** Brands with better catalogues may be found more easily.
-- **[C]** Checks cover only kitchen hoods; anything else is flagged for the engineer.
-- **[P]** Manufacturer airflow figures may not reflect performance in a real duct installation. Checks only test what the documents support.
-
-## 8. Change log
-
-| Date | Change | Agreed by |
-|---|---|---|
-| 28 Oct 2026 | v0.1 draft created | pending: Sahil, Jeff, Luca |
+Changes to this file are recorded in `docs/decisions.md`.

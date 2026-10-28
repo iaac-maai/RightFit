@@ -7,15 +7,17 @@ Instructions for any AI agent (Claude, ChatGPT/Codex, Copilot) and any human con
 1. `spec/constitution/mission.md` — problem, scope, principles
 2. `spec/constitution/roadmap.md` — milestones, phases, features
 3. `spec/constitution/tech_stack.md` — tools, architecture, data rule, repository structure
+4. `spec/features/maf_checker.md` — the MAF checker, the feature this branch builds
 
 If this file and the constitution disagree, the constitution wins.
 
 ## Project
 
-RightFit is an AI-assisted product selection and MEP coordination tool for architects and interior designers. A designer describes a product (text or reference image); the system finds visually and semantically relevant products, runs deterministic MEP checks against the room's known constraints, and explains trade-offs with source evidence.
+On this branch (`maf-checker`) RightFit checks material approval forms (MAFs) for MEP equipment before the reviewer signs them. It reads the attached documents, runs deterministic checks against EU and national rules and a checklist built from past reviewers' comments, and drafts the review with a page reference for each finding. The reviewer decides.
 
 - Course: IAAC MaAI01, Operable Futures (2026–27). AEC phase: Design & Pre-Construction.
-- First and only product family for the prototype: **kitchen extraction hoods**.
+- First families: pumps and air handling units (with their outdoor units and DX kits). We hold two complete real packages for them, P01 and P02.
+- This is Luca's proposal, not yet agreed by Sahil and Jeff. `main` keeps the kitchen hood version.
 
 ## Milestones (IAAC)
 
@@ -32,14 +34,14 @@ RightFit is an AI-assisted product selection and MEP coordination tool for archi
 | Person | Owns |
 |---|---|
 | Sahil | Integration, documentation, AI implementation, validation |
-| Jeff | Hood catalogue, product images, visual relevance, design requirements |
-| Luca | Specifications, airflow, ducting, installation constraints, engineering verification |
+| Jeff | Design requirements; his part in the MAF version is still to agree with him [O] |
+| Luca | Rules and checklist, reference answers, verification of extracted values, engineering verification |
 
-Engineering rules in `checks/` must be approved by Luca. Visual relevance judgements belong to Jeff.
+Engineering rules in `checks/` must be approved by Luca.
 
 ## Testing context
 
-Spain is the provisional testing context. Luca must validate which engineering standards apply. Until then, no check is presented as regulatory compliance.
+The packages are Romanian, so the checks run for Romania (RO); Spain (ES) stays the provisional testing context of the constitution. EU product rules apply to both. Luca validates which national rules apply, and each rule carries its status in `data/maf/rules.csv`. Until a rule is verified on the official text, no check is presented as regulatory compliance.
 
 ## Core rules
 
@@ -49,7 +51,7 @@ Spain is the provisional testing context. Luca must validate which engineering s
 4. **AI and engineering stay separate.** Code in `checks/` is deterministic Python with no AI models. AI outputs are always labelled as AI output.
 5. **Explanations are built by template from verified values.** A language model may only rephrase them, never add values.
 6. **Predictions are not warnings.** Predictive output is labelled as a prediction and never shown as a check.
-7. **Test data is locked.** Briefs in `eval/test/` are never used for tuning or preference learning.
+7. **Test data is locked.** Reference answers in `data/maf/reference/` are written before the tool's output is seen and never used for tuning.
 8. **Humans decide.** The tool never certifies. Every result states what was and was not checked.
 9. **No confidential material, copyrighted files or secrets in Git.**
 10. **Decisions and scope changes are recorded in `docs/decisions.md`.**
@@ -72,6 +74,6 @@ The planned repository structure is in `spec/constitution/tech_stack.md` §6.
 
 Open decisions are the items tagged **[O]** in `spec/constitution/`. This file keeps no separate list.
 
-## Current status (28 Oct 2026)
+## Current status (28 Oct 2026, branch maf-checker)
 
-Repository created. No catalogue data collected, no model trained or tuned, no results.
+Two packages read into `data/maf/extracted/`; all values still `extracted`, none verified. Checks, draft status, draft comments and the Streamlit page built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. The app and every file are in English.

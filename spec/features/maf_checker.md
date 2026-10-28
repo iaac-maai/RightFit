@@ -5,7 +5,7 @@ Status: proposal by Luca, 28 Oct 2026, on branch maf-checker. Pending Sahil and 
 ## 1. What it does
 RightFit checks a material approval form (MAF; in Romania "fișă pentru transmitere și aprobare materiale") for MEP equipment before the reviewer signs it. It reads every attached document, checks it against the law, the project's requirements and a checklist written from reviewers' past comments, and drafts a review that points to the page behind each finding. AI reads, rules decide, a person signs.
 
-- user: the reviewer who signs the MAF (site supervisor, designer, consultant); the contractor can run the same check before sending;
+- user: the reviewer who signs the MAF, most often the consultant (also the site supervisor or the designer); the contractor can run the same check before sending;
 - first families: pumps and air handling units, because we hold two complete real packages for them;
 - not in this feature: visual search, product suggestions, doors, the space check.
 
@@ -65,7 +65,7 @@ Results: pass, flag, unclear, info. A check passes only on verified values; extr
 | D2 | Declarations match the items | each declaration covers at least one submitted item; flag a declaration that covers none, and name the items left without one | EU-MACH-DOC, EU-LVD-DOC |
 | D3 | Documents in date | valid_until on or after the review date, else flag; on or after the delivery date, else flag "renew before delivery"; no date: info | CL-02 |
 | D4 | Documents are what the form says | each attachment's doc_type agrees with the label it is listed as; every listed attachment exists | practice |
-| V1 | Duty point | data sheet flow and head at the duty point meet the form's duty; tolerance from ENG-DUTY-TOL, exact until Luca sets it | ENG-DUTY-TOL |
+| V1 | Duty point | data sheet flow and head at the duty point meet the form's duty, with no tolerance (the designer's margins are already in the duty) | ENG-DUTY-TOL |
 | V2 | Pressure rating | PN at least the required pressure; no requirement: info | CL-05 |
 | E1 | Ecodesign, ventilation units | heat recovery efficiency against EU-ECO-VU-HRS (or -RAC); SFPint at most SFPint_limit; filter warning present | EU-ECO-VU-* |
 | C | Checklist | every item of data/maf/checklist.csv for the family, with its source rows as the reason | data/maf/checklist.csv |
@@ -81,7 +81,7 @@ Results: pass, flag, unclear, info. A check passes only on verified values; extr
 In the earlier register, missing declarations led to a reminder for the delivery, not to a C (three such MAFs were approved). That is why a missing declaration is a flag (B), not a C.
 
 ## 8. Draft comments (explain/)
-One sentence per flag or unclear, from a template per check, in Romanian with an English toggle, in the tone of the reviewers' past comments. A language model may only rephrase them, never add values. Example for D2: "Declarația de conformitate atașată pentru {covers} nu corespunde niciunui produs din MAF; vă rugăm atașați declarațiile pentru {items}."
+One sentence per flag or unclear, from a template per check, in English, in the tone of the reviewers' past comments. A language model may only rephrase them, never add values. Example for D2: "The declaration of conformity attached for {covers} matches no product in the MAF; please attach the declarations for {items}."
 
 ## 9. Interface (app/, Streamlit)
 - package picker (P01, P02), location switch (RO, ES), review date, delivery date;
@@ -106,7 +106,7 @@ One sentence per flag or unclear, from a template per check, in Romanian with an
 
 ## 12. Open questions
 - the draft status rules (Luca);
-- the duty point tolerance (Luca);
+- the duty point tolerance: none (Luca, 28 Oct 2026, ENG-DUTY-TOL);
 - which roles sit behind the four reviewer columns of the register (Luca);
 - the Romanian law and the RITE article checked against the official journals;
 - which LEED, BREEAM or VERDE values join each family's checklist (Sahil or Jeff);

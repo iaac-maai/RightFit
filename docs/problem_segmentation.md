@@ -1,123 +1,103 @@
 # Problem Segmentation Tree — RightFit
 
-Version 0.1 (draft) · 28 Oct 2026 · IAAC deliverable, 29 Oct 2026
+IAAC deliverable, 29 Oct 2026. MAF version on branch `maf-checker`; the hood version is on `main` and the team chooses which one to hand in. Open questions are marked [O].
 
-Tags: **[C]** agreed in team discussion; formal approval of this v0.1 draft is pending · **[P]** proposed, awaiting approval · **[O]** open question
-
-Task types: **Human** (a person decides or provides input) · **AI** (perception or interpretation by a pretrained model) · **Rule** (deterministic engineering check, no AI) · **Data** (collection, storage, software plumbing)
+We split the work by who does each step. "Human" means one of us or a reviewer decides. "AI" means a model reads or interprets, and a person checks what it read. "Rule" is a fixed check in plain Python. "Data" is collecting, storing and moving files.
 
 ## 1. Tree
 
 ```text
-L0  Visible products are chosen by look; their MEP consequences
-    are discovered late, when changes are expensive.
+L0  MEP approval forms go back and forth. Each reviewer reads the same
+    documents again, and missing items are found late.
  |
- |-- L1  Interior product selection in design development (LOD 200-300)
+ |-- L1  MAF review of MEP equipment, Design & Pre-Construction
  |    |
- |    `-- L2  Prototype scope [C]: choosing a kitchen extraction hood
+ |    `-- L2  Prototype: pumps and air handling units (P01, P02)
  |         |
- |         |-- A. Capture design intent
- |         |-- B. Describe the room and MEP context
- |         |-- C. Build the product catalogue
- |         |-- D. Find candidate products
- |         |-- E. Check MEP fit
- |         |-- F. Explain and decide
- |         `-- G. Learn and evaluate
+ |         |-- 1. Receive the package
+ |         |-- 2. Read the documents
+ |         |-- 3. Set the context
+ |         |-- 4. Check the documents
+ |         |-- 5. Check the values
+ |         |-- 6. Draft the answer
+ |         `-- 7. Decide and evaluate
  |
- `-- L1  Other product families (lights, grilles, radiators,
-         sanitaryware) -- future work, out of prototype scope [C]
+ `-- L1  Other families (fire dampers and valves, pipes, meters): later
 ```
 
-## 2. Atomic tasks
+The check codes in the last column (D1, V1, C...) are the ones in `spec/features/maf_checker.md`.
 
-### A. Capture design intent
+## 2. Tasks
 
-| ID | Atomic task | Type | Owner | Notes |
+### 1. Receive the package
+
+| ID | Task | Type | Who | Status |
 |---|---|---|---|---|
-| A1 | Write a text description of the desired product | Human | Designer | e.g. "slim, hidden, matte black" |
-| A2 | Provide a reference image | Human | Designer | Optional |
-| A3 | Identify visual attributes from words or image (colour, finish, form, how visible it is) | AI | Search module | Designer can correct [P] |
-| A4 | State non-visual client rules (e.g. "made in Europe") | Human | Designer | Confirmed by a person, as in v1 |
+| 1.1 | Fill in the form and attach the documents | Human | Contractor | Outside the tool |
+| 1.2 | Read the form fields: number, revision, items, duty, attachments, signer roles | Rule | `ingest/maf_form.py` | Done |
+| 1.3 | Keep the originals on our laptops, outside Git | Data | Luca | Done (`data/raw/`) |
 
-### B. Describe the room and MEP context
+### 2. Read the documents
 
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Who | Status |
 |---|---|---|---|---|
-| B1 | Ceiling height and available ceiling void | Human | Designer | Room input schema to be defined [P] |
-| B2 | Kitchen layout (wall, island, open-plan or enclosed) | Human | Designer | |
-| B3 | Hob type and width | Human | Designer | |
-| B4 | Duct exit option (façade, shaft, none) and distance | Human | Designer / Luca | |
-| B5 | Identify which engineering standards apply | Human | Luca | [O] Spain provisional, not yet validated |
+| 2.1 | List every file with pages, text layer and language | Data | AI reader | Done (`data/maf/packages.csv`) |
+| 2.2 | Say what each document is and which models it names, never from the file name | AI + Human | AI reader, Luca checks | Read, not verified |
+| 2.3 | Read the values each family needs, with page and a short quote | AI + Human | AI reader, Luca checks | Read, not verified |
+| 2.4 | Mark a value that isn't there as `unclear`, with where we looked | Rule | AI reader | Done |
+| 2.5 | Verify each value in the app | Human | Luca | Not started |
 
-### C. Build the product catalogue
+### 3. Set the context
 
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Who | Status |
 |---|---|---|---|---|
-| C1 | Collect product images and catalogue descriptions | Data | Jeff | Images stay outside Git |
-| C2 | Collect data sheets and installation manuals | Data | Luca | Availability of MEP values to be audited [P] |
-| C3 | Extract technical values with page citations | AI + Human | Sahil / Luca | Every value checked before `verified` |
-| C4 | Tag visual attributes for each product | AI + Human | Jeff | Jeff confirms tags |
-| C5 | Cross-check values against EPREL where available | Data | Luca | [P] |
-| C6 | Mark missing values as `unclear` | Rule | Sahil | Never guessed |
+| 3.1 | Choose the location (RO or ES), which picks the rules | Human | Reviewer | Done in the app |
+| 3.2 | Review date and delivery date (form date plus lead time, unless given) | Human | Reviewer | Done in the app |
+| 3.3 | Project requirements from the specification or BOQ | Human | Reviewer | [O] none for P01 and P02 |
+| 3.4 | Write each rule with clause, source and status | AI + Human | AI first pass, Luca verifies | Partly; several rules "to confirm" |
 
-### D. Find candidate products
+### 4. Check the documents
 
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Check | Status |
 |---|---|---|---|---|
-| D1 | Convert product images and texts into embeddings | AI | Sahil | Pretrained model, no training |
-| D2 | Convert the designer's query into an embedding | AI | Sahil | |
-| D3 | Rank products by similarity | AI | Sahil | Scores labelled as AI output |
-| D4 | Keyword search on the same catalogue | Rule | Sahil | Baseline for comparison |
+| 4.1 | Each item has the documents its family needs | Rule | D1 | Done |
+| 4.2 | Each declaration names at least one submitted item | Rule | D2 | Done |
+| 4.3 | Certificates are valid on the review date and at delivery | Rule | D3 | Done |
+| 4.4 | Each attachment is what the form says it is | Rule | D4 | Done |
 
-### E. Check MEP fit
+### 5. Check the values
 
-All rules are specified and approved by Luca before implementation. No thresholds are set until he provides them with sources.
-
-**Note:** E1–E7 are engineering rules approved by Luca. C6, E8 and E9 are data-integrity rules owned by Sahil and contain no engineering thresholds.
-
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Check | Status |
 |---|---|---|---|---|
-| E1 | Mounting type compatible with the kitchen layout | Rule | Luca | |
-| E2 | Duct diameter and resulting bulkhead depth | Rule | Luca | |
-| E3 | Required ceiling void vs. available void | Rule | Luca | Mainly ceiling-flush hoods |
-| E4 | Duct route length vs. manufacturer's stated maximum | Rule | Luca | Only if manuals publish it |
-| E5 | Hood width vs. hob width | Rule | Luca | Basis to be specified by Luca |
-| E6 | Whether recirculation is acceptable in this room | Rule | Luca | [O] depends on applicable standards |
-| E7 | Required airflow for the room | Rule | Luca | [O] source of the rule to be defined |
-| E8 | Show noise and efficiency values as information, not as pass/fail | Data | Sahil | From data sheets or EPREL |
-| E9 | Return `unclear` when any input is not `verified` | Rule | Sahil | Principle 3 of the mission |
+| 5.1 | The data sheet's duty point meets the form, with no tolerance | Rule | V1 | Done |
+| 5.2 | Pressure rating against the required pressure | Rule | V2 | Done; no requirement given yet |
+| 5.3 | Ecodesign of air handling units: heat recovery, SFPint, filter warning | Rule | E1 | Done |
+| 5.4 | The reviewers' checklist for the family | Rule | C | Done |
+| 5.5 | What the location asks for at delivery, as a reminder | Rule | R | Done |
 
-### F. Explain and decide
+### 6. Draft the answer
 
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Who | Status |
 |---|---|---|---|---|
-| F1 | Explain each candidate's trade-offs from verified values | Rule | Sahil | Template; a language model may only rephrase [P] |
-| F2 | State what was checked and what was not | Rule | Sahil | |
-| F3 | Select or reject candidates | Human | Designer | |
-| F4 | Engineering sign-off | Human | MEP engineer | The tool never certifies |
+| 6.1 | Propose A, B or C with the reasons | Rule | `checks/maf/status.py` | Done; [O] Luca confirms the rules |
+| 6.2 | One comment per issue, from templates | Rule | `explain/` | Done |
+| 6.3 | Say what was checked and what wasn't | Rule | App | Done |
+| 6.4 | Override a result, with a note | Human | Reviewer | Done in the app |
+| 6.5 | Sign, and choose the status (including Neaprobat or a sample request) | Human | Reviewer | Outside the tool |
 
-### G. Learn and evaluate
+### 7. Decide and evaluate
 
-| ID | Atomic task | Type | Owner | Notes |
+| ID | Task | Type | Who | Status |
 |---|---|---|---|---|
-| G1 | Record picks and rejections | Data | Sahil | |
-| G2 | Re-rank within a session from picks | AI | Sahil | [P] |
-| G3 | Learning-to-rank across sessions | AI | Sahil | [O] stretch; needs non-test data |
-| G4 | Predict installation or approval concerns | AI | Team | [O] exploratory; never shown as a check |
-| G5 | Compare against keyword and manual baselines | Data + Human | All | Locked test set, blind judging |
+| 7.1 | Write the reference answer before seeing the tool's output | Human | Luca | Done for P01 and P02 |
+| 7.2 | Count found by both, found only by the tool, missed by the tool | Data + Human | Sahil, Luca | First pass, on unverified values |
+| 7.3 | Time to review by hand against time to check the draft | Human | Luca | By hand done (10 min, 3 h); with the tool not yet |
+| 7.4 | Turn new reviewer comments into checklist items | Human | Luca | [O] |
 
-## 3. Where AI is and is not used
+## 3. Where the AI is
 
-- **AI:** A3, C3 (with human check), C4 (with human check), D1–D3, G2–G4.
-- **Rules:** C6, D4, E1–E7, E9, F1–F2. No AI model may produce or override these results.
-- **Humans:** intent, room input, standards, design choice, engineering sign-off.
+The AI reads the attachments (2.2, 2.3) and makes a first pass at the rules (3.4). A person checks all of it. Everything in groups 4 to 6 is fixed rules and templates, and no model can change their result. People choose the location and dates, set the requirements, verify values, override, and sign.
 
-## 4. Smallest demonstrable path [P]
+## 4. What runs today
 
-For the 12 Nov milestone: **A1/A2 → D1–D3 (with D4 as baseline) → one rule from E2 or E3**, on a seed catalogue (C1–C2 for about 50 hoods), with automated tests.
-
-## 5. Change log
-
-| Date | Change | Agreed by |
-|---|---|---|
-| 28 Oct 2026 | v0.1 draft created | pending: Sahil, Jeff, Luca |
+Both packages go through every check, for Romania and for Spain. Because nobody has verified a value yet, every pass and flag still shows as `unclear` together with the result it would give. The next step is 2.5, then 7.2 again on verified values.

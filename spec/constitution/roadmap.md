@@ -1,105 +1,77 @@
 # Roadmap — RightFit
 
-Version 0.1 (draft) · 28 Oct 2026 · Full version due 12 Nov 2026
+Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet. Open questions are marked [O].
 
-Tags: **[C]** agreed in team discussion; formal approval of this v0.1 draft is pending · **[P]** proposed, awaiting approval · **[O]** open question
+## 1. IAAC milestones
 
-## 1. Official IAAC milestones [C]
-
-| Date | Required deliverables |
+| Date | What IAAC asks for |
 |---|---|
-| 29 Oct 2026 | Hierarchical problem segmentation tree, data mapping, repository setup, initial agent test |
+| 29 Oct 2026 | Problem segmentation tree, data mapping, repository setup, initial agent test |
 | 5 Nov 2026 | Midterm submission |
 | 6 Nov 2026 | Midterm presentation |
 | 12 Nov 2026 | Full SDD constitution, first feature with tests, first MCP connection attempt |
 | 17 Dec 2026 | Final presentation |
 
-## 2. Development phases [P]
+## 2. Where we are on 28 Oct
 
-**P0 — Foundation (by 29 Oct)**
-- Repository, `AGENTS.md`, draft constitution
-- `docs/problem_segmentation.md`, `docs/data_map.md`
-- Initial agent test: an AI agent reads `AGENTS.md` and the constitution and respects the rules
+On this branch we have the feature spec, the rules and checklist tables, both packages read into JSON, the checks with their tests, a first Streamlit page, and Luca's reference answers for both packages. Luca has also set two engineering inputs: no tolerance on the duty point, and which pump groups need a control panel. What's missing is his check of the extracted values, so the first comparison with his answers (in `agent/LOG.md`, local) is still on unverified values.
 
-**P1 — Data and specifications (by 5 Nov)**
-- Catalogue schema in which every value has source, page and status
-- Seed catalogue of about 50 kitchen hoods from several manufacturers (Jeff)
-- Audit of about 10 installation manuals: which MEP values are actually published (Luca)
-- Room input schema: what the designer must describe about the room
-- Written specifications for the first engineering checks (Luca)
-- Engineering standards for the provisional Spanish context identified (Luca) [O]
+## 3. Phases
 
-**P2 — First feature (by 12 Nov)**
-- Text/image search over the seed catalogue with a pretrained model
-- Keyword search baseline on the same catalogue
-- One deterministic check with automated tests
-- First MCP connection attempt
-- Full constitution
+By 29 Oct we hand in the repository, `AGENTS.md`, the constitution draft, the problem tree, the data map and the first agent test. The hood version of these is on `main`; this branch rewrites them for the MAF review, and the team chooses which version to hand in.
 
-**P3 — Scale and interface (13–26 Nov)**
-- Catalogue of 150–300 hoods, if data quality allows
-- Data-sheet extraction with page citations, checked by a person
-- Further checks approved by Luca
-- Simple web interface
+Before the midterm on 5 Nov, Luca verifies the extracted values in the app. We compare the tool with his reference answers again and write the result in the repository, good or bad. Luca also confirms the draft status rules, and we check the Romanian law and the Spanish RITE article on the official journals instead of the secondary sites we used so far. At the midterm we demo both packages with that comparison.
 
-**P4 — Evaluation (27 Nov–10 Dec)**
-- 20–30 design briefs, split into development and locked test sets
-- Comparison against keyword search and manual process
-- Blind relevance judging, timed trials
+By 12 Nov we need the full constitution, the feature spec approved and a first MCP connection: the checks exposed as tools an agent can call. [O] Which agent client we connect.
 
-**P5 — Final (11–17 Dec)**
-- Results reported honestly, including negative ones
-- Pitch, demo, IAAC blog
+From 13 to 26 Nov we add more packages from Luca's practice, anonymised, and one new family (fire dampers or valves). New packages are read with page citations and checked by a person before any check uses them.
 
-## 3. Feature list
+From 27 Nov to 10 Dec we evaluate on packages we did not use while building: findings against the reference, draft status against the reviewer's, time by hand against time with the tool. [O] A second reviewer outside the team.
 
-| ID | Feature | Type | Status |
+The last week, 11 to 17 Dec, is for writing up the results (the negative ones too), the pitch, the demo and the IAAC blog post.
+
+## 4. Features
+
+The hood features (image search, keyword baseline, re-ranking from a designer's picks) are not needed for this use case, so the list below replaces them. The IDs are new to avoid mixing them up with the FEAT numbers on `main`.
+
+| ID | Feature | How it works | Status |
 |---|---|---|---|
-| FEAT-01 | Catalogue with sourced values | Data | Planned |
-| FEAT-02 | Text and image search | AI | Planned |
-| FEAT-03 | Keyword search baseline | Non-AI | Planned |
-| FEAT-04 | Engineering checks (e.g. duct size, ceiling void) | Deterministic | Planned, rules not yet specified |
-| FEAT-05 | Explanation of trade-offs from verified fields | Template | Planned |
-| FEAT-06 | Web interface | UI | Planned |
-| FEAT-07 | Re-ranking from a designer's picks within a session | AI | Proposed [P] |
-| FEAT-08 | Learning-to-rank across sessions | AI | Stretch, only if enough non-test data [O] |
-| FEAT-09 | Prediction of installation or approval concerns | AI | Exploratory, not committed [O] |
-| FEAT-10 | MCP server exposing search and checks | Integration | Planned |
+| MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; nothing verified yet |
+| MAF-02 | Reading the form (.xls), roles only | Plain Python | Done |
+| MAF-03 | Document checks D1–D4 | Rules | Done, tested |
+| MAF-04 | Value checks V1, V2 and ecodesign E1 | Rules | Done, tested; no tolerance on the duty point (Luca) |
+| MAF-05 | Reviewers' checklist (C) and delivery reminders by location (R) | Rules | Done, tested |
+| MAF-06 | Draft status and draft comments | Written rules and templates | Done; the status rules wait for Luca |
+| MAF-07 | Review page | Streamlit | First version done |
+| MAF-08 | Comparison with the reference answers | A small script and a table | First pass done on unverified values |
+| MAF-09 | MCP server with the checks | Integration | Planned for 12 Nov |
+| MAF-10 | Rule watch: a rule goes back to "to confirm" when its source changes | Scheduled check | Idea only [O] |
 
-No feature is considered done until it has a specification, passing tests and a review against its specification.
+A feature is done when it has a spec, passing tests and a review against the spec.
 
-## 4. Responsibilities [C]
+## 5. Who does what
 
-| Person | Leads | Reviews |
+| Person | Leads | Checks |
 |---|---|---|
-| Sahil | Integration, AI implementation, documentation, evaluation | Overall consistency with the constitution |
-| Jeff | Catalogue, images, visual relevance, design requirements | Look relevance of results |
-| Luca | Technical specifications, MEP checks, installation constraints | Engineering correctness |
+| Sahil | Integration, AI reading, documentation, evaluation | That the work matches the constitution |
+| Jeff | [O] To agree with Jeff. The spec leaves two things open that fit his side: sustainability values for the checklist (LEED, BREEAM, VERDE) and the items the architect has to see (CL-10) | The design side of the checklist |
+| Luca | Rules and checklist, reference answers, verifying the values the AI read | Engineering correctness |
 
-All three contribute to research, testing and presentation.
+All three of us share the research, testing and presentation.
 
-## 5. Testing strategy [P]
+## 6. Testing
 
-- **Unit tests** for every engineering check, using hand-written cases with known answers approved by Luca.
-- **Data tests**: every catalogue entry has source and status fields; no value without a source.
-- **Retrieval evaluation**: look relevance of the top 5 results, compared with the keyword baseline.
-- **Locked test set**: test briefs are never used for development or tuning.
-- **Blind judging**: judges do not know which system produced a result.
-- **Outside judges**: 2–3 designers outside the team, if available.
+Every check has unit tests with hand written cases, which Luca approves. Data tests make sure every value has a source, page and status, quotes stay short, and no name from the local names list ends up in Git. Reference answers are written before the tool's output is seen, live in `data/maf/reference/`, and are never used for tuning. And since the checklist was built from the register, we never evaluate it on the register.
 
-## 6. Risks [P]
+## 7. Risks
 
-| Risk | Mitigation |
+| Risk | What we do about it |
 |---|---|
-| Installation manuals lack values the checks need | Audit 10 manuals first; checks return `unclear`; adjust check scope |
-| Keyword baseline performs as well as AI search | Include image-reference briefs; report the result honestly |
-| Evaluator bias (team judging its own system) | Blind judging, outside designers |
-| Engineering standards unconfirmed | Spain provisional; no compliance claims until Luca validates |
-| Not enough time for all features | FEAT-01–FEAT-06 and FEAT-10 are core; FEAT-07–FEAT-09 only if time allows |
-| Image copyright | Images kept outside Git; not published |
+| Two packages are very few | Ask for more from Luca's practice, anonymised, and present results as a demonstration until then |
+| The AI misreads or misses a value | Every value starts as `extracted`, with page and quote; checks wait for a person to verify it |
+| Some rules were read on secondary sites | Each rule carries its status; the official texts are checked before the midterm |
+| Luca built the checklist and is also the only reviewer | He writes the reference before seeing the tool; [O] a second reviewer |
+| The team keeps the hood version | `main` stays as it is; this branch remains a proposal |
+| Scanned PDFs without text | They are read from the page image and marked for a closer check |
 
-## 7. Change log
-
-| Date | Change | Agreed by |
-|---|---|---|
-| 28 Oct 2026 | v0.1 draft created | pending: Sahil, Jeff, Luca |
+Changes to this file are recorded in `docs/decisions.md`.
