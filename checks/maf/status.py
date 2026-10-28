@@ -1,6 +1,6 @@
 """Draft MAF status from the check results (spec section 7). Written rules, not a model; the reviewer decides."""
 
-LABELS = {"A": "Aprobat", "B": "Aprobat conform notații", "C": "Revizie și retransmitere"}
+LABELS = {"A": "Approved", "B": "Approved as noted", "C": "Revise and resubmit"}
 
 
 def draft_status(results, key="result"):

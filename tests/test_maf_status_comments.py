@@ -24,9 +24,8 @@ def test_status_once_verified_uses_the_would_be_verdict():
 
 def test_comment_d2_matches_the_spec_example():
     r = result("D2", "flag", "x", code="D2.no_match", params={"covers": "SL1, SLV", "items": "Hydro Multi-E"})
-    assert comment(r) == ("Declarația de conformitate atașată pentru SL1, SLV nu corespunde niciunui produs din MAF; "
-                          "vă rugăm atașați declarațiile pentru Hydro Multi-E.")
-    assert comment(r, "en").startswith("The declaration of conformity attached for SL1, SLV")
+    assert comment(r) == ("The declaration of conformity attached for SL1, SLV matches no product in the MAF; "
+                          "please attach the declarations for Hydro Multi-E.")
 
 
 def test_no_comment_for_a_pass_waiting_for_verification_but_one_for_a_flag():
@@ -34,7 +33,7 @@ def test_no_comment_for_a_pass_waiting_for_verification_but_one_for_a_flag():
     assert comment(waiting_pass) is None
     waiting_flag = result("D1", "flag", "x", [v(1, status="extracted")], code="D1.missing",
                           params={"item": "DPK", "doc_type": "eu_declaration_of_conformity"})
-    assert comment(waiting_flag) == "Lipsește declarația de conformitate UE pentru DPK; vă rugăm atașați documentul."
+    assert comment(waiting_flag) == "The EU declaration of conformity for DPK is missing; please attach it."
 
 
 def test_no_comment_without_a_template():

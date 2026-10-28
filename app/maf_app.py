@@ -51,22 +51,23 @@ form_date = date.fromisoformat(form["date"])
 review = st.sidebar.date_input("Review date", form_date)
 delivery = st.sidebar.date_input("Delivery date", form_date + timedelta(weeks=form["delivery_weeks"] or 0),
                                  help=f"Form: {form['delivery_raw']}")
-lang = st.sidebar.radio("Comments in", ["ro", "en"], horizontal=True)
 overrides = st.session_state.setdefault("overrides", {})
 
 results = run_all(pkg, context(location, review, delivery))
 item_names = {i["id"]: f"{i['id']} {i['model']}" for i in pkg["items"]}
 
 # ---------------------------------------------------------------- header
-st.title(f"MAF {form['form_no']} rev {form['revision']} · {form['discipline']} · {form['works_group']}")
-st.caption(f"Form date {form['date']} · BOQ {form['boq_ref']} · sample sent: {form['sample_sent']} · "
-           f"signers (roles): {', '.join(form['signers'])}")
+st.title(f"MAF {form['form_no']} rev {form['revision']} · {', '.join(i['name'] for i in pkg['items'])}")
+st.caption(f"Form date {form['date']} · sample sent: {form['sample_sent']} · signers (roles): "
+           f"{', '.join(form['signers'])} · discipline, works group and BOQ line as written on the form: "
+           f"{form['discipline']} / {form['works_group']} / {form['boq_ref']}")
 status_box = st.container(border=True)
 
 # ---------------------------------------------------------------- documents and values
 st.subheader("Documents")
 st.caption("Read by the AI reader (AI output). Document types and values stay 'extracted' until the reviewer "
-           "verifies them; checks pass or flag only on verified inputs.")
+           "verifies them; checks pass or flag only on verified inputs. Quotes stay in the language of the source "
+           "document.")
 with st.form("verify"):
     docs = pd.DataFrame([{"verified": d["status"] == "verified", "file": d["file"], "type found": d["doc_type"],
                           "listed as": d["listed_as"] or "(not listed)", "covers": ", ".join(d["covers"]),
@@ -136,7 +137,7 @@ with status_box:
     now, reasons = draft_status(results)
     later, _ = draft_status(results, "would_be")
     st.markdown(f"### Draft status: {now} · {LABELS[now]}")
-    st.caption("Draft, the reviewer decides. Neaprobat and Se solicită mostră are the reviewer's choice only.")
+    st.caption("Draft, the reviewer decides. 'Not approved' and 'Sample requested' are the reviewer's choice only.")
     if later != now:
         st.warning(f"Once the extracted values are verified as read: {later} · {LABELS[later]}")
     with st.expander(f"Why {now} ({len(reasons)} reasons)"):
@@ -145,7 +146,7 @@ with status_box:
 
 # ---------------------------------------------------------------- comments and exports
 st.subheader("Draft comments")
-lines = list(dict.fromkeys(c for c in (comment(r, lang) for r in results) if c))
+lines = list(dict.fromkeys(c for c in (comment(r) for r in results) if c))
 st.caption("Built from templates and the values above; a language model may only rephrase them.")
 st.code("\n".join(f"{n}. {line}" for n, line in enumerate(lines, 1)) or "(no comments)", language=None,
         wrap_lines=True)
