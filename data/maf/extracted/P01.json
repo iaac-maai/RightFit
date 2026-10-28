@@ -219,7 +219,7 @@
   "items": [
     {
       "id": "P01-1",
-      "name": "Grup pompare apa menajera",
+      "name": "Domestic water booster set",
       "family": "pump",
       "brand": "Grundfos",
       "model": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
@@ -231,6 +231,16 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "booster",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare apa menajera - Alimentare cu apa",
           "status": "extracted",
           "checked_by": null,
           "note": null
@@ -389,7 +399,7 @@
     },
     {
       "id": "P01-2",
-      "name": "Grup de pompare pentru ape pluviale P1/P2",
+      "name": "Stormwater pump set P1/P2",
       "family": "pump",
       "brand": "Grundfos",
       "model": "DPK15803050D",
@@ -401,6 +411,16 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "stormwater",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare pentru ape pluviale P1/P2",
           "status": "extracted",
           "checked_by": null,
           "note": null
@@ -549,7 +569,7 @@
     },
     {
       "id": "P01-3",
-      "name": "Electropompa submersibila evacuare ape accidentale 3 l/s",
+      "name": "Drainage pump, accidental water, 3 l/s",
       "family": "pump",
       "brand": "Grundfos",
       "model": "UNILIFT_AP1250113",
@@ -561,6 +581,16 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "drainage",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale",
           "status": "extracted",
           "checked_by": null,
           "note": null
@@ -675,6 +705,16 @@
           "checked_by": null,
           "note": "not found; looked in pages 1-6 (built-in motor protection: none; thermal protection: external, page 4)"
         },
+        "float_switch": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6 (no float or level switch mentioned)"
+        },
         "bms_protocol": {
           "value": null,
           "unit": null,
@@ -709,7 +749,7 @@
     },
     {
       "id": "P01-4",
-      "name": "Electropompa submersibila evacuare ape accidentale 1 l/s",
+      "name": "Drainage pump, accidental water, 1 l/s",
       "family": "pump",
       "brand": "Grundfos",
       "model": "UNILIFT_AP1240063",
@@ -721,6 +761,16 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "drainage",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale",
           "status": "extracted",
           "checked_by": null,
           "note": null
@@ -834,6 +884,16 @@
           "status": "unclear",
           "checked_by": null,
           "note": "not found; looked in pages 1-7 (built-in motor protection: none; thermal protection: external, page 4)"
+        },
+        "float_switch": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7 (no float or level switch mentioned)"
         },
         "bms_protocol": {
           "value": null,

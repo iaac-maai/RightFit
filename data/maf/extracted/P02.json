@@ -329,7 +329,7 @@
   "items": [
     {
       "id": "P02-1",
-      "name": "Centrala Tratare Aer",
+      "name": "Air handling unit",
       "family": "ahu",
       "brand": "FläktGroup",
       "model": "Z096096GBVA / A096096GBVA",
@@ -351,9 +351,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "FläktGroup CAIRplus SX 096.096AGBV - 1 Pcs",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "the form lists two models with two airflows; the sheet shows one double-deck unit"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "the form lists two models with two airflows; Luca confirmed on 28 Oct 2026 that it is one unit",
+          "verified_on": "2026-10-28"
         },
         "duty_airflow_supply": {
           "value": 9000,
@@ -619,7 +620,7 @@
     },
     {
       "id": "P02-2",
-      "name": "Unitate exterioara pentru baterie in detenta directa CTA",
+      "name": "Outdoor unit for the AHU DX coil",
       "family": "outdoor_unit",
       "brand": "Hisense",
       "model": "AVW-54HKFHH2",
@@ -849,7 +850,7 @@
     }
   ],
   "notes_for_reviewer": [
-    "The form lists Z096096GBVA 9000 m3/h and A096096GBVA 7000 m3/h like two AHUs; the data sheet shows one double-deck unit (1 pc) with supply 9000 and return 7000 m3/h.",
+    "The form lists Z096096GBVA 9000 m3/h and A096096GBVA 7000 m3/h like two AHUs; the data sheet shows one double-deck unit (1 pc) with supply 9000 and return 7000 m3/h. Luca confirmed it is one unit.",
     "Refrigerant: the AHU DX coil is selected for R32 (data sheet p. 18); the outdoor unit sheet and both DX reports give R410A.",
     "DX heating: the coil target is 38.2 kW at -15 °C outdoor (p. 18, after heat recovery); the -15 °C report gives 12.67 kW per outdoor unit. The sheet also lists an electrical reheater (p. 4).",
     "The steam humidifier (p. 23) is 'not suitable for outdoor installation'; the unit is for outdoor installation (p. 5). Page 30 is a separate humidifier casing (3500 m3/h) dated 2025-08-11.",

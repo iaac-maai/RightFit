@@ -154,11 +154,33 @@ def checklist_row(results, cl_id):
     return next(r for r in results if r["rules"] == [cl_id])
 
 
-def test_checklist_bms_not_included_flags_and_panel_is_left_to_luca():
-    pump = item("I7", "pump", "P", bms_included=v(False), controller_included=v(None))
-    results = c.c_checklist(pkg([pump], []), ctx())
-    assert checklist_row(results, "CL-08")["result"] == "flag"
-    assert checklist_row(results, "CL-09")["result"] == "unclear"
+def test_checklist_bms_not_included_flags():
+    pump = item("I7", "pump", "P", bms_included=v(False))
+    assert checklist_row(c.c_checklist(pkg([pump], []), ctx()), "CL-08")["result"] == "flag"
+
+
+def panel_result(application, **values):
+    pump = item("P", "pump", "P", application=v(application), controller_included=v(None), **values)
+    return checklist_row(c.c_checklist(pkg([pump], []), ctx()), "CL-09")
+
+
+def test_control_panel_depends_on_the_pump_application():
+    # Luca, 28 Oct 2026: required for stormwater and circulation, recommended for boosters,
+    # a float switch is enough for drainage pumps.
+    assert panel_result("stormwater")["result"] == "flag"
+    assert panel_result("circulation")["result"] == "flag"
+    assert panel_result("booster")["result"] == "info"
+    drainage = panel_result("drainage", float_switch=v(None))
+    assert (drainage["result"], drainage["code"]) == ("flag", "C.CL-09.float")
+    assert panel_result("drainage", float_switch=v(True))["result"] == "pass"
+    assert panel_result("fountain")["result"] == "unclear"
+
+
+def test_no_tolerance_on_the_duty_point():
+    rules, _, _ = tables()
+    assert c.tolerance({"rules": rules}) == 0.0
+    pump = item("I11", "pump", "P", duty_flow=v(15, "m3/h"), flow=v(14.99, "m3/h"))
+    assert only(c.v1_duty_point(pkg([pump], []), ctx()))["result"] == "flag"
 
 
 def test_checklist_value_not_found_stays_unclear_until_verified_as_absent():

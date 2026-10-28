@@ -339,11 +339,26 @@ def _cl08(item, pkg, ctx):
     return "missing", f"{seen}not stated as included ({included.get('note') or 'no note'})", [included], {}
 
 
+# What each pump application needs, from Luca on 28 Oct 2026 (rules.csv ENG-PUMP-PANEL).
+PANEL_NEED = {"circulation": "panel", "stormwater": "panel", "booster": "recommended", "drainage": "float"}
+
+
 def _cl09(item, pkg, ctx):
-    panel = val(item, "controller_included")
+    application, panel = val(item, "application"), val(item, "controller_included")
+    need = PANEL_NEED.get(application["value"])
+    if need is None:
+        return "unclear", f"application '{application['value']}' has no panel rule in ENG-PUMP-PANEL", [], {}
     if panel["value"] is True:
-        return "pass", f"controller included: {fmt(panel)}", [panel], {}
-    return "unclear", "no controller or panel stated as included; Luca says which pump groups need one", [], {}
+        return "pass", f"controller included: {fmt(panel)}", [application, panel], {}
+    if need == "recommended":
+        return "info", "booster set: a control panel is recommended, none stated", [], {}
+    if need == "float":
+        switch = val(item, "float_switch")
+        if switch["value"] is True:
+            return "pass", f"float switch: {fmt(switch)}", [application, switch], {}
+        return "missing", "drainage pump: no float switch or panel stated", [application, panel, switch], \
+            {"variant": ".float"}
+    return "missing", f"{application['value']} pumps need a control panel; none stated", [application, panel], {}
 
 
 def _cl12(item, pkg, ctx):
@@ -370,8 +385,9 @@ def c_checklist(pkg, ctx):
             verdict, reason, inputs, params = check(item, pkg, ctx)
             if verdict == "missing":
                 verdict = row["if_missing"].lower()
+            code = f"C.{row['id']}{params.pop('variant', '')}"
             out.append(result("C", verdict, f"{row['id']} {row['item']}: {reason} (register {row['source_rows']})",
-                              inputs, item=item["id"], rules=[row["id"]], code=f"C.{row['id']}",
+                              inputs, item=item["id"], rules=[row["id"]], code=code,
                               params={"item": item["model"], **params}, blocking=row["blocking"] == "yes"))
     return out
 
