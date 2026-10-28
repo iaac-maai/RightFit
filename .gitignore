@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local only, never pushed
+data/raw/
+agent/
+.DS_Store
