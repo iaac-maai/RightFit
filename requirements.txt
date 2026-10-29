@@ -3,3 +3,5 @@ streamlit>=1.58
 pandas
 pytest>=9
 xlrd>=2.0
+pypdf>=6.0
+scikit-learn>=1.5
