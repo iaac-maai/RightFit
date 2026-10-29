@@ -13,11 +13,13 @@ import joblib
 from sklearn.model_selection import GroupKFold, cross_val_predict
 
 from model.evaluate_pages import scores
-from model.page_classifier import CLASSES, build_model, pdf_pages
+from model.page_classifier import CLASSES, MIN_TEXT, build_model, normalize, pdf_pages
 
 ROOT = Path(__file__).resolve().parents[1]
 TRAINING = ROOT / "data/raw/training"
 LABELS = ROOT / "eval/page_classifier/training_labels.csv"
+# Data sheets Luca printed from Grundfos Product Center for unrelated pumps: every page with text is a data sheet.
+DATASHEETS = TRAINING / "datasheets_ro"
 MODEL_PATH = ROOT / "data/raw/models/page_classifier.joblib"
 CAP = 40  # at most this many pages of one class from one document, so a 200-page manual doesn't drown the rest
 
@@ -30,6 +32,10 @@ def training_set(seed=0):
         for p in pdf_pages(TRAINING / doc / f"{doc}.pdf"):
             if (doc, p["page"]) in labels:
                 grouped[(doc, labels[(doc, p["page"])])].append(p["text"])
+    for path in sorted(DATASHEETS.glob("*.pdf")):
+        for p in pdf_pages(path):
+            label = "data_sheet" if len(normalize(p["text"])) >= MIN_TEXT else "other"
+            grouped[(f"datasheets_ro/{path.stem}", label)].append(p["text"])
     rng = random.Random(seed)
     texts, ys, docs = [], [], []
     for (doc, label), pages in sorted(grouped.items()):

@@ -1,674 +1,674 @@
-doc,page,label,how,note
-W1,1,declaration,document type,
-W2,1,declaration,document type,
-W3,1,declaration,document type,
-W5,1,declaration,document type,
-P1,1,declaration,document type,
-P1,2,declaration,document type,
-P1,3,declaration,document type,
-P1,4,declaration,document type,
-P1,5,declaration,document type,
-P1,6,declaration,document type,
-P1,7,declaration,document type,
-P2,1,declaration,document type,
-P2,2,declaration,document type,
-P2,3,declaration,document type,
-P3,1,declaration,document type,
-P3,2,declaration,document type,
-P3,3,declaration,document type,
-P3,4,declaration,document type,
-P3,5,declaration,document type,
-P3,6,declaration,document type,
-P3,7,declaration,document type,
-P4,1,declaration,document type,
-P4,2,declaration,document type,
-P4,3,declaration,document type,
-P4,4,declaration,document type,
-P4,5,declaration,document type,
-P4,6,declaration,document type,
-P4,7,declaration,document type,
-D1,1,declaration,document type,
-D2,1,declaration,document type,
-D2,2,declaration,document type,
-D2,3,declaration,document type,
-D2,4,declaration,document type,
-D3,1,other,document type,data act notice that says it is not a declaration of conformity
-D3,2,other,document type,data act notice that says it is not a declaration of conformity
-D3,3,other,document type,data act notice that says it is not a declaration of conformity
-H1,1,declaration,document type,
-H1,2,declaration,document type,
-H1,3,declaration,document type,
-H1,4,declaration,document type,
-H1,5,declaration,document type,
-H1,6,declaration,document type,
-G1,1,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,2,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition
-G1,3,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,4,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,5,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,6,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,7,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,8,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,9,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,10,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,11,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,12,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,13,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,14,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,15,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,16,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,17,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,18,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,19,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,20,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,21,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,22,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,23,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,24,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,25,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,26,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,27,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,28,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,29,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,30,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,31,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,32,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,33,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,34,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,35,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,36,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,37,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,38,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,39,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,40,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,41,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,42,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,43,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,44,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,45,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,46,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,47,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,48,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,49,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,50,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,51,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,52,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,53,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,54,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,55,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,56,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,57,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,58,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,59,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,60,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,61,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,62,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,63,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,64,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,65,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,66,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,67,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,68,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,69,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,70,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,71,manual,document type,English-only edition: the declaration is in the multilingual edition
-G1,72,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G1,73,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G1,74,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,1,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition
-G2,2,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,3,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,4,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,5,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,6,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,7,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,8,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,9,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,10,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,11,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,12,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,13,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,14,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,15,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,16,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,17,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,18,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,19,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,20,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,21,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,22,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,23,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,24,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,25,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,26,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,27,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,28,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition
-G2,29,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,30,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,31,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,32,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,33,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,34,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,35,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,36,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,37,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,38,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,39,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,40,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,41,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,42,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,43,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,44,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,45,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,46,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,47,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,48,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,49,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,50,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,51,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,52,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,53,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,54,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,55,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,56,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,57,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,58,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,59,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,60,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,61,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,62,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,63,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,64,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,65,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,66,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,67,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,68,manual,document type,English-only edition: the declaration is in the multilingual edition
-G2,69,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition
-G2,70,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G2,71,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G2,72,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G2,73,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,1,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition
-G5,2,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,3,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,4,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,5,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,6,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,7,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,8,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,9,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,10,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,11,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,12,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,13,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,14,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,15,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,16,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,17,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,18,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,19,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,20,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,21,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,22,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,23,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,24,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,25,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,26,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,27,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,28,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,29,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,30,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,31,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,32,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,33,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,34,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,35,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,36,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,37,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,38,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,39,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,40,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,41,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,42,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,43,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,44,manual,document type,English-only edition: the declaration is in the multilingual edition
-G5,45,other,company addresses,English-only edition: the declaration is in the multilingual edition
-G5,46,manual,document type,English-only edition: the declaration is in the multilingual edition
-G6,1,other,"page with almost no text (cover, figure, blank)",
-G6,2,manual,document type,
-G6,3,manual,document type,
-G6,4,manual,document type,
-G6,5,manual,document type,
-G6,6,manual,document type,
-G6,7,manual,document type,
-G6,8,manual,document type,
-G6,9,manual,document type,
-G6,10,manual,document type,
-G6,11,manual,document type,
-G6,12,manual,document type,
-G6,13,manual,document type,
-G6,14,manual,document type,
-G6,15,manual,document type,
-G6,16,manual,document type,
-G6,17,manual,document type,
-G6,18,manual,document type,
-G6,19,manual,document type,
-G6,20,manual,document type,
-G6,21,manual,document type,
-G6,22,declaration,section read,
-G6,23,declaration,section read,
-G6,24,manual,document type,
-G6,25,manual,document type,
-G6,26,manual,document type,
-G7,1,other,"page with almost no text (cover, figure, blank)",
-G7,2,declaration,section read,
-G7,3,declaration,section read,
-G7,4,declaration,section read,
-G7,5,declaration,section read,
-G7,6,declaration,section read,
-G7,7,manual,document type,
-G7,8,manual,document type,
-G7,9,manual,document type,
-G7,10,manual,document type,
-G7,11,manual,document type,
-G7,12,manual,document type,
-G7,13,manual,document type,
-G7,14,manual,document type,
-G7,15,manual,document type,
-G7,16,manual,document type,
-G7,17,manual,document type,
-G7,18,manual,document type,
-G7,19,other,"page with almost no text (cover, figure, blank)",
-G7,20,manual,document type,
-G7,21,manual,document type,
-G7,22,manual,document type,
-W6,1,manual,document type,
-W6,2,other,"page with almost no text (cover, figure, blank)",
-W6,3,other,"page with almost no text (cover, figure, blank)",
-W6,4,other,"page with almost no text (cover, figure, blank)",
-W6,5,manual,document type,
-W6,6,other,"page with almost no text (cover, figure, blank)",
-W6,7,other,"page with almost no text (cover, figure, blank)",
-W6,8,manual,document type,
-W6,9,manual,document type,
-W6,10,manual,document type,
-W6,11,manual,document type,
-W6,12,manual,document type,
-W6,13,manual,document type,
-W6,14,manual,document type,
-W6,15,manual,document type,
-W6,16,manual,document type,
-W6,17,manual,document type,
-W6,18,manual,document type,
-W6,19,manual,document type,
-W6,20,manual,document type,
-W6,21,manual,document type,
-W6,22,manual,document type,
-W6,23,manual,document type,
-W6,24,manual,document type,
-W6,25,manual,document type,
-W6,26,manual,document type,
-W6,27,manual,document type,
-W6,28,manual,document type,
-W6,29,manual,document type,
-W6,30,manual,document type,
-W6,31,manual,document type,
-W6,32,manual,document type,
-W6,33,manual,document type,
-W6,34,manual,document type,
-W6,35,manual,document type,
-W6,36,other,"page with almost no text (cover, figure, blank)",
-W6,37,manual,document type,
-W6,38,manual,document type,
-W7,1,manual,document type,
-W7,2,other,"page with almost no text (cover, figure, blank)",
-W7,3,manual,document type,
-W7,4,manual,document type,
-W7,5,manual,document type,
-W7,6,manual,document type,
-W7,7,manual,document type,
-W7,8,manual,document type,
-W7,9,manual,document type,
-W7,10,manual,document type,
-W7,11,manual,document type,
-W7,12,manual,document type,
-W7,13,manual,document type,
-W7,14,manual,document type,
-W7,15,manual,document type,
-W7,16,manual,document type,
-W7,17,manual,document type,
-W7,18,manual,document type,
-W7,19,manual,document type,
-W7,20,manual,document type,
-W7,21,manual,document type,
-W7,22,manual,document type,
-W7,23,manual,document type,
-W7,24,manual,document type,
-W7,25,declaration,section read,
-W7,26,declaration,section read,
-W7,27,declaration,section read,
-W7,28,declaration,section read,
-W7,29,declaration,section read,
-W7,30,declaration,section read,
-W7,31,declaration,section read,
-W7,32,declaration,section read,
-W7,33,other,"page with almost no text (cover, figure, blank)",
-W7,34,other,"page with almost no text (cover, figure, blank)",
-W7,35,other,"page with almost no text (cover, figure, blank)",
-W7,36,manual,document type,
-W8,1,manual,document type,
-W8,2,manual,document type,
-W8,3,manual,document type,
-W8,4,manual,document type,
-W8,5,manual,document type,
-W8,6,manual,document type,
-W8,7,manual,document type,
-W8,8,other,"page with almost no text (cover, figure, blank)",
-W8,9,other,"page with almost no text (cover, figure, blank)",
-W8,10,other,"page with almost no text (cover, figure, blank)",
-W8,11,manual,document type,
-W8,12,manual,document type,
-W8,13,manual,document type,
-W8,14,manual,document type,
-W8,15,declaration,section read,
-W8,16,manual,document type,
-D4,1,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,2,other,"page with almost no text (cover, figure, blank)","mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,3,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,4,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,5,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,6,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,7,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,8,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,9,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,10,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,11,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,12,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,13,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,14,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,15,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,16,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,17,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,18,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,19,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,20,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,21,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,22,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,23,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,24,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,25,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,26,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,27,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,28,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,29,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,30,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,31,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,32,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,33,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,34,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,35,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,36,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,37,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,38,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,39,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,40,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,41,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,42,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,43,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,44,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,45,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,46,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,47,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,48,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,49,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,50,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,51,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,52,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,53,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,54,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,55,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,56,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,57,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,58,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,59,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,60,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,61,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,62,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,63,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,64,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,65,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,66,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,67,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,68,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,69,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,70,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,71,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,72,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,73,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,74,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,75,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,76,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,77,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,78,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,79,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,80,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,81,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,82,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,83,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,84,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,85,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,86,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,87,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,88,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,89,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,90,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,91,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,92,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,93,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,94,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,95,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,96,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,97,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,98,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,99,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,100,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,101,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,102,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,103,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,104,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,105,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,106,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,107,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,108,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,109,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,110,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,111,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,112,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,113,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,114,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,115,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,116,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,117,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,118,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,119,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,120,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,121,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,122,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,123,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,124,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,125,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,126,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,127,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,128,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,129,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,130,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,131,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,132,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,133,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,134,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,135,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,136,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,137,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,138,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,139,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,140,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,141,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,142,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,143,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,144,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,145,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,146,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,147,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,148,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,149,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,150,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,151,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,152,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,153,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,154,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,155,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,156,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,157,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,158,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,159,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,160,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,161,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,162,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,163,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,164,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,165,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,166,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,167,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,168,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,169,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,170,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,171,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,172,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,173,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,174,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,175,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,176,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,177,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,178,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,179,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,180,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,181,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,182,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,183,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,184,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,185,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,186,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,187,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,188,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,189,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,190,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,191,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,192,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,193,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,194,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,195,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,196,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,197,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,198,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,199,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,200,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,201,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D4,202,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)"
-D5,1,manual,document type,
-D5,2,manual,document type,
-D5,3,manual,document type,
-D5,4,manual,document type,
-D5,5,manual,document type,
-D5,6,manual,document type,
-D5,7,manual,document type,
-D5,8,manual,document type,
-D5,9,manual,document type,
-D5,10,manual,document type,
-D5,11,declaration,section read,
-D5,12,manual,document type,
-G11,1,data_sheet,document type,
-G11,2,data_sheet,document type,
-G12,1,other,section read,
-G12,2,data_sheet,document type,
-G12,3,data_sheet,document type,
-G12,4,data_sheet,document type,
-G12,5,data_sheet,document type,
-G12,6,data_sheet,document type,
-G12,7,data_sheet,document type,
-G12,8,data_sheet,document type,
-G12,9,data_sheet,document type,
-G12,10,data_sheet,document type,
-G12,11,data_sheet,document type,
-G12,12,data_sheet,document type,
-G12,13,data_sheet,document type,
-G12,14,data_sheet,document type,
-G12,15,data_sheet,document type,
-G12,16,data_sheet,document type,
-G12,17,data_sheet,document type,
-G12,18,data_sheet,document type,
-G12,19,data_sheet,document type,
-G12,20,data_sheet,document type,
-G12,21,data_sheet,document type,
-G12,22,data_sheet,document type,
-G12,23,data_sheet,document type,
-G12,24,data_sheet,document type,
-G12,25,data_sheet,document type,
-G12,26,data_sheet,document type,
-G12,27,data_sheet,document type,
-G12,28,data_sheet,document type,
-G12,29,data_sheet,document type,
-G12,30,data_sheet,document type,
-G12,31,data_sheet,document type,
-G12,32,data_sheet,document type,
-G12,33,data_sheet,document type,
-G12,34,data_sheet,document type,
-G12,35,data_sheet,document type,
-G12,36,data_sheet,document type,
-G12,37,data_sheet,document type,
-G12,38,data_sheet,document type,
-G12,39,data_sheet,document type,
-G12,40,data_sheet,document type,
-G12,41,data_sheet,document type,
-G12,42,data_sheet,document type,
-G12,43,data_sheet,document type,
-G12,44,data_sheet,document type,
-G12,45,data_sheet,document type,
-G12,46,data_sheet,document type,
-G12,47,data_sheet,document type,
-G12,48,data_sheet,document type,
-D6,1,data_sheet,document type,
-D6,2,data_sheet,document type,
-D6,3,data_sheet,document type,
-D6,4,data_sheet,document type,
-K1,1,other,"page with almost no text (cover, figure, blank)",
-K1,2,data_sheet,document type,
-K1,3,data_sheet,document type,
-K1,4,data_sheet,document type,
-K1,5,data_sheet,document type,
-K1,6,data_sheet,document type,
-K1,7,data_sheet,document type,
-K1,8,other,section read,
-C1,1,certificate,document type,
-C2,1,certificate,document type,
-C3,1,certificate,document type,
-C4,1,certificate,document type,
-C4,2,certificate,document type,
-O1,1,other,document type,
-O1,2,other,document type,
-O1,3,other,document type,
-O1,4,other,document type,
-O1,5,other,document type,
-O1,6,other,document type,
-O1,7,other,document type,
-O1,8,other,document type,
-O1,9,other,document type,
-O1,10,other,document type,
-O1,11,other,document type,
-O1,12,other,document type,
-O1,13,other,document type,
-O1,14,other,document type,
-O1,15,other,document type,
-O1,16,other,document type,
-O1,17,other,document type,
-O1,18,other,document type,
-O1,19,other,"page with almost no text (cover, figure, blank)",
+doc,page,label,how,note,checked_by
+W1,1,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W2,1,declaration,document type,,
+W3,1,declaration,document type,,
+W5,1,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P1,1,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P1,2,declaration,document type,,
+P1,3,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P1,4,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P1,5,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P1,6,declaration,document type,,
+P1,7,declaration,document type,,
+P2,1,declaration,document type,,
+P2,2,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P2,3,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P3,1,declaration,document type,,
+P3,2,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P3,3,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P3,4,declaration,document type,,
+P3,5,declaration,document type,,
+P3,6,declaration,document type,,
+P3,7,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P4,1,declaration,document type,,
+P4,2,declaration,document type,,
+P4,3,declaration,document type,,
+P4,4,declaration,document type,,
+P4,5,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+P4,6,declaration,document type,,
+P4,7,declaration,document type,,
+D1,1,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D2,1,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D2,2,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D2,3,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D2,4,declaration,document type,,
+D3,1,other,document type,data act notice that says it is not a declaration of conformity,"Luca, 29 Oct 2026, sample with no corrections"
+D3,2,other,document type,data act notice that says it is not a declaration of conformity,"Luca, 29 Oct 2026, sample with no corrections"
+D3,3,other,document type,data act notice that says it is not a declaration of conformity,"Luca, 29 Oct 2026, sample with no corrections"
+H1,1,declaration,document type,,
+H1,2,declaration,document type,,
+H1,3,declaration,document type,,
+H1,4,declaration,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+H1,5,declaration,document type,,
+H1,6,declaration,document type,,
+G1,1,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,2,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition,
+G1,3,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,4,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,5,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,6,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,7,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,8,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,9,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,10,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,11,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,12,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,13,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G1,14,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,15,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,16,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G1,17,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,18,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,19,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,20,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,21,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,22,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,23,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,24,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,25,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,26,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,27,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,28,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,29,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,30,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,31,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,32,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,33,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,34,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,35,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,36,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,37,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,38,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,39,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,40,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,41,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,42,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,43,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,44,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,45,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,46,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,47,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,48,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,49,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,50,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,51,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,52,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,53,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,54,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,55,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,56,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,57,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,58,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,59,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,60,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,61,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,62,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,63,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,64,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,65,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,66,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,67,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,68,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,69,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,70,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,71,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G1,72,other,company addresses,English-only edition: the declaration is in the multilingual edition,
+G1,73,other,company addresses,English-only edition: the declaration is in the multilingual edition,
+G1,74,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,1,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition,
+G2,2,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,3,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,4,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,5,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,6,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,7,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,8,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,9,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,10,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,11,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,12,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,13,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,14,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,15,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,16,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,17,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,18,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,19,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,20,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,21,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,22,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,23,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,24,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,25,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,26,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,27,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,28,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition,
+G2,29,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,30,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,31,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,32,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,33,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,34,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,35,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,36,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,37,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,38,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,39,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,40,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,41,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,42,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,43,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,44,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,45,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,46,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,47,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,48,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,49,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,50,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,51,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,52,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,53,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,54,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,55,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,56,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,57,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,58,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,59,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,60,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,61,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,62,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,63,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,64,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,65,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,66,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,67,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,68,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G2,69,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition,
+G2,70,other,company addresses,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,71,other,company addresses,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G2,72,other,company addresses,English-only edition: the declaration is in the multilingual edition,
+G2,73,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,1,other,"page with almost no text (cover, figure, blank)",English-only edition: the declaration is in the multilingual edition,
+G5,2,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,3,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,4,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,5,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,6,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,7,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,8,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,9,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,10,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,11,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,12,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G5,13,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,14,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,15,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,16,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,17,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,18,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,19,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,20,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,21,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,22,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,23,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,24,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,25,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,26,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,27,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,28,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,29,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,30,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,31,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,32,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,33,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,34,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,35,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,36,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,37,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,38,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,39,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,40,manual,document type,English-only edition: the declaration is in the multilingual edition,"Luca, 29 Oct 2026, sample with no corrections"
+G5,41,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,42,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,43,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,44,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G5,45,other,company addresses,English-only edition: the declaration is in the multilingual edition,
+G5,46,manual,document type,English-only edition: the declaration is in the multilingual edition,
+G6,1,other,"page with almost no text (cover, figure, blank)",,"Luca, 29 Oct 2026, sample with no corrections"
+G6,2,manual,document type,,
+G6,3,manual,document type,,
+G6,4,manual,document type,,
+G6,5,manual,document type,,
+G6,6,manual,document type,,
+G6,7,manual,document type,,
+G6,8,manual,document type,,
+G6,9,manual,document type,,
+G6,10,manual,document type,,
+G6,11,manual,document type,,
+G6,12,manual,document type,,
+G6,13,manual,document type,,
+G6,14,manual,document type,,
+G6,15,manual,document type,,
+G6,16,manual,document type,,
+G6,17,manual,document type,,
+G6,18,manual,document type,,
+G6,19,manual,document type,,
+G6,20,manual,document type,,
+G6,21,manual,document type,,
+G6,22,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G6,23,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G6,24,manual,document type,,
+G6,25,manual,document type,,
+G6,26,manual,document type,,
+G7,1,other,"page with almost no text (cover, figure, blank)",,"Luca, 29 Oct 2026, sample with no corrections"
+G7,2,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,3,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,4,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,5,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,6,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,7,manual,document type,,
+G7,8,manual,document type,,
+G7,9,manual,document type,,
+G7,10,manual,document type,,
+G7,11,manual,document type,,
+G7,12,manual,document type,,
+G7,13,manual,document type,,
+G7,14,manual,document type,,
+G7,15,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,16,manual,document type,,
+G7,17,manual,document type,,
+G7,18,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G7,19,other,"page with almost no text (cover, figure, blank)",,
+G7,20,manual,document type,,
+G7,21,manual,document type,,
+G7,22,manual,document type,,
+W6,1,manual,document type,,
+W6,2,other,"page with almost no text (cover, figure, blank)",,
+W6,3,other,"page with almost no text (cover, figure, blank)",,
+W6,4,other,"page with almost no text (cover, figure, blank)",,
+W6,5,manual,document type,,
+W6,6,other,"page with almost no text (cover, figure, blank)",,
+W6,7,other,"page with almost no text (cover, figure, blank)",,"Luca, 29 Oct 2026, sample with no corrections"
+W6,8,manual,document type,,
+W6,9,manual,document type,,
+W6,10,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W6,11,manual,document type,,
+W6,12,manual,document type,,
+W6,13,manual,document type,,
+W6,14,manual,document type,,
+W6,15,manual,document type,,
+W6,16,manual,document type,,
+W6,17,manual,document type,,
+W6,18,manual,document type,,
+W6,19,manual,document type,,
+W6,20,manual,document type,,
+W6,21,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W6,22,manual,document type,,
+W6,23,manual,document type,,
+W6,24,manual,document type,,
+W6,25,manual,document type,,
+W6,26,manual,document type,,
+W6,27,manual,document type,,
+W6,28,manual,document type,,
+W6,29,manual,document type,,
+W6,30,manual,document type,,
+W6,31,manual,document type,,
+W6,32,manual,document type,,
+W6,33,manual,document type,,
+W6,34,manual,document type,,
+W6,35,manual,document type,,
+W6,36,other,"page with almost no text (cover, figure, blank)",,
+W6,37,manual,document type,,
+W6,38,manual,document type,,
+W7,1,manual,document type,,
+W7,2,other,"page with almost no text (cover, figure, blank)",,
+W7,3,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,4,manual,document type,,
+W7,5,manual,document type,,
+W7,6,manual,document type,,
+W7,7,manual,document type,,
+W7,8,manual,document type,,
+W7,9,manual,document type,,
+W7,10,manual,document type,,
+W7,11,manual,document type,,
+W7,12,manual,document type,,
+W7,13,manual,document type,,
+W7,14,manual,document type,,
+W7,15,manual,document type,,
+W7,16,manual,document type,,
+W7,17,manual,document type,,
+W7,18,manual,document type,,
+W7,19,manual,document type,,
+W7,20,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,21,manual,document type,,
+W7,22,manual,document type,,
+W7,23,manual,document type,,
+W7,24,manual,document type,,
+W7,25,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,26,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,27,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,28,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,29,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,30,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,31,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,32,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W7,33,other,"page with almost no text (cover, figure, blank)",,"Luca, 29 Oct 2026, sample with no corrections"
+W7,34,other,"page with almost no text (cover, figure, blank)",,
+W7,35,other,"page with almost no text (cover, figure, blank)",,
+W7,36,manual,document type,,
+W8,1,manual,document type,,
+W8,2,manual,document type,,
+W8,3,manual,document type,,
+W8,4,manual,document type,,
+W8,5,manual,document type,,
+W8,6,manual,document type,,
+W8,7,manual,document type,,
+W8,8,other,"page with almost no text (cover, figure, blank)",,
+W8,9,other,"page with almost no text (cover, figure, blank)",,
+W8,10,other,"page with almost no text (cover, figure, blank)",,
+W8,11,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+W8,12,manual,document type,,
+W8,13,manual,document type,,
+W8,14,manual,document type,,
+W8,15,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+W8,16,manual,document type,,
+D4,1,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,2,other,"page with almost no text (cover, figure, blank)","mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,3,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,4,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,5,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,6,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,7,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,8,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,9,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,10,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,11,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,12,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,13,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,14,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,15,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,16,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,17,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,18,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,19,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,20,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,21,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,22,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,23,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,24,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,25,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,26,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,27,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,28,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,29,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,30,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,31,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,32,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,33,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,34,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,35,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,36,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,37,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,38,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,39,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,40,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,41,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,42,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,43,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,44,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,45,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,46,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,47,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,48,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,49,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,50,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,51,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,52,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,53,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,54,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,55,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,56,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,57,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,58,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,59,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,60,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,61,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,62,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,63,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,64,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,65,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,66,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,67,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,68,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,69,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,70,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,71,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,72,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,73,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,74,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,75,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,76,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,77,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,78,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,79,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,80,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,81,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,82,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,83,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,84,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,85,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,86,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,87,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,88,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,89,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,90,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,91,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,92,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,93,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,94,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,95,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,96,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,97,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,98,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,99,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,100,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,101,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,102,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,103,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,104,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,105,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,106,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,107,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,108,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,109,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,110,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,111,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,112,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,113,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,114,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,115,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,116,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,117,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,118,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,119,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,120,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,121,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,122,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,123,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,124,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,125,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,126,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,127,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,128,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,129,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,130,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,131,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,132,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,133,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,134,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,135,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,136,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,137,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,138,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,139,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,140,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,141,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,142,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,143,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,144,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,145,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,146,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,147,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,148,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,149,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,150,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,151,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,152,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,153,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,154,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,155,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,156,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,157,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,158,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,159,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,160,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,161,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,162,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,163,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,164,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,165,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,166,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,167,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,168,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,169,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,170,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,171,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,172,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,173,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,174,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,175,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,176,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,177,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,178,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,179,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,180,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,181,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,182,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,183,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,184,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,185,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,186,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,187,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,188,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,189,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,190,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,191,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,192,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,193,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,194,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,195,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,196,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,197,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)","Luca, 29 Oct 2026, sample with no corrections"
+D4,198,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,199,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,200,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,201,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D4,202,manual,document type,"mentions the declaration only as a reference (pages 3, 9, 10)",
+D5,1,manual,document type,,
+D5,2,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D5,3,manual,document type,,
+D5,4,manual,document type,,
+D5,5,manual,document type,,
+D5,6,manual,document type,,
+D5,7,manual,document type,,
+D5,8,manual,document type,,
+D5,9,manual,document type,,
+D5,10,manual,document type,,
+D5,11,declaration,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+D5,12,manual,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G11,1,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G11,2,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,1,other,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,2,data_sheet,document type,,
+G12,3,data_sheet,document type,,
+G12,4,data_sheet,document type,,
+G12,5,data_sheet,document type,,
+G12,6,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,7,data_sheet,document type,,
+G12,8,data_sheet,document type,,
+G12,9,data_sheet,document type,,
+G12,10,data_sheet,document type,,
+G12,11,data_sheet,document type,,
+G12,12,data_sheet,document type,,
+G12,13,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,14,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,15,data_sheet,document type,,
+G12,16,data_sheet,document type,,
+G12,17,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,18,data_sheet,document type,,
+G12,19,data_sheet,document type,,
+G12,20,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,21,data_sheet,document type,,
+G12,22,data_sheet,document type,,
+G12,23,data_sheet,document type,,
+G12,24,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,25,data_sheet,document type,,
+G12,26,data_sheet,document type,,
+G12,27,data_sheet,document type,,
+G12,28,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,29,data_sheet,document type,,
+G12,30,data_sheet,document type,,
+G12,31,data_sheet,document type,,
+G12,32,data_sheet,document type,,
+G12,33,data_sheet,document type,,
+G12,34,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,35,data_sheet,document type,,
+G12,36,data_sheet,document type,,
+G12,37,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,38,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,39,data_sheet,document type,,
+G12,40,data_sheet,document type,,
+G12,41,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,42,data_sheet,document type,,
+G12,43,data_sheet,document type,,
+G12,44,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,45,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,46,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+G12,47,data_sheet,document type,,
+G12,48,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D6,1,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D6,2,data_sheet,document type,,
+D6,3,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+D6,4,data_sheet,document type,,
+K1,1,other,"page with almost no text (cover, figure, blank)",,
+K1,2,data_sheet,document type,,
+K1,3,data_sheet,document type,,
+K1,4,data_sheet,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+K1,5,data_sheet,document type,,
+K1,6,data_sheet,document type,,
+K1,7,data_sheet,document type,,
+K1,8,other,section read,,"Luca, 29 Oct 2026, sample with no corrections"
+C1,1,certificate,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+C2,1,certificate,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+C3,1,certificate,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+C4,1,certificate,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+C4,2,certificate,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,1,other,document type,,
+O1,2,other,document type,,
+O1,3,other,document type,,
+O1,4,other,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,5,other,document type,,
+O1,6,other,document type,,
+O1,7,other,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,8,other,document type,,
+O1,9,other,document type,,
+O1,10,other,document type,,
+O1,11,other,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,12,other,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,13,other,document type,,"Luca, 29 Oct 2026, sample with no corrections"
+O1,14,other,document type,,
+O1,15,other,document type,,
+O1,16,other,document type,,
+O1,17,other,document type,,
+O1,18,other,document type,,
+O1,19,other,"page with almost no text (cover, figure, blank)",,
