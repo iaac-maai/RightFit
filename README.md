@@ -28,7 +28,8 @@ A check only passes or flags on verified values. Until then it shows `unclear` a
 ```
 pip install -r requirements.txt
 pytest
-streamlit run app/maf_app.py
+python app/review_server.py      # the PoC review page: http://127.0.0.1:8520
+streamlit run app/maf_app.py     # the first review page, in Streamlit
 ```
 
 The app works from `data/maf/extracted/`, which is in Git. The original PDFs and forms stay on our laptops in `data/raw/`.

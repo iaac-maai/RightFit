@@ -85,7 +85,8 @@ In the earlier register, missing declarations led to a reminder for the delivery
 ## 8. Draft comments (explain/)
 One sentence per flag or unclear, from a template per check, in English, in the tone of the reviewers' past comments. A language model may only rephrase them, never add values. Example for D2: "The declaration of conformity attached for {covers} matches no product in the MAF; please attach the declarations for {items}."
 
-## 9. Interface (app/, Streamlit)
+## 9. Interface (app/)
+- two pages over the same checks: the Streamlit page (`app/maf_app.py`) and the PoC page (`app/review_server.py` with `app/review/`), which runs only on the laptop;
 - package picker (P01, P02), location switch (RO, ES), review date, delivery date;
 - header: form fields with roles only; draft status with its reasons;
 - documents table: file, type found, listed as, covers, valid until, pages, method;

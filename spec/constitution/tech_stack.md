@@ -10,7 +10,8 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, private), VS Code 
 |---|---|
 | xlrd | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`) |
 | pytest | Tests for every check (`tests/`) |
-| Streamlit, with pandas | The review page (`app/maf_app.py`) |
+| Streamlit, with pandas | The first review page (`app/maf_app.py`) |
+| Python's standard library (`http.server`), with plain HTML, CSS and JavaScript | The PoC review page (`app/review_server.py`, `app/review/`), which runs only on the laptop |
 | An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
 
 Still planned: the official MCP Python SDK, to expose the checks as tools an agent can call (12 Nov).
@@ -45,7 +46,7 @@ checks/maf/  plain Python, no AI, rules from data/maf/   -> pass / flag / unclea
 explain/     comments filled from templates              -> one sentence per issue
         |
         v
-app/         Streamlit review page                       -> draft status, overrides, exports
+app/         review pages (Streamlit, and the PoC page)  -> draft status, overrides, exports
 ```
 
 Nothing in `checks/` may import or call an AI model.
@@ -82,7 +83,7 @@ RightFit/
 |-- ingest/                form reader
 |-- checks/maf/            the checks and the draft status
 |-- explain/               comment templates
-|-- app/                   Streamlit page
+|-- app/                   Streamlit page, and the PoC review page (review/)
 `-- tests/                 tests
 ```
 
