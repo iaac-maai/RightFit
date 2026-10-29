@@ -223,3 +223,11 @@ __marimo__/
 data/raw/
 agent/
 .DS_Store
+
+# Design working files: screenshots, decision sketches, local cache
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/questions/
+.impeccable/hook.cache.json
+# Launch video output, local only
+brag-output*/
