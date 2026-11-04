@@ -65,6 +65,15 @@
         ],
         "createdAt": "2026-10-29T15:03:19.874Z",
         "reason": "agent's call: unchosen card from the closed decision round, git-ignored, never shipped"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "app/review/demo/index.html"
+        ],
+        "createdAt": "2026-11-04T23:51:56.387Z",
+        "reason": "user pinned the look: Luca asked that the demo look like Jeff's recording, whose ground is #F3EEE4"
       }
     ]
   }

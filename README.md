@@ -29,6 +29,7 @@ A check only passes or flags on verified values. Until then it shows `unclear` a
 pip install -r requirements.txt
 pytest
 python app/review_server.py      # the PoC review page: http://127.0.0.1:8520
+                                 # and the pump demo of the midterm: http://127.0.0.1:8520/demo/
 streamlit run app/maf_app.py     # the first review page, in Streamlit
 ```
 

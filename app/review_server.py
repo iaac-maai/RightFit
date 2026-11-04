@@ -13,12 +13,14 @@ import sys
 from datetime import date, timedelta
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from checks.maf.checks import DOC_LABELS, context, run_all  # noqa: E402
 from checks.maf.status import LABELS, draft_status  # noqa: E402
 from explain.maf_comments import comment  # noqa: E402
+from app import pump_demo  # noqa: E402
 
 PAGE = Path(__file__).with_name("review")
 RAW = ROOT / "data/raw"   # the original PDFs, on the laptop only (git-ignored)
@@ -241,11 +243,46 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
+            size = int(self.headers.get("Content-Length", 0))
+            if size > 60_000_000:
+                return self.send_json({"error": "The file is larger than 60 MB."}, 413)
+            raw = self.rfile.read(size)
+            if self.path == "/api/upload":   # one file of the package, held in memory for this run only
+                return self.send_json({"name": unquote(self.headers.get("X-File-Name", "")), "size": size,
+                                       "pages": pump_demo.page_count(raw), "token": pump_demo.keep(raw)})
+            body = json.loads(raw or b"{}")
+            if self.path == "/api/extract" and body.get("token"):   # read every page of one uploaded file
+                data = pump_demo.UPLOADS.get(body["token"])
+                if data is None:
+                    return self.send_json({"error": "That upload is no longer in memory; upload the package again."}, 404)
+                pages, chars = pump_demo.read_pages(data, body.get("page"))
+                return self.send_json({"pages": pages, "chars": chars})
+            if self.path == "/api/pumps/sets":
+                return self.send_json(pump_demo.booster_sets())
+            if self.path == "/api/identify":
+                packages = {k: json.loads(p.read_text()) for k, p in self.packages().items()}
+                return self.send_json({"package": pump_demo.identify(body.get("names", []), packages)})
+            if self.path == "/api/pumps/booster":
+                return self.send_json(pump_demo.booster_view(int(body["flats"]), int(body["floors"]),
+                                                             body.get("submitted") or None, float(body.get("mains_m") or 0)))
             path = self.packages().get(body.get("package"))   # only a package that exists, never a free path
             if path is None:
                 return self.send_json({"error": "unknown package"}, 404)
             pkg = json.loads(path.read_text())
+            if self.path == "/api/pumps/check":
+                return self.send_json(pump_demo.package_check(pkg))
+            if self.path == "/api/extract":   # read every page of one original on this laptop
+                f = original(body["package"], pkg, int(body["no"]))
+                if f is None:
+                    return self.send_json({"error": "The original of this attachment is not on this laptop."}, 404)
+                pages, chars = pump_demo.read_pages(f.read_bytes(), body.get("page"))
+                return self.send_json({"pages": pages, "chars": chars})
+            if self.path == "/api/read":   # the package already on this laptop: count the pages of each original
+                return self.send_json([{"name": d["file"], "pages": pump_demo.page_count(f.read_bytes()) if f else None}
+                                       for n, d in enumerate(pkg["documents"], 1)
+                                       for f in [original(body["package"], pkg, n)]])
+            if self.path == "/api/pumps/standby":
+                return self.send_json(pump_demo.standby_view(pkg))
             if self.path == "/api/confirm":
                 confirm(pkg, body["targets"])
                 save(path, pkg)
@@ -256,7 +293,9 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_json({"error": "unknown address"}, 404)
             self.send_json(review(pkg, body.get("location") or "RO", day(body.get("review")),
                                   day(body.get("delivery")), body.get("dismissed")))
-        except (KeyError, ValueError, StopIteration, TypeError) as e:
+        except FileNotFoundError:
+            self.send_json({"error": "The package's own readings (checks/pumps/data/raw/) are not on this laptop."}, 404)
+        except (KeyError, ValueError, StopIteration, TypeError, IndexError) as e:
             self.send_json({"error": f"{type(e).__name__}: {e}"}, 400)
 
 

@@ -1,0 +1,13 @@
+dataset_file,source,url,licence_or_status,how_built
+rules/rules.json,CTE DB-HS (Spain Ministry) + EU regulations,https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf,public law,quoted by hand with page numbers
+data/cte_hs4_fixture_flows.csv,CTE DB-HS4 Tabla 2.1 p82,https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf,public law,transcribed from PDF text
+data/cte_hs5_rainfall_intensity.csv,CTE DB-HS5 Appendix B Tabla B.1 p136,https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf,public law,transcribed from PDF text
+data/cte_hs_rule_sentences.csv,CTE DB-HS sections HS1-HS5,https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf,public law,auto-extracted deontic sentences (debe/deben/al menos...) - unannotated
+data/curves_booster_sets.csv,Lowara GHV booster sets catalogue (Xylem),https://www.anglianpumping.com/app/uploads/2026/06/lowara-ghv-data.pdf,manufacturer catalogue - research use,parse_performance_tables.py
+data/curves_drainage_pumps.csv,Lowara DOC/DOMO/DL catalogues (Xylem),https://www.anglianpumping.com/app/uploads/2023/03/lowara-domo-all.pdf ; https://www.motralec.com/public/fichiers/docs/Lowara_DLC_DLS_DLV_DLG.pdf,manufacturer catalogue - research use,parse_performance_tables.py
+data/products.csv,summary of the two curve files + your package,see source_url column,,build_catalogue.py
+data/products_package_IS15.csv,your MAF_IS_15 Grundfos data sheets,team project files,confidential - do not publish,extract_datasheet.py
+data/declarations_package_IS15.csv,your MAF_IS_15 declarations,team project files,confidential - do not publish,pdf text + OCR
+data/page_labels_package_IS15.csv,your MAF_IS_15 package (34 pages),team project files,confidential - do not publish,auto-labelled - check
+public/codeaccord/annotated_data,CODE-ACCORD (Accord-Project),https://github.com/Accord-Project/CODE-ACCORD,CC-BY-4.0,git clone
+public/regulations/ES_CTE_DB-HS.pdf,CTE DB-HS,https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf,public law,download
