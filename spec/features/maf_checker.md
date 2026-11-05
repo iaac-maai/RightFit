@@ -1,6 +1,6 @@
 # Feature spec: MAF checker for MEP equipment (proposal)
 
-Status: proposal by Luca, 28 Oct 2026, on branch maf-checker. Pending Sahil and Jeff. Nothing here changes main or the constitution until the team agrees (see docs/decisions.md).
+Status: proposed by Luca on 28 Oct 2026, agreed by the team on 5 Nov 2026 (see docs/decisions.md).
 
 ## 1. What it does
 RightFit checks a material approval form (MAF; in Romania "fișă pentru transmitere și aprobare materiale") for MEP equipment before the reviewer signs it. It reads every attached document, checks it against the law, the project's requirements and a checklist written from reviewers' past comments, and drafts a review that points to the page behind each finding. AI reads, rules decide, a person signs.
@@ -12,7 +12,7 @@ RightFit checks a material approval form (MAF; in Romania "fișă pentru transmi
 ## 2. How it fits the constitution
 Unchanged: the data rule (value, unit, source, page, status, checked_by), deterministic checks in checks/ with no AI, results as pass, flag or unclear with sources, humans decide, nothing confidential in Git, decisions in docs/decisions.md, Python, pytest, Streamlit.
 
-Changed if the team agrees: the first use case becomes the MAF review of MEP equipment instead of hood selection; the user becomes the reviewer instead of the interior designer; FEAT-02 and FEAT-03 (visual and keyword search) are not needed for it.
+Changed by the team's decision: the first use case becomes the MAF review of MEP equipment instead of hood selection; the user becomes the reviewer instead of the interior designer; FEAT-02 and FEAT-03 (visual and keyword search) are not needed for it.
 
 ## 3. Inputs
 
@@ -112,5 +112,4 @@ One sentence per flag or unclear, from a template per check, in English, in the 
 - the duty point tolerance: none (Luca, 28 Oct 2026, ENG-DUTY-TOL);
 - which roles sit behind the four reviewer columns of the register (Luca);
 - the Romanian law and the RITE article checked against the official journals;
-- which LEED, BREEAM or VERDE values join each family's checklist (Sahil or Jeff);
-- the IAAC deliverables of 29 Oct and the midterm still describe hoods: the team decides whether they change.
+- which LEED, BREEAM or VERDE values join each family's checklist (Sahil or Jeff).

@@ -1,6 +1,6 @@
 # Data Map — RightFit
 
-IAAC deliverable, 29 Oct 2026. MAF version on branch `maf-checker`; the hood version is on `main`. Open questions are marked [O].
+IAAC deliverable, 29 Oct 2026. MAF version, which the team agreed to on 5 Nov 2026; the hood version stays in the Git history. Open questions are marked [O].
 
 Unlike the hood version, which started from data we still had to collect, the MAF version starts from data Luca already holds: a register of 80 forms and two complete packages. The weak spots are different. We have very few packages, and some of the rules were read on secondary sites.
 

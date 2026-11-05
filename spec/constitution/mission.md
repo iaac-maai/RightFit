@@ -1,6 +1,6 @@
 # Mission — RightFit
 
-Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet; the full version is due on 12 Nov. Open questions are marked [O].
+Draft for the MAF checker, 28 Oct 2026; the team agreed to it on 5 Nov 2026, and the full version is due on 12 Nov. Open questions are marked [O].
 
 ## 1. Problem
 

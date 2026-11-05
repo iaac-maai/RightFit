@@ -1,6 +1,6 @@
 # Tech Stack — RightFit
 
-Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet. Open questions are marked [O].
+Draft for the MAF checker, 28 Oct 2026; the team agreed to it on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. Tools
 

@@ -4,7 +4,7 @@ RightFit helps the person who signs a material approval form (MAF) for MEP equip
 
 IAAC MaAI01 · Operable Futures · 2026–27 · Sahil Khan, Jeff El Khoury, Luca Obejdeanu
 
-This is the `maf-checker` branch. It is Luca's proposal to move the project from choosing kitchen hoods to reviewing MAFs, and Sahil and Jeff have not agreed to it yet. `main` still has the hood version.
+On 5 Nov 2026 the team agreed to move the project from choosing kitchen hoods to reviewing MAFs. The hood version stays in the Git history.
 
 ## Why we changed direction
 

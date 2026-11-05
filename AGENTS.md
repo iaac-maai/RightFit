@@ -7,17 +7,17 @@ Instructions for any AI agent (Claude, ChatGPT/Codex, Copilot) and any human con
 1. `spec/constitution/mission.md` — problem, scope, principles
 2. `spec/constitution/roadmap.md` — milestones, phases, features
 3. `spec/constitution/tech_stack.md` — tools, architecture, data rule, repository structure
-4. `spec/features/maf_checker.md` — the MAF checker, the feature this branch builds
+4. `spec/features/maf_checker.md` — the MAF checker, the feature we build first
 
 If this file and the constitution disagree, the constitution wins.
 
 ## Project
 
-On this branch (`maf-checker`) RightFit checks material approval forms (MAFs) for MEP equipment before the reviewer signs them. It reads the attached documents, runs deterministic checks against EU and national rules and a checklist built from past reviewers' comments, and drafts the review with a page reference for each finding. The reviewer decides.
+RightFit checks material approval forms (MAFs) for MEP equipment before the reviewer signs them. It reads the attached documents, runs deterministic checks against EU and national rules and a checklist built from past reviewers' comments, and drafts the review with a page reference for each finding. The reviewer decides.
 
 - Course: IAAC MaAI01, Operable Futures (2026–27). AEC phase: Design & Pre-Construction.
 - First families: pumps and air handling units (with their outdoor units and DX kits). We hold two complete real packages for them, P01 and P02.
-- This is Luca's proposal, not yet agreed by Sahil and Jeff. `main` keeps the kitchen hood version.
+- Luca proposed the MAF review on 28 Oct 2026 and the team agreed to it on 5 Nov 2026. The kitchen hood version stays in the Git history (`main` up to `e155640`).
 
 ## Milestones (IAAC)
 
@@ -74,6 +74,6 @@ The planned repository structure is in `spec/constitution/tech_stack.md` §6.
 
 Open decisions are the items tagged **[O]** in `spec/constitution/`. This file keeps no separate list.
 
-## Current status (28 Oct 2026, branch maf-checker)
+## Current status (5 Nov 2026)
 
-Two packages read into `data/maf/extracted/`; all values still `extracted`, none verified. Checks, draft status, draft comments and the Streamlit page built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. The app and every file are in English.
+Two packages read into `data/maf/extracted/`; all values still `extracted`, none verified. Checks, draft status, draft comments and the Streamlit page built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. A review page without Streamlit and the midterm pump demo, which reads uploaded packages live, run on `app/review_server.py`. The app and every file are in English.

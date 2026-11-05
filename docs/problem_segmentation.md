@@ -1,6 +1,6 @@
 # Problem Segmentation Tree — RightFit
 
-IAAC deliverable, 29 Oct 2026. MAF version on branch `maf-checker`; the hood version is on `main` and the team chooses which one to hand in. Open questions are marked [O].
+IAAC deliverable, 29 Oct 2026. MAF version, which the team agreed to on 5 Nov 2026; the hood version stays in the Git history. Open questions are marked [O].
 
 We split the work by who does each step. "Human" means one of us or a reviewer decides. "AI" means a model reads or interprets, and a person checks what it read. "Rule" is a fixed check in plain Python. "Data" is collecting, storing and moving files.
 

@@ -1,6 +1,6 @@
 # Roadmap — RightFit
 
-Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff have not agreed to it yet. Open questions are marked [O].
+Draft for the MAF checker, 28 Oct 2026; the team agreed to it on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. IAAC milestones
 
@@ -14,11 +14,11 @@ Draft for the MAF proposal on branch `maf-checker`, 28 Oct 2026. Sahil and Jeff 
 
 ## 2. Where we are on 28 Oct
 
-On this branch we have the feature spec, the rules and checklist tables, both packages read into JSON, the checks with their tests, a first Streamlit page, and Luca's reference answers for both packages. Luca has also set two engineering inputs: no tolerance on the duty point, and which pump groups need a control panel. What's missing is his check of the extracted values, so the first comparison with his answers (in `agent/LOG.md`, local) is still on unverified values.
+We have the feature spec, the rules and checklist tables, both packages read into JSON, the checks with their tests, a first Streamlit page, and Luca's reference answers for both packages. Luca has also set two engineering inputs: no tolerance on the duty point, and which pump groups need a control panel. What's missing is his check of the extracted values, so the first comparison with his answers (in `agent/LOG.md`, local) is still on unverified values.
 
 ## 3. Phases
 
-By 29 Oct we hand in the repository, `AGENTS.md`, the constitution draft, the problem tree, the data map and the first agent test. The hood version of these is on `main`; this branch rewrites them for the MAF review, and the team chooses which version to hand in.
+By 29 Oct we hand in the repository, `AGENTS.md`, the constitution draft, the problem tree, the data map and the first agent test. They describe the MAF review; the hood versions stay in the Git history.
 
 Before the midterm on 5 Nov, Luca verifies the extracted values in the app. We compare the tool with his reference answers again and write the result in the repository, good or bad. Luca also confirms the draft status rules, and we check the Romanian law and the Spanish RITE article on the official journals instead of the secondary sites we used so far. At the midterm we demo both packages with that comparison.
 
@@ -76,7 +76,6 @@ Every check has unit tests with hand written cases, which Luca approves. Data te
 | The AI misreads or misses a value | Every value starts as `extracted`, with page and quote; checks wait for a person to verify it |
 | Some rules were read on secondary sites | Each rule carries its status; the official texts are checked before the midterm |
 | Luca built the checklist and is also the only reviewer | He writes the reference before seeing the tool; [O] a second reviewer |
-| The team keeps the hood version | `main` stays as it is; this branch remains a proposal |
 | Scanned PDFs without text | They are read from the page image and marked for a closer check |
 
 Changes to this file are recorded in `docs/decisions.md`.
