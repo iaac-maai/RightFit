@@ -201,6 +201,11 @@ class Handler(SimpleHTTPRequestHandler):
     def log_message(self, *args):
         pass
 
+    def end_headers(self):
+        if self.command == "GET" and not self.path.startswith("/api/"):
+            self.send_header("Cache-Control", "no-cache")   # a page changed on this laptop shows at the next reload
+        super().end_headers()
+
     def send_json(self, payload, code=200):
         body = json.dumps(payload, ensure_ascii=False).encode()
         self.send_response(code)

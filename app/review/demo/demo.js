@@ -6,7 +6,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n, d = 1) => (n == null ? 'n/a' : Number(n).toFixed(d));
 const PKG = 'P01';   // the pump package kept on this laptop, for the "use the package already on this laptop" link
-const state = { analysis: null, standbyShown: null };
+const state = { entries: [], analysis: null, standbyShown: null, busy: false };
 const TITLES = { check: 'Package check', booster: 'Size the booster', standby: 'Standby test' };
 
 async function api(path, body, headers) {
@@ -53,8 +53,16 @@ document.querySelector('.tabs').addEventListener('keydown', (ev) => {
 });
 
 // ------------------------------------------------------------------ 1 · package check
-function fail(where, message) {
-  where.insertAdjacentHTML('beforeend', `<p class="error" role="alert">${esc(message)}</p>`);
+// The package is every file added so far. Files added later are read on their own, then the whole package is checked again.
+function pkgBar(n) {
+  return `<div class="pkg"><p class="cap">${n} file${n === 1 ? '' : 's'} in this package</p>
+    <button class="add" type="button" data-pick>+ Add documents</button></div>`;
+}
+
+function failed(e) {
+  if (state.analysis) renderCheck(state.analysis);   // keep the last result on screen
+  else $('#check-main').insertAdjacentHTML('afterbegin', pkgBar(state.entries.length));
+  $('.pkg').insertAdjacentHTML('afterend', `<p class="error" role="alert">${esc(e.message)}</p>`);
 }
 
 function listFiles() {
@@ -62,12 +70,20 @@ function listFiles() {
   $('#check-main').innerHTML = `<ul class="files" id="flist"></ul>
     <div class="progress" id="progress" hidden><p class="label"><span class="spin" aria-hidden="true"></span><span id="plabel">Reading the package</span></p>
       <div class="track"><div class="fill" id="pfill"></div></div></div>`;
+  state.entries.forEach(addFile);   // the files already in the package stay listed
 }
 
 function addFile(e, i) {
   $('#flist').insertAdjacentHTML('beforeend', `<li id="f${i}" style="animation-delay:${i * 60}ms">
     <span class="pdf">${e.pages == null ? 'FILE' : 'PDF'}</span><span class="name">${esc(e.name)}</span>
-    <span class="pages">${e.pages == null ? 'not a PDF' : `${e.pages} pages`}</span><span class="bar-in"></span></li>`);
+    <span class="pages">${e.pages == null ? 'not a PDF' : `${e.pages} pages${e.ocr ? ' · OCR' : ''}`}</span>
+    <span class="bar-in"${e.done ? ' style="width:100%"' : ''}></span></li>`);
+}
+
+function include(e) {   // a file joins the package once, however often it is added
+  if (state.entries.some((x) => x.token === e.token)) return;
+  addFile(e, state.entries.length);
+  state.entries.push(e);
 }
 
 // Every page is read on the server as the counter moves: its text, or OCR when the page is a scan.
@@ -76,56 +92,50 @@ async function readPages(entries) {
   let done = 0;
   $('#progress').hidden = false;
   $('#plabel').textContent = `Reading page 0 of ${total}`;
-  for (const [i, e] of entries.entries()) {
-    let ocr = false;
+  for (const e of entries) {
+    const row = $(`#f${state.entries.indexOf(e)}`);
     for (let p = 1; p <= (e.pages || 0); p++) {
-      $('#plabel').textContent = `Reading page ${done + 1} of ${total}${ocr ? ' · OCR of a scanned page' : ''}`;
+      $('#plabel').textContent = `Reading page ${done + 1} of ${total}${e.ocr ? ' · OCR of a scanned page' : ''}`;
       const r = await api('/api/extract', { token: e.token, page: p });
-      ocr = ocr || r.read === 'ocr';
+      e.ocr = e.ocr || r.read === 'ocr';
       done += 1;
-      $(`#f${i} .bar-in`).style.width = `${(p / e.pages) * 100}%`;
+      $('.bar-in', row).style.width = `${(p / e.pages) * 100}%`;
       $('#pfill').style.width = `${(done / total) * 100}%`;
     }
-    if (ocr) $(`#f${i} .pages`).textContent = `${e.pages} pages · OCR`;
+    if (e.ocr) $('.pages', row).textContent = `${e.pages} pages · OCR`;
+    e.done = true;
   }
   $('#plabel').textContent = `Read ${done} pages · matching pumps to declarations`;
 }
 
-async function run(entries) {
-  await readPages(entries);
-  const c = await api('/api/analyse', { tokens: entries.map((e) => e.token) });
-  $('#progress').classList.add('done');
-  state.analysis = c;
-  state.standbyShown = null;
-  renderCheck(c);
+async function addToPackage(adding) {
+  if (state.busy) return;
+  state.busy = true;
+  try {
+    listFiles();
+    await adding();
+    await readPages(state.entries.filter((e) => !e.done));
+    const c = await api('/api/analyse', { tokens: state.entries.map((e) => e.token) });
+    $('#progress').classList.add('done');
+    state.analysis = c;
+    state.standbyShown = null;
+    renderCheck(c);
+  } catch (e) {
+    failed(e);
+  } finally {
+    state.busy = false;
+  }
 }
 
 async function upload(fileList) {
   const files = [...fileList];
-  if (!files.length) return;
-  try {
-    listFiles();
-    const sent = [];
-    for (const f of files) {
-      const r = await api('/api/upload', f, { 'X-File-Name': encodeURIComponent(f.name) });
-      addFile(r, sent.length);
-      sent.push(r);
-    }
-    await run(sent);
-  } catch (e) {
-    fail($('#check-main'), e.message);
-  }
+  if (files.length) await addToPackage(async () => {
+    for (const f of files) include(await api('/api/upload', f, { 'X-File-Name': encodeURIComponent(f.name) }));
+  });
 }
 
-async function useLocal() {
-  try {
-    listFiles();
-    const files = await api('/api/load-local', { package: PKG });   // the original files on this laptop
-    files.forEach(addFile);
-    await run(files);
-  } catch (e) {
-    fail($('#check-main'), e.message);
-  }
+function useLocal() {   // the original files on this laptop, as if they were uploaded
+  return addToPackage(async () => (await api('/api/load-local', { package: PKG })).forEach(include));
 }
 
 function chip(rule) {
@@ -139,8 +149,9 @@ function chip(rule) {
 
 function renderCheck(c) {
   $('#check-title').textContent = c.form ? `MAF ${c.form} · pump package` : 'Pump package';
+  const head = pkgBar(c.files.length);
   if (!c.pumps.length) {
-    $('#check-main').insertAdjacentHTML('beforeend', '<p class="note">No pump data sheet was found among these files, so there is nothing to check against the declarations.</p>');
+    $('#check-main').innerHTML = `${head}<p class="note">No pump data sheet was found among these files, so there is nothing to check against the declarations.</p>`;
     return;
   }
   const ok = !c.missing;
@@ -149,7 +160,7 @@ function renderCheck(c) {
     ...c.unused.map((d) => `<p class="also"><b>Also:</b> the ${esc(d.names.join(', '))} declaration in the package names <b>no submitted pump</b>${d.read === 'OCR' ? ' (read by OCR from a scan)' : ''}.</p>`),
     ...c.unread.map((d) => `<p class="also"><b>Not read:</b> ${esc(d.file || d.name)}${d.names ? ' names no products RightFit can find' : ' has no text, even by OCR'}. Check it by eye.</p>`),
   ].join('');
-  $('#check-main').innerHTML = `
+  $('#check-main').innerHTML = `${head}
     <div class="banner ${ok ? 'ok' : 'return'}"><b>${ok ? 'Pass' : 'Return'}</b>
       <span>${ok ? 'every pump has a declaration that names it' : `${c.missing} of ${c.pumps.length} pumps have no declaration that names them`}</span></div>
     <div class="counts">${count(c.pages, 'pages read', 0)}${count(c.pumps.length, 'pumps found', 1)}${count(c.declarations.length, 'declarations', 2)}${count(c.missing, 'pumps not covered', 3, c.missing > 0)}</div>
@@ -182,18 +193,21 @@ function selectPump(i) {
 $('#check-main').addEventListener('click', (ev) => {
   const tr = ev.target.closest('.pumps tbody tr');
   if (tr) selectPump(Number(tr.dataset.i));
+  if (ev.target.closest('[data-pick]')) $('#files').click();
 });
 $('#check-main').addEventListener('keydown', (ev) => {
   const tr = ev.target.closest('.pumps tbody tr');
   if (tr && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); selectPump(Number(tr.dataset.i)); }
 });
-$('#pick').addEventListener('click', () => $('#files').click());
-$('#files').addEventListener('change', (ev) => upload(ev.target.files));
+$('#files').addEventListener('change', (ev) => { upload(ev.target.files); ev.target.value = ''; });   // so the same file can be picked again
 $('#local').addEventListener('click', useLocal);
-const drop = $('#drop');
-['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (ev) => { ev.preventDefault(); drop.classList.add('over'); }));
-['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, () => drop.classList.remove('over')));
-drop.addEventListener('drop', (ev) => { ev.preventDefault(); upload(ev.dataTransfer.files); });
+// Files can be dropped anywhere on this step, before or after the first upload.
+const zone = $('#check');
+const target = () => $('#drop') || $('#check-main');
+['dragenter', 'dragover'].forEach((t) => zone.addEventListener(t, (ev) => { ev.preventDefault(); if (!state.busy) target().classList.add('over'); }));
+['dragleave', 'drop'].forEach((t) => zone.addEventListener(t, () => target().classList.remove('over')));
+zone.addEventListener('drop', (ev) => { ev.preventDefault(); upload(ev.dataTransfer.files); });
+['dragover', 'drop'].forEach((t) => window.addEventListener(t, (ev) => ev.preventDefault()));   // a file dropped beside the page must not replace it
 
 // ------------------------------------------------------------------ charts drawn from the real curve points
 function chart({ xMax, yMin = 0, yMax, xStep, yStep, xLabel, yLabel, series = [], points = [], guides = [], label }) {

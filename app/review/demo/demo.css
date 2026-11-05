@@ -60,6 +60,13 @@ h1 { margin: 0; font: 800 clamp(34px, 3vw, 56px)/1.1 var(--display); letter-spac
 .drop.over { border-color: var(--teal); background: #EEF6F1; }
 .drop .up { width: 30px; height: 30px; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .drop-title { margin: 0; font: 600 var(--big)/1.2 var(--sans); }
+#check-main.over { outline: 2px dashed var(--teal); outline-offset: 12px; }
+
+/* the package so far, and adding to it after the first upload */
+.pkg { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 14px; }
+.pkg .cap { margin: 0; font-size: var(--small); font-weight: 600; }
+.add { border: 1.5px solid var(--navy); background: none; color: var(--navy); font: 600 var(--small)/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; padding: .8em 1.1em; cursor: pointer; white-space: nowrap; }
+.add:hover { background: var(--navy); color: #fff; }
 
 /* reading, file by file and page by page */
 .files { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
