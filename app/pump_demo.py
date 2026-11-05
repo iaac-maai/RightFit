@@ -206,7 +206,13 @@ def analyse(tokens):
             form = number or form
             files.append({"name": up["name"], "token": token, "pages": None, "kind": "form" if number else "not a PDF"})
             continue
-        pages = [read_page(token, number) for number in range(1, n + 1)]
+        try:
+            pages = [read_page(token, number) for number in range(1, n + 1)]
+        except Exception:   # a locked or damaged PDF is listed as not read; the rest of the package is still checked
+            locked = pymupdf.open(stream=up["data"], filetype="pdf").needs_pass
+            files.append({"name": up["name"], "token": token, "pages": n, "kind": "unreadable",
+                          "reason": "is locked with a password" if locked else "is damaged"})
+            continue
         text = "\n".join(t for t, _ in pages)
         hows = {h for _, h in pages}
         kind = classify(text)
@@ -225,7 +231,7 @@ def analyse(tokens):
         p["rules"] = rules_for(p, families)
     named = {p["rules"]["CE-01"]["label"] for p in pumps if p["rules"]["CE-01"]["verdict"] == "pass"}
     booster_set = next((p for p in pumps if p["category"] == "booster_set" and p.get("flow_m3h") and p.get("head_m")), None)
-    return {"form": form, "files": files, "pages": sum(f["pages"] or 0 for f in files), "pumps": pumps,
+    return {"form": form, "files": files, "pages": sum(f["pages"] or 0 for f in files if not f.get("reason")), "pumps": pumps,
             "declarations": decls, "missing": sum(p["rules"]["CE-01"]["verdict"] == "fail" for p in pumps),
             "unused": [d for d in decls if d["names"] and not set(d["names"]) & named],
             "unread": [d for d in decls if not d["names"]] + [f for f in files if f["kind"] == "unreadable"],

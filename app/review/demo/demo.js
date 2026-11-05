@@ -6,7 +6,7 @@ const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n, d = 1) => (n == null ? 'n/a' : Number(n).toFixed(d));
 const PKG = 'P01';   // the pump package kept on this laptop, for the "use the package already on this laptop" link
-const state = { entries: [], analysis: null, standbyShown: null, busy: false };
+const state = { entries: [], analysis: null, standbyShown: null, busy: false, waiting: [], refused: [] };
 const TITLES = { check: 'Package check', booster: 'Size the booster', standby: 'Standby test' };
 
 async function api(path, body, headers) {
@@ -18,7 +18,7 @@ async function api(path, body, headers) {
     throw new Error('The RightFit server is not answering. Start it with: python app/review_server.py');
   }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok || data.error) throw new Error(data.error || `The server answered ${res.status}.`);
+  if (!res.ok || data.error) throw Object.assign(new Error(data.error || `The server answered ${res.status}.`), { status: res.status });
   return data;
 }
 
@@ -54,15 +54,24 @@ document.querySelector('.tabs').addEventListener('keydown', (ev) => {
 
 // ------------------------------------------------------------------ 1 · package check
 // The package is every file added so far. Files added later are read on their own, then the whole package is checked again.
-function pkgBar(n) {
+const START = $('#check-main').innerHTML;   // the empty drop zone, shown again when the package starts over
+
+function pkgBar(n) {   // the package so far, the button that adds to it, and the files the server refused this time
   return `<div class="pkg"><p class="cap">${n} file${n === 1 ? '' : 's'} in this package</p>
-    <button class="add" type="button" data-pick>+ Add documents</button></div>`;
+    <button class="add" type="button" data-pick>+ Add documents</button></div>`
+    + state.refused.map((r) => `<p class="error" role="alert">${esc(r.name)} was not added. ${esc(r.message)}</p>`).join('');
 }
 
 function failed(e) {
+  if (e.status === 410) {   // the server was restarted and no longer has the files: the package starts over
+    state.entries = [];
+    state.analysis = null;
+    $('#check-title').textContent = 'Pump package check';
+  }
   if (state.analysis) renderCheck(state.analysis);   // keep the last result on screen
+  else if (!state.entries.length) $('#check-main').innerHTML = START;
   else $('#check-main').insertAdjacentHTML('afterbegin', pkgBar(state.entries.length));
-  $('.pkg').insertAdjacentHTML('afterend', `<p class="error" role="alert">${esc(e.message)}</p>`);
+  ($('.pkg') || $('#drop')).insertAdjacentHTML('afterend', `<p class="error" role="alert">${esc(e.message)}</p>`);
 }
 
 function listFiles() {
@@ -94,15 +103,20 @@ async function readPages(entries) {
   $('#plabel').textContent = `Reading page 0 of ${total}`;
   for (const e of entries) {
     const row = $(`#f${state.entries.indexOf(e)}`);
-    for (let p = 1; p <= (e.pages || 0); p++) {
-      $('#plabel').textContent = `Reading page ${done + 1} of ${total}${e.ocr ? ' · OCR of a scanned page' : ''}`;
-      const r = await api('/api/extract', { token: e.token, page: p });
-      e.ocr = e.ocr || r.read === 'ocr';
-      done += 1;
-      $('.bar-in', row).style.width = `${(p / e.pages) * 100}%`;
-      $('#pfill').style.width = `${(done / total) * 100}%`;
+    try {
+      for (let p = 1; p <= (e.pages || 0); p++) {
+        $('#plabel').textContent = `Reading page ${done + 1} of ${total}${e.ocr ? ' · OCR of a scanned page' : ''}`;
+        const r = await api('/api/extract', { token: e.token, page: p });
+        e.ocr = e.ocr || r.read === 'ocr';
+        done += 1;
+        $('.bar-in', row).style.width = `${(p / e.pages) * 100}%`;
+        $('#pfill').style.width = `${(done / total) * 100}%`;
+      }
+      if (e.ocr) $('.pages', row).textContent = `${e.pages} pages · OCR`;
+    } catch (err) {
+      if (!err.status) throw err;   // the server is not answering: stop here
+      $('.pages', row).textContent = 'not read';   // a locked or damaged file: the check lists it and goes on
     }
-    if (e.ocr) $('.pages', row).textContent = `${e.pages} pages · OCR`;
     e.done = true;
   }
   $('#plabel').textContent = `Read ${done} pages · matching pumps to declarations`;
@@ -111,6 +125,7 @@ async function readPages(entries) {
 async function addToPackage(adding) {
   if (state.busy) return;
   state.busy = true;
+  state.refused = [];
   try {
     listFiles();
     await adding();
@@ -124,13 +139,27 @@ async function addToPackage(adding) {
     failed(e);
   } finally {
     state.busy = false;
+    if (state.waiting.length) upload(state.waiting.splice(0));   // files dropped while this package was being read
   }
 }
 
 async function upload(fileList) {
   const files = [...fileList];
-  if (files.length) await addToPackage(async () => {
-    for (const f of files) include(await api('/api/upload', f, { 'X-File-Name': encodeURIComponent(f.name) }));
+  if (!files.length) return;
+  if (state.busy) {   // still reading: these files are added as soon as it ends
+    state.waiting.push(...files);
+    $('#flist')?.insertAdjacentHTML('afterend', `<p class="note">${esc(files.map((f) => f.name).join(', '))}: added when this reading ends.</p>`);
+    return;
+  }
+  await addToPackage(async () => {
+    for (const f of files) {
+      try {
+        include(await api('/api/upload', f, { 'X-File-Name': encodeURIComponent(f.name) }));
+      } catch (err) {
+        if (!err.status) throw err;   // the server is not answering: stop here
+        state.refused.push({ name: f.name, message: err.message });   // e.g. larger than 60 MB; the other files go on
+      }
+    }
   });
 }
 
@@ -150,16 +179,15 @@ function chip(rule) {
 function renderCheck(c) {
   $('#check-title').textContent = c.form ? `MAF ${c.form} · pump package` : 'Pump package';
   const head = pkgBar(c.files.length);
+  const unread = c.unread.map((d) => `<p class="also"><b>Not read:</b> ${esc(d.file || d.name)} ${d.names ? 'names no products RightFit can find'
+    : esc(d.reason || 'has no text, even by OCR')}. Check it by eye.</p>`).join('');
   if (!c.pumps.length) {
-    $('#check-main').innerHTML = `${head}<p class="note">No pump data sheet was found among these files, so there is nothing to check against the declarations.</p>`;
+    $('#check-main').innerHTML = `${head}<p class="note">No pump data sheet was found among these files, so there is nothing to check against the declarations.</p>${unread}`;
     return;
   }
   const ok = !c.missing;
   const count = (n, label, i, bad) => `<div class="count${bad ? ' bad' : ''}" style="animation-delay:${200 + i * 90}ms"><b>${n}</b><span>${label}</span></div>`;
-  const also = [
-    ...c.unused.map((d) => `<p class="also"><b>Also:</b> the ${esc(d.names.join(', '))} declaration in the package names <b>no submitted pump</b>${d.read === 'OCR' ? ' (read by OCR from a scan)' : ''}.</p>`),
-    ...c.unread.map((d) => `<p class="also"><b>Not read:</b> ${esc(d.file || d.name)}${d.names ? ' names no products RightFit can find' : ' has no text, even by OCR'}. Check it by eye.</p>`),
-  ].join('');
+  const also = c.unused.map((d) => `<p class="also"><b>Also:</b> the ${esc(d.names.join(', '))} declaration in the package names <b>no submitted pump</b>${d.read === 'OCR' ? ' (read by OCR from a scan)' : ''}.</p>`).join('') + unread;
   $('#check-main').innerHTML = `${head}
     <div class="banner ${ok ? 'ok' : 'return'}"><b>${ok ? 'Pass' : 'Return'}</b>
       <span>${ok ? 'every pump has a declaration that names it' : `${c.missing} of ${c.pumps.length} pumps have no declaration that names them`}</span></div>
@@ -194,17 +222,17 @@ $('#check-main').addEventListener('click', (ev) => {
   const tr = ev.target.closest('.pumps tbody tr');
   if (tr) selectPump(Number(tr.dataset.i));
   if (ev.target.closest('[data-pick]')) $('#files').click();
+  if (ev.target.closest('#local')) useLocal();
 });
 $('#check-main').addEventListener('keydown', (ev) => {
   const tr = ev.target.closest('.pumps tbody tr');
   if (tr && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); selectPump(Number(tr.dataset.i)); }
 });
 $('#files').addEventListener('change', (ev) => { upload(ev.target.files); ev.target.value = ''; });   // so the same file can be picked again
-$('#local').addEventListener('click', useLocal);
 // Files can be dropped anywhere on this step, before or after the first upload.
 const zone = $('#check');
 const target = () => $('#drop') || $('#check-main');
-['dragenter', 'dragover'].forEach((t) => zone.addEventListener(t, (ev) => { ev.preventDefault(); if (!state.busy) target().classList.add('over'); }));
+['dragenter', 'dragover'].forEach((t) => zone.addEventListener(t, (ev) => { ev.preventDefault(); target().classList.add('over'); }));
 ['dragleave', 'drop'].forEach((t) => zone.addEventListener(t, () => target().classList.remove('over')));
 zone.addEventListener('drop', (ev) => { ev.preventDefault(); upload(ev.dataTransfer.files); });
 ['dragover', 'drop'].forEach((t) => window.addEventListener(t, (ev) => ev.preventDefault()));   // a file dropped beside the page must not replace it

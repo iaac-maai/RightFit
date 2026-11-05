@@ -40,6 +40,17 @@ def test_a_text_file_is_no_pdf_and_a_damaged_pdf_is_still_read():
     assert "Nr. produs" in pump_demo.read_page(pump_demo.keep("damaged.pdf", data), 1)[0]
 
 
+def test_a_locked_pdf_is_listed_as_not_read_and_the_rest_is_still_checked():
+    locked, sheet = pymupdf.open(), pymupdf.open()
+    locked.new_page().insert_text((72, 72), "EU declaration of conformity, a page long enough to read")
+    sheet.new_page().insert_text((72, 72), "Nr. produs: 96001652\nCant. Descriere\n1 UNILIFT AP12.40.06.1\nSubmersible drainage pump")
+    c = pump_demo.analyse([
+        pump_demo.keep("locked.pdf", locked.tobytes(encryption=pymupdf.PDF_ENCRYPT_AES_256, user_pw="open", owner_pw="x")),
+        pump_demo.keep("sheet.pdf", sheet.tobytes())])
+    assert [p["model"] for p in c["pumps"]] == ["UNILIFT AP12.40.06.1"] and c["pages"] == 1
+    assert [(f["name"], f["reason"]) for f in c["unread"]] == [("locked.pdf", "is locked with a password")]
+
+
 def test_a_declaration_names_its_products_and_carries_the_brand_on():
     pages = [("cover", "text"),
              ("We declare under our sole responsibility that the products Unilift AP, APB, KP, to which this", "ocr")]

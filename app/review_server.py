@@ -271,6 +271,9 @@ class Handler(SimpleHTTPRequestHandler):
                 text, how = pump_demo.read_page(body["token"], int(body["page"]))
                 return self.send_json({"chars": len(text), "read": how})
             if self.path == "/api/analyse":
+                if not all(t in pump_demo.UPLOADS for t in body["tokens"]):   # the server was restarted since the upload
+                    return self.send_json({"error": "The server was restarted and no longer has these files. "
+                                                    "Add the package again."}, 410)
                 return self.send_json(pump_demo.analyse(body["tokens"]))
             if self.path == "/api/pumps/sets":
                 return self.send_json(pump_demo.booster_sets())
