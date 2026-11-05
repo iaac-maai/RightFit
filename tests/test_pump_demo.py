@@ -1,15 +1,13 @@
-"""The pump demo reproduces the midterm deck: booster sizing on the Lowara catalogue, and, on the laptop that
-holds the package's own readings (checks/pumps/data/raw, git-ignored), the declaration check and the standby test."""
-import json
+"""The pump demo reads the uploaded files itself. Booster sizing is checked against the midterm deck; on the laptop
+that holds the real package (data/raw/P01, git-ignored), so are the declaration check and the standby test."""
 from pathlib import Path
 
+import pymupdf
 import pytest
 
 from app import pump_demo
 
-ROOT = Path(__file__).resolve().parents[1]
-P01 = json.loads((ROOT / "data/maf/extracted/P01.json").read_text())
-HAS_RAW = (pump_demo.RAW / "curves_package_IS15.csv").exists()
+P01 = Path(__file__).resolve().parents[1] / "data/raw/P01"
 
 
 def test_booster_need_judgement_and_suggestions_match_the_deck():
@@ -26,21 +24,58 @@ def test_booster_refuses_impossible_buildings_and_flags_unknown_sets():
     assert pump_demo.booster_view(40, 10, "NOT-A-SET")["unknown_submitted"]
 
 
-def test_renamed_files_still_identify_the_package():
-    packages = {"P01": P01}
-    assert pump_demo.identify(["Q=1ls@H=10mCA_96001652_UNILIFT_AP12400.pdf"], packages) == "P01"
-    assert pump_demo.identify(["holiday.pdf"], packages) is None
+def test_files_are_sorted_by_their_own_words():
+    assert pump_demo.classify("Nr. produs: 96001652\nCant. Descriere\n1 UNILIFT AP12.40.06.1") == "data sheet"
+    assert pump_demo.classify("EU declaration of conformity") == "declaration"
+    assert pump_demo.classify("Price list") == "other"
+    assert pump_demo.classify("  ") == "unreadable"
 
 
-@pytest.mark.skipif(not HAS_RAW, reason="the package's own readings are only on Luca's laptop")
-def test_two_of_four_pumps_have_no_declaration():
-    c = pump_demo.package_check(P01)
-    assert c["missing"] == 2 and len(c["pumps"]) == 4 and c["pages"] == 34
-    assert [d["names"] for d in c["unused_declarations"]] == [["SL1", "SLV"]]
+def test_a_text_file_is_no_pdf_and_a_damaged_pdf_is_still_read():
+    assert pump_demo.page_count(b"# notes\nnot a PDF") is None
+    doc = pymupdf.open()
+    doc.new_page().insert_text((72, 72), "Nr. produs: 96001652, a page long enough to read")
+    data = doc.tobytes()[:-60]   # the end of the file is cut off
+    assert pump_demo.page_count(data) == 1
+    assert "Nr. produs" in pump_demo.read_page(pump_demo.keep("damaged.pdf", data), 1)[0]
 
 
-@pytest.mark.skipif(not HAS_RAW, reason="the package's own readings are only on Luca's laptop")
-def test_one_pump_alone_holds_the_duty_with_a_thin_margin():
-    s = pump_demo.standby_view(P01)
-    assert (s["head_one"], s["margin_m"], s["margin_pct"], s["points"]) == (51.3, 1.3, 2.6, 84)
+def test_a_declaration_names_its_products_and_carries_the_brand_on():
+    pages = [("cover", "text"),
+             ("We declare under our sole responsibility that the products Unilift AP, APB, KP, to which this", "ocr")]
+    assert pump_demo.declared(pages) == (["Unilift AP", "Unilift APB", "Unilift KP"], 2)
+    assert pump_demo.declared([("no such sentence", "text")]) == ([], None)
+
+
+def test_rules_apply_only_where_their_scope_says():
+    families = [("uniliftap", "Unilift AP", "declaration.pdf")]
+    r = pump_demo.rules_for(pump_demo.scope({"model": "UNILIFT AP12.40.06.1", "p2_kw": "0.7"},
+                                            "Pompă submersibilă pentru drenaj"), families)
+    assert (r["CE-01"]["verdict"], r["CE-01"]["label"]) == ("pass", "Unilift AP")
+    assert r["PUMP-MEI"]["verdict"] == r["MOTOR-IE"]["verdict"] == "n/a"
+    r = pump_demo.rules_for(pump_demo.scope({"model": "Hydro Multi-E 2 CME5-4", "p2_kw": "1.1", "ie_class": "IE5"},
+                                            "Grupul de pompare CME"), families)
+    assert [r[k]["verdict"] for k in ("CE-01", "PUMP-MEI", "MOTOR-IE")] == ["fail", "n/a", "pass"]
+    r = pump_demo.rules_for(pump_demo.scope({"model": "X1"}, "Pump"), families)
+    assert r["PUMP-MEI"]["verdict"] == r["MOTOR-IE"]["verdict"] == "?"
+    assert "None" not in r["MOTOR-IE"]["detail"]
+
+
+@pytest.fixture(scope="module")
+def p01():
+    if not P01.is_dir():
+        pytest.skip("the real package is only on Luca's laptop")
+    return pump_demo.analyse([pump_demo.keep(f.name, f.read_bytes()) for f in sorted(P01.iterdir())
+                              if not f.name.startswith(".")])
+
+
+def test_two_of_four_pumps_have_no_declaration(p01):
+    assert (p01["form"], p01["pages"], len(p01["pumps"]), p01["missing"]) == ("IS 015", 34, 4, 2)
+    if pump_demo.OCR:   # the SL1/SLV declaration is a scan
+        assert [d["names"] for d in p01["unused"]] == [["SL1", "SLV"]]
+
+
+def test_one_pump_alone_holds_the_duty_with_a_thin_margin(p01):
+    s = p01["standby"]
+    assert (s["page"], s["points"], s["head_less"], s["margin_m"], s["margin_pct"]) == (3, 84, 51.3, 1.3, 2.6)
     assert s["standby"]

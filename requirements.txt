@@ -5,3 +5,5 @@ pytest>=9
 xlrd>=2.0
 pypdf>=6.0
 scikit-learn>=1.5
+pymupdf>=1.24
+pytesseract>=0.3   # OCR of scanned pages; needs the Tesseract program (macOS: brew install tesseract)

@@ -10,8 +10,6 @@ Always have a person check the output before using it (column checked_by).
 import argparse, csv, re, sys
 from pathlib import Path
 
-import pdfplumber
-
 # label patterns (RO / EN) -> column. First match wins.
 LABELS = {
     "flow_m3h":      [r"Debitul curent calculat", r"Actual calculated flow"],
@@ -37,9 +35,15 @@ def to_m3h(value, unit):
 
 
 def extract(pdf_path):
+    import pdfplumber
     with pdfplumber.open(pdf_path) as pdf:
         text = "\n".join((p.extract_text() or "") for p in pdf.pages)
-    row = {"source_file": Path(pdf_path).name, "maker": "Grundfos" if "Grundfos" in text else ""}
+    return fields(text, Path(pdf_path).name)
+
+
+def fields(text, name):
+    """The values found in the text of one data sheet, whichever library read it."""
+    row = {"source_file": name, "maker": "Grundfos" if "Grundfos" in text else ""}
     m = re.search(r"Nr\. Produs:\s*(\d+)|Product No\.?:\s*(\d+)", text)
     if m:
         row["product_no"] = m.group(1) or m.group(2)

@@ -1,12 +1,12 @@
 'use strict';
-// RightFit pump demo. Every number on this page comes from the server (app/pump_demo.py), which runs the
-// dataset kit's deterministic checks in checks/pumps/. The page only shows them.
+// RightFit pump demo. The server (app/pump_demo.py) reads the uploaded files and runs the dataset kit's
+// deterministic checks on what they say; this page uploads the files and shows the results.
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (n, d = 1) => (n == null ? 'n/a' : Number(n).toFixed(d));
-const PKG = 'P01';   // the pump package of the demo
-const state = { check: null, standby: false, pages: 0 };
+const PKG = 'P01';   // the pump package kept on this laptop, for the "use the package already on this laptop" link
+const state = { analysis: null, standbyShown: null };
 const TITLES = { check: 'Package check', booster: 'Size the booster', standby: 'Standby test' };
 
 async function api(path, body, headers) {
@@ -24,6 +24,8 @@ async function api(path, body, headers) {
 
 // Display names as the data sheets print them: drop the order code after the product name, soften all-caps names.
 const shortName = (model) => model.replace(/\s+U\d\s+[A-Z](-[A-Z])+$/, '').replace(/\b([A-Z])([A-Z]{3,})\b/g, (_, a, b) => a + b.toLowerCase());
+const kindOf = (p) => (p.category === 'booster_set' ? 'booster set'
+  : (p.pump_type || '').startsWith('submersible_') ? p.pump_type.split('_')[1] : p.category.replace('_', ' '));
 
 // ------------------------------------------------------------------ tabs
 const TABS = ['check', 'booster', 'standby'];
@@ -35,7 +37,7 @@ function show(tab) {
   });
   document.querySelectorAll('.view').forEach((v) => { v.hidden = v.id !== tab; });
   document.title = `RightFit · ${TITLES[tab]}`;
-  if (tab === 'standby' && !state.standby) loadStandby();
+  if (tab === 'standby') renderStandby();
   history.replaceState(null, '', `#${tab}`);
 }
 document.querySelector('.tabs').addEventListener('click', (ev) => {
@@ -55,12 +57,11 @@ function fail(where, message) {
   where.insertAdjacentHTML('beforeend', `<p class="error" role="alert">${esc(message)}</p>`);
 }
 
-function listFiles(entries) {
+function listFiles() {
   $('#viewer').hidden = true;
   $('#check-main').innerHTML = `<ul class="files" id="flist"></ul>
     <div class="progress" id="progress" hidden><p class="label"><span class="spin" aria-hidden="true"></span><span id="plabel">Reading the package</span></p>
       <div class="track"><div class="fill" id="pfill"></div></div></div>`;
-  entries.forEach(addFile);
 }
 
 function addFile(e, i) {
@@ -69,51 +70,48 @@ function addFile(e, i) {
     <span class="pages">${e.pages == null ? 'not a PDF' : `${e.pages} pages`}</span><span class="bar-in"></span></li>`);
 }
 
-// Reads every page for real, one request per page, so the counter shows the reading as it happens.
-async function readPages(entries, source) {
+// Every page is read on the server as the counter moves: its text, or OCR when the page is a scan.
+async function readPages(entries) {
   const total = entries.reduce((a, e) => a + (e.pages || 0), 0);
   let done = 0;
   $('#progress').hidden = false;
   $('#plabel').textContent = `Reading page 0 of ${total}`;
   for (const [i, e] of entries.entries()) {
+    let ocr = false;
     for (let p = 1; p <= (e.pages || 0); p++) {
-      await api('/api/extract', { ...source(e, i), page: p });
+      $('#plabel').textContent = `Reading page ${done + 1} of ${total}${ocr ? ' · OCR of a scanned page' : ''}`;
+      const r = await api('/api/extract', { token: e.token, page: p });
+      ocr = ocr || r.read === 'ocr';
       done += 1;
       $(`#f${i} .bar-in`).style.width = `${(p / e.pages) * 100}%`;
-      $('#plabel').textContent = `Reading page ${done} of ${total}`;
       $('#pfill').style.width = `${(done / total) * 100}%`;
     }
+    if (ocr) $(`#f${i} .pages`).textContent = `${e.pages} pages · OCR`;
   }
-  return done;
+  $('#plabel').textContent = `Read ${done} pages · matching pumps to declarations`;
 }
 
-async function check(names, pages) {
-  const { package: found } = await api('/api/identify', { names });
-  if (found !== PKG) {
-    $('#progress').classList.add('done');
-    $('#plabel').textContent = found
-      ? `This is package ${found}. The pump checks are for pump packages.`
-      : 'RightFit has not read this package yet. Reading new packages is the next step of the prototype.';
-    if (found) $('#check-main').insertAdjacentHTML('beforeend', `<p class="note"><a href="/#${esc(found)}">Open ${esc(found)} in the full review</a></p>`);
-    return;
-  }
-  $('#plabel').textContent = 'Matching pumps to declarations';
-  renderCheck(await api('/api/pumps/check', { package: PKG }), pages);
+async function run(entries) {
+  await readPages(entries);
+  const c = await api('/api/analyse', { tokens: entries.map((e) => e.token) });
+  $('#progress').classList.add('done');
+  state.analysis = c;
+  state.standbyShown = null;
+  renderCheck(c);
 }
 
 async function upload(fileList) {
   const files = [...fileList];
   if (!files.length) return;
   try {
-    listFiles([]);
+    listFiles();
     const sent = [];
     for (const f of files) {
       const r = await api('/api/upload', f, { 'X-File-Name': encodeURIComponent(f.name) });
       addFile(r, sent.length);
       sent.push(r);
     }
-    const pages = await readPages(sent, (e) => ({ token: e.token }));
-    await check(sent.map((e) => e.name), pages);
+    await run(sent);
   } catch (e) {
     fail($('#check-main'), e.message);
   }
@@ -121,10 +119,10 @@ async function upload(fileList) {
 
 async function useLocal() {
   try {
-    const originals = await api('/api/read', { package: PKG });   // page counts of the PDFs on this laptop
-    listFiles(originals);
-    const pages = await readPages(originals, (e, i) => ({ package: PKG, no: i + 1 }));
-    await check(originals.map((e) => e.name), pages);
+    listFiles();
+    const files = await api('/api/load-local', { package: PKG });   // the original files on this laptop
+    files.forEach(addFile);
+    await run(files);
   } catch (e) {
     fail($('#check-main'), e.message);
   }
@@ -133,44 +131,52 @@ async function useLocal() {
 function chip(rule) {
   if (!rule) return '';
   const title = rule.detail ? ` title="${esc(rule.detail)}"` : '';
-  if (rule.verdict === 'pass') return `<span class="chip pass"${title}>${rule.label ? `Named · ${esc(rule.label)}` : 'Pass'}</span>`;
-  if (rule.verdict === 'fail') return `<span class="chip fail"${title}>${rule.label && rule.detail ? `Fail · ${esc(rule.detail)}` : 'Not found'}</span>`;
+  if (rule.verdict === 'pass') return `<span class="chip pass"${title}>${rule.label ? `${rule.file ? 'Named' : 'Pass'} · ${esc(rule.label)}` : 'Pass'}</span>`;
+  if (rule.verdict === 'fail') return `<span class="chip fail"${title}>${rule.label ? `Fail · ${esc(rule.label)}` : 'Not found'}</span>`;
   if (rule.verdict === 'n/a') return `<span class="chip na"${title}>N/A · ${esc(rule.label)}</span>`;
-  return `<span class="chip unknown"${title}>? · ${esc(rule.detail)}</span>`;
+  return `<span class="chip unknown"${title}>? · ${esc(rule.label)}</span>`;
 }
 
-function renderCheck(c, pages) {
-  state.check = c;
-  $('#check-title').textContent = `MAF ${c.form} · sanitary pumps`;
+function renderCheck(c) {
+  $('#check-title').textContent = c.form ? `MAF ${c.form} · pump package` : 'Pump package';
+  if (!c.pumps.length) {
+    $('#check-main').insertAdjacentHTML('beforeend', '<p class="note">No pump data sheet was found among these files, so there is nothing to check against the declarations.</p>');
+    return;
+  }
   const ok = !c.missing;
   const count = (n, label, i, bad) => `<div class="count${bad ? ' bad' : ''}" style="animation-delay:${200 + i * 90}ms"><b>${n}</b><span>${label}</span></div>`;
+  const also = [
+    ...c.unused.map((d) => `<p class="also"><b>Also:</b> the ${esc(d.names.join(', '))} declaration in the package names <b>no submitted pump</b>${d.read === 'OCR' ? ' (read by OCR from a scan)' : ''}.</p>`),
+    ...c.unread.map((d) => `<p class="also"><b>Not read:</b> ${esc(d.file || d.name)}${d.names ? ' names no products RightFit can find' : ' has no text, even by OCR'}. Check it by eye.</p>`),
+  ].join('');
   $('#check-main').innerHTML = `
     <div class="banner ${ok ? 'ok' : 'return'}"><b>${ok ? 'Pass' : 'Return'}</b>
       <span>${ok ? 'every pump has a declaration that names it' : `${c.missing} of ${c.pumps.length} pumps have no declaration that names them`}</span></div>
-    <div class="counts">${count(pages || c.pages, 'pages read', 0)}${count(c.pumps.length, 'pumps found', 1)}${count(c.declarations.length, 'declarations', 2)}${count(c.missing, 'pumps not covered', 3, c.missing > 0)}</div>
+    <div class="counts">${count(c.pages, 'pages read', 0)}${count(c.pumps.length, 'pumps found', 1)}${count(c.declarations.length, 'declarations', 2)}${count(c.missing, 'pumps not covered', 3, c.missing > 0)}</div>
     <p class="rule" title="${esc(c.rule.quote)}">Rule ${esc(c.rule.id)} · ${esc(c.rule.source)}: ${esc(c.rule.rule)}</p>
     <table class="pumps"><thead><tr><th>Pump</th><th>Declaration</th><th>Efficiency (MEI)</th><th>Motor (IE)</th></tr></thead>
     <tbody>${c.pumps.map((p, i) => `<tr tabindex="0" data-i="${i}" aria-selected="false" style="animation-delay:${600 + i * 160}ms">
-      <td><span class="model" title="${esc(p.model)}">${esc(shortName(p.model))}</span><span class="sub">${esc(p.category)} · data sheet p1</span></td>
+      <td><span class="model" title="${esc(p.model)}">${esc(shortName(p.model))}</span><span class="sub">${esc(kindOf(p))} · data sheet p1</span></td>
       <td>${chip(p.rules['CE-01'])}</td><td>${chip(p.rules['PUMP-MEI'])}</td><td>${chip(p.rules['MOTOR-IE'])}</td></tr>`).join('')}</tbody></table>
-    ${c.unused_declarations.map((d) => `<p class="also"><b>Also:</b> the ${esc(d.names.join(', '))} declaration in the package names <b>no submitted pump</b>.</p>`).join('')}
+    ${also}
     <p class="note">N/A = the EU efficiency rules do not apply to this pump type, so the form is not returned for them.</p>`;
   $('#viewer-body').innerHTML = '<p class="empty">Select a pump to open<br>its source page</p>';
   $('#viewer').hidden = false;
 }
 
 function selectPump(i) {
-  const p = state.check.pumps[i];
+  const c = state.analysis;
+  const p = c.pumps[i];
   document.querySelectorAll('.pumps tbody tr').forEach((tr) => tr.setAttribute('aria-selected', tr.dataset.i === String(i)));
   const ce = p.rules['CE-01'];
-  const named = ce && ce.verdict === 'pass';
-  const decl = named ? state.check.declarations.find((d) => d.doc === ce.doc) : null;
-  const doc = named ? decl.doc : p.datasheet;
-  const file = named ? decl.file : p.datasheet_file;
-  $('#viewer-body').innerHTML = `<div><div class="doc-head"><p class="head">${esc(file)} · p1</p>
-    <p class="say ${named ? 'pass' : 'fail'}">${named ? `Names: ${esc(decl.names.join(', '))}` : 'No declaration in the package names this model'}</p></div>
-    <iframe title="${esc(file)}, page 1" src="/doc/${PKG}/${doc}#page=1&toolbar=0&navpanes=0&view=FitH"></iframe>
-    <a class="open" href="/doc/${PKG}/${doc}#page=1" target="_blank" rel="noopener">Open the PDF in a new tab</a></div>`;
+  const decl = ce.verdict === 'pass' ? c.declarations.find((d) => d.file === ce.file) : null;
+  const token = decl ? decl.token : p.token;
+  const page = decl ? decl.page || 1 : 1;
+  const file = decl ? decl.file : p.source_file;
+  $('#viewer-body').innerHTML = `<div><div class="doc-head"><p class="head">${esc(file)} · p${page}</p>
+    <p class="say ${decl ? 'pass' : 'fail'}">${decl ? `Names: ${esc(decl.names.join(', '))}` : 'No declaration in the package names this model'}</p></div>
+    <iframe title="${esc(file)}, page ${page}" src="/upload/${token}#page=${page}&toolbar=0&navpanes=0&view=FitH"></iframe>
+    <a class="open" href="/upload/${token}#page=${page}" target="_blank" rel="noopener">Open the PDF in a new tab</a></div>`;
 }
 
 $('#check-main').addEventListener('click', (ev) => {
@@ -307,37 +313,43 @@ form.addEventListener('submit', async (ev) => {
   }
 });
 
-// ------------------------------------------------------------------ 3 · standby test
-async function loadStandby() {
-  state.standby = true;
-  try {
-    const r = await api('/api/pumps/standby', { package: PKG });
-    $('#s-lede').textContent = `${r.model} from the package · duty ${fmt(r.duty_flow, 0)} m³/h at ${fmt(r.duty_head, 0)} m`;
-    const all = [...r.two, ...r.one];
-    const xMax = ceilTo(Math.max(...all.map(([q]) => q)), 10);
-    const yMin = Math.max(0, Math.floor(Math.min(...all.map(([, h]) => h)) / 5) * 5 - 5);
-    const yMax = ceilTo(Math.max(...all.map(([, h]) => h)) + 1, 5);
-    const at = (c, f, dx, dy) => [c[Math.floor(c.length * f)][0] + dx, c[Math.floor(c.length * f)][1] + dy];
-    const svg = chart({ xMax, yMin, yMax, xStep: 10, yStep: 5, xLabel: 'Flow Q (m³/h)', yLabel: 'Head H (m)', label: 'One pump and two pumps against the duty point',
-      series: [{ pts: r.two, color: '#0A1E2A', label: '2 pumps', at: at(r.two, 0.7, 1, 1.5), delay: 200 },
-               { pts: r.one, color: '#1FA6A2', label: '1 pump alone', at: at(r.one, 0.78, 1.5, 0), delay: 900 }],
-      guides: [{ x1: r.duty_flow, y1: yMin, x2: r.duty_flow, y2: r.head_two ?? r.head_one, color: '#9A958B', delay: 1500 }],
-      points: [{ x: r.duty_flow, y: r.duty_head, color: '#F15946', delay: 1600, tip: `Duty · ${fmt(r.duty_flow)} m³/h · ${fmt(r.duty_head)} m` },
-               { x: r.duty_flow, y: r.head_one, color: '#1FA6A2', r: 6, delay: 1800, tip: `1 pump alone · ${fmt(r.duty_flow)} m³/h · ${fmt(r.head_one)} m`, tipColor: '#137C79' }] });
-    $('#s-grid').innerHTML = `
-      <figure class="sheet"><p class="cap">Grundfos data sheet · page ${r.page}</p>
-        <iframe title="Grundfos data sheet, page ${r.page}" src="/doc/${PKG}/${r.datasheet}#page=${r.page}&toolbar=0&navpanes=0&view=FitH"></iframe></figure>
-      <figure class="chart"><p class="cap">Curves read from the PDF's vector drawing · ${r.points} points</p>${svg}</figure>
-      <div class="s-stats"><div class="stat red" style="animation-delay:1900ms"><b>${fmt(r.duty_head, 0)}</b><span>m needed at duty</span></div>
-        <div class="stat" style="animation-delay:2150ms"><b>${fmt(r.head_one)}</b><span>m from one pump alone</span></div>
-        <div class="stat" style="animation-delay:2400ms"><b>${fmt(r.margin_m)}</b><span>m margin</span></div></div>`;
-    $('#s-verdict').innerHTML = r.standby
-      ? `<div class="banner ok" style="animation-delay:2800ms"><b>Real standby</b><span>one pump alone meets the duty, with ${r.margin_pct < 5 ? 'only ' : ''}${fmt(r.margin_pct)}% to spare</span></div>`
-      : `<div class="banner return" style="animation-delay:2800ms"><b>No real standby</b><span>one pump alone gives ${fmt(r.head_one)} m, ${fmt(-r.margin_m)} m short of the duty</span></div>`;
-  } catch (e) {
-    state.standby = false;
-    fail($('#s-grid'), e.message);
+// ------------------------------------------------------------------ 3 · standby test, on the uploaded package
+function renderStandby() {
+  const a = state.analysis;
+  const r = a && a.standby;
+  if (state.standbyShown === r && r) return;
+  state.standbyShown = r;
+  $('#s-verdict').innerHTML = '';
+  if (!r) {
+    $('#s-lede').textContent = 'The booster set of the package, with the duty from its own data sheet';
+    $('#s-grid').innerHTML = `<p class="note">${a ? 'The uploaded package has no booster set data sheet with a duty point.'
+      : 'Upload the package in step 1 first: the standby test reads the booster set\'s curve from its data sheet.'}</p>`;
+    return;
   }
+  if (r.error) { $('#s-grid').innerHTML = `<p class="error">${esc(r.error)}</p>`; return; }
+  const less = r.pumps - 1;
+  $('#s-lede').textContent = `${shortName(r.model)} from the package · duty ${fmt(r.duty_flow, 0)} m³/h at ${fmt(r.duty_head, 0)} m`;
+  const all = [...r.all, ...(r.less || [])];
+  const xMax = ceilTo(Math.max(...all.map(([q]) => q)), 10);
+  const yMin = Math.max(0, Math.floor(Math.min(...all.map(([, h]) => h)) / 5) * 5 - 5);
+  const yMax = ceilTo(Math.max(...all.map(([, h]) => h)) + 1, 5);
+  const at = (c, f, dx, dy) => [c[Math.floor(c.length * f)][0] + dx, c[Math.floor(c.length * f)][1] + dy];
+  const series = [{ pts: r.all, color: '#0A1E2A', label: `${r.pumps} pumps`, at: at(r.all, 0.7, 1, 1.5), delay: 200 }];
+  if (r.less) series.push({ pts: r.less, color: '#1FA6A2', label: `${less} pump${less === 1 ? '' : 's'} alone`, at: at(r.less, 0.78, 1.5, 0), delay: 900 });
+  const points = [{ x: r.duty_flow, y: r.duty_head, color: '#F15946', delay: 1600, tip: `Duty · ${fmt(r.duty_flow)} m³/h · ${fmt(r.duty_head)} m` }];
+  if (r.head_less != null) points.push({ x: r.duty_flow, y: r.head_less, color: '#1FA6A2', r: 6, delay: 1800, tip: `${less} pump${less === 1 ? '' : 's'} alone · ${fmt(r.duty_flow)} m³/h · ${fmt(r.head_less)} m`, tipColor: '#137C79' });
+  const svg = chart({ xMax, yMin, yMax, xStep: 10, yStep: 5, xLabel: 'Flow Q (m³/h)', yLabel: 'Head H (m)', label: 'The set with all pumps and with one pump out, against the duty point',
+    series, points, guides: [{ x1: r.duty_flow, y1: yMin, x2: r.duty_flow, y2: r.head_all ?? r.head_less ?? r.duty_head, color: '#9A958B', delay: 1500 }] });
+  $('#s-grid').innerHTML = `
+    <figure class="sheet"><p class="cap">${esc(r.file)} · page ${r.page}</p>
+      <iframe title="${esc(r.file)}, page ${r.page}" src="/upload/${r.token}#page=${r.page}&toolbar=0&navpanes=0&view=FitH"></iframe></figure>
+    <figure class="chart"><p class="cap">Curves read from the PDF's vector drawing · ${r.points} points</p>${svg}</figure>
+    <div class="s-stats"><div class="stat red" style="animation-delay:1900ms"><b>${fmt(r.duty_head, 0)}</b><span>m needed at duty</span></div>
+      <div class="stat" style="animation-delay:2150ms"><b>${fmt(r.head_less)}</b><span>m from ${less} pump${less === 1 ? '' : 's'} alone</span></div>
+      <div class="stat" style="animation-delay:2400ms"><b>${fmt(r.margin_m)}</b><span>m margin</span></div></div>`;
+  $('#s-verdict').innerHTML = r.standby
+    ? `<div class="banner ok" style="animation-delay:2800ms"><b>Real standby</b><span>${less} pump${less === 1 ? '' : 's'} alone meet${less === 1 ? 's' : ''} the duty, with ${r.margin_pct < 5 ? 'only ' : ''}${fmt(r.margin_pct)}% to spare</span></div>`
+    : `<div class="banner return" style="animation-delay:2800ms"><b>No real standby</b><span>with one pump out the set gives ${fmt(r.head_less)} m, ${fmt(-r.margin_m)} m short of the duty</span></div>`;
 }
 
 show(TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'check');
