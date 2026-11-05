@@ -1,0 +1,18 @@
+package,file,pages,text_layer,language,listed_as
+P01,MAF_IS_015_Pompe si grup pompare sanitare.xls,1,yes,ro,(the form itself)
+P01,"Declaration of conformity_SL1, SLV.PDF",2,no,multi,Declaratie de conformitate SLV1
+P01,Declaration of conformity_Unilift AP.PDF,2,yes,multi,Declaratie de conformitate Unilift AP
+P01,Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf,7,yes,ro,FT UNILIFT_AP1240063
+P01,Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf,6,yes,ro,FT UNILIFT_AP1250113
+P01,Q=15mch@H=50mCA___92761855_MultiCME.pdf,7,yes,ro,FT Hydro Multi-E 2 CME 15-2 U2
+P01,Q=38mch@H=15mCA___99478794_DPK15803050D.pdf,10,yes,ro,FT DPK15803050D
+P02,MAF_IV_004_CTA rev04.xls,1,yes,ro,(the form itself)
+P02,Fisa tehnica CTA 19.03.2026.pdf,30,yes,en;de,FISA TEHNICA CTA
+P02,Hisense seria L AVW-HJFHH-HKFHH.pdf,1,no,en,FT UNITATE EXTERNA
+P02,Declaration of Conformity_ All Products_for 202403.pdf,9,yes,en,
+P02,Declaration of Conformity_Hisense AC_EN+IT - 20220506.pdf,10,yes,en;it,Declaratie conformitate HISENSE
+P02,AHU KIT HZX-6BEJ.pdf,1,no,en,FT KIT AHU HISENSE
+P02,TUV.pdf,2,yes,de,TUV CTA
+P02,FG_Eurovent certificate for CAIRplus_certificates_en (1).pdf,2,yes,en;fr,CERTIFICAT EUROVENT CTA
+P02,19.03 DX project +6C.pdf,11,yes,en,RAPORT DE SIMULARE 6grC
+P02,19.03 DX project -15C.pdf,11,yes,en,RAPORT DE SIMULARE -15grC

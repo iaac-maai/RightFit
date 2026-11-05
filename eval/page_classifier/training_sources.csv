@@ -1,0 +1,34 @@
+id,brand,title,lang,url,size_kb,sha256,pages,used
+W1,Wilo,DoC Stratos GIGA2.0-I,multi,https://cms.media.wilo.com/dcidocpfinder/wilo717008/9630792/wilo717008.pdf,215,edea9950acec68e94dba96bf452ea5b9e277d9cd84f2b95e12a11bb0d2264706,1,yes
+W2,Wilo,DoC WS 1100,multi,https://cms.media.wilo.com/dcidocpfinder/wilo673102/8859010/wilo673102.pdf,193,7f156b0e535f26028329449af6a4fb7550b322ac5caa4974f70ac8c0496288b1,1,yes
+W3,Wilo,DoC Drainlift SANI CUT,multi,https://cms.media.wilo.com/dcidocpfinder/wilo740986/10114673/wilo740986.pdf,224,d8816a92381067c16afbc66326e5d2e58e3c36118080809d22715e4f5212f5eb,1,yes
+W5,Wilo,UK declaration (BS EN),en,https://cms.media.wilo.com/dcidocpfinder/wilo704795/9502843/wilo704795.pdf,198,7a39a9aa5e9efc803a8803dfaa2982f74e1880ef8af32eba30e668e8e1ef24ec,1,yes
+P1,Panasonic,EU DoC PAS-21D022-05,en,https://www.ptc.panasonic.eu/download/146464,575,6066c475730c673cf9bf2652829ac144aec7fb7b54e1c9dc41ba246e8a344bb3,7,yes
+P2,Panasonic,EU DoC AVG-D19002-05,en,https://www.ptc.panasonic.eu/download/79347,354,ba6b6dd7341e861844a26db206a7318d7fa16cd85ae320058af6d9a64fa52b2b,3,yes
+P3,Panasonic,EU DoC PAS-21D020-03,en,https://www.ptc.panasonic.eu/download/145303,514,51c82442f33d4b44a5d331cb49cdf213b3a0115813b365736d6aaf805187a58a,7,yes
+P4,Panasonic,EU DoC PAS-17D013-06,en,https://www.ptc.panasonic.eu/download/146375,447,25a9e9dfbbbc760c1a5e89b476909e8ef179d8d590f2f8e467a8a0735e29e0f1,7,yes
+D1,Danfoss,Manufacturer declaration 00702218 A2 (2011),en,https://files.danfoss.com/download/Drives/Document%20-%20Manufacturers%20Declaration%20Danfoss%2000702218%20A2.pdf,583,fc3891f7dc96a19d9d4ad20124ac0824cdf4fba1e615bf7e6a897c6471d34156,1,yes
+D2,Danfoss,EU DoC FC-302 (2023),en,https://files.danfoss.com/download/Drives/ID365934702339-0301.pdf,835,3cc255870a8a00ad7052745a62ac44c45f317489ce237e87da66f2ea47e045df,4,yes
+D3,Danfoss,Approval / declaration (Helsinki),en,https://assets.danfoss.com/approvals/latest/594976/ID565942482388-0101.pdf,296,ebec270e41dd3a6b53b5f982e21178e843e0c4f8015e6d32b43f60c34a7a475d,3,yes
+I1,IMI,DoC floor control set,multi,https://assets.imi-hydronic.com/Documents/Declaration%20PDF%20TA%20Hydronics/Conformity_Declaration_Floor_Control_Set.pdf,277,c046b9ff4835d0f9d3f2937ef4fab0fe8372925bbb00754540693c8827249828,1,"no, scanned without text"
+I2,IMI,DoC thermostatic inserts,multi,https://assets.imi-hydronic.com/Documents/Declaration%20PDF%20TA%20Hydronics/Conformity_Declaration_Thermostatic_Inserts.pdf,276,b2ad720b5a80561f221ed43032fc78d858b6aed06c845739d9355728326fca15,1,"no, scanned without text"
+H1,Hisense,CE declaration HVAC 2025 (regional site),en,https://hisenseairconditioning.gr/app/uploads/2025/09/CE-declaration-letter_Hisense-HVAC_EN_2025.pdf,237,906d849a7f42b114ae55de90d89a3b3bacf6c440ebd23b1f2da51d761fe0e3c3,6,yes
+G1,Grundfos,CRE/CRIE/CRNE/SPKE/MTRE/CME manual,multi,https://api.grundfos.com/literature/Grundfosliterature-4912197.pdf,2541,48c5be5df788c4a6664af13d479f2603f2b5721d17142ff9a998a2adfadd03d6,74,yes
+G2,Grundfos,"CR, CRI, CRN manual (older)",en,https://api.grundfos.com/literature/Grundfosliterature-3929721.pdf,9600,65cae4b78b446943273b77554614009f27a8300d0bf31960e0dc06e7cdb718ae,73,yes
+G5,Grundfos,MAGNA3 manual,en,https://api.grundfos.com/literature/Grundfosliterature-5564196.pdf,11265,b7781735c281e43d385ce6f04f20cf75f959068260281f684785dcb27fe01365,46,yes
+G6,Grundfos,CM manual (Romanian),ro,https://net.grundfos.com/Appl/ccmsservices/public/revisions/Grundfosliterature-5606177_15280920.pdf,1935,3a69b862a33476a5239145bda3e75cc3e2e27d18fc374a0a3a7a7bb656e40bf7,26,yes
+G7,Grundfos,CMV manual (Romanian),ro,https://net.grundfos.com/Appl/ccmsservices/public/revisions/Grundfosliterature-3542728_13907328.pdf,898,c1b70c7decddf578f12ddb78b143189b1aa54fa602f9a7fb3055e8f159851b0e,22,yes
+W6,Wilo,Helix VE manual,en,https://cms.media.wilo.com/dcidocpfinder/wilo48309/1180870/wilo48309.pdf,7081,df5ab312fffc1d61563e62511695140938f85989c18f98fd6c6e23e881d515ca,38,yes
+W7,Wilo,Stratos PICO-Z manual (2023),multi,https://cms.media.wilo.com/dcidocpfinder/wilo595648/7224731/wilo595648.pdf,4638,c271b7419f1cb49f0c3cfcf3a1055f1771620b5d6d49fc77acf3010e19a36638,36,yes
+W8,Wilo,manual with embedded DoC,multi,https://cms.media.wilo.com/dcidocpfinder/wilo436240/4815432/wilo436240.pdf,1635,16d148986593c0a656901d940881e978fe42a087936833502930e41b5c3915e1,16,yes
+D4,Danfoss,Operating guide VLT AQUA FC 202,en,https://assets.danfoss.com/documents/latest/274783/AQ262141056213en-000401.pdf,16044,5c768b07079f7e5e5e353f4dd0a10d5e16404f0717079b88ed6a21d3dbf1a88a,202,yes
+D5,Danfoss,ECL Comfort installation guide,en,https://assets.danfoss.com/documents/406968/AN41913394756900-000901.pdf,2066,fd473fce34a3d4396f9159e690b8f87c5da895652e93c7255587e12c1974f68d,12,yes
+G11,Grundfos,MAGNA3 data sheet,en,https://api.grundfos.com/literature/Grundfosliterature-5991455.pdf,282,63f466b0883a525f0a1b140f5c9184da301d0cff2ef3e142edd8446f04acbe70,2,yes
+G12,Grundfos,SP-G data booklet,en,https://api.grundfos.com/literature/Grundfosliterature-433.pdf,2342,ed04ff0ca52a3a3b9594a1e3280954a5019b226df1bb14719479efbebaf7d7f4,48,yes
+D6,Danfoss,data sheet (French),fr,https://assets.danfoss.com/documents/latest/199820/AI000086430828fr-000401.pdf,894,bd42de02ff3a43530f87a4800021dc1ee5f8f779a55d0462183d7fd74175694c,4,yes
+K1,Daikin,D-AHU Modular L product profile,en,https://www.daikin.eu/content/dam/document-library/catalogues/as/air-handling-application/alb-rb/Modular%20L_Product%20profile_ECPEN18-416_English.pdf,500,285ac9cd691a9656c4c19f091813ed4666c7627aded718b62b448437bf45461e,8,yes
+C1,Heat Pump KEYMARK,certificate 037-0096-22,en,https://www.heatpumpkeymark.com/uploads/tx_ehpakeymark/037-0096-22-rev.1_HPK_web.pdf,58,7f7e034d1cc58292af91536af5d9ac45bbe44dd4d2df7014217f850dc471566a,1,yes
+C2,Heat Pump KEYMARK,certificate 012-C700324,en,https://www.heatpumpkeymark.com/uploads/tx_ehpakeymark/012-C700324_issue_3.pdf,140,9fb420a2373a7d324e4414ed97dee24452e9d6d3a8adc091b716e5ef69a183f4,1,yes
+C3,Heat Pump KEYMARK,certificate 037-0158-25,en,https://www.heatpumpkeymark.com/uploads/tx_ehpakeymark/037-0158-25_HPK_web.pdf,61,cea67c2298b3dee91019a7b818af502eafa130613afbe903c294405a472bd8e5,1,yes
+C4,Eurovent,hygienic AHU certificate 26.03.016,en,https://erp.eurovent-certification.com/claris/files/download/TV6EU6M763YIVHVR3VORYFTQDKB2Y5P7RRQRC4CRW2ZZVNLFSN6ADKR4CUQUHT6GJOTZDXBWMYVYTGHOQ3FXQHVKV3XSQZXCFNSIH3AFJ7KWC2NBWFTBY4HZ76SO5NXXFCVVDE4TVNBGFD7N4VF3QA74IQ,231,a0f76a0778af2168b3b1b07e401bf1e051c997e3e7df21594be26301c86ea8ad,2,yes
+O1,Danfoss,EPD (HVAC drive),en,https://assets.danfoss.com/documents/latest/588167/BI477739340887en-000102.pdf,3242,c855ff9e2ab70c1e1d2703e66f5f0fd260a881e506053d0615eb80614e588e38,19,yes

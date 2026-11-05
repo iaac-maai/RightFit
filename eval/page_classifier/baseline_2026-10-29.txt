@@ -1,0 +1,13 @@
+Run on 2026-10-29
+
+### Keyword baseline (non-AI)
+Set A: 111 pages (4 scanned without text), accuracy 27%, macro F1 0.47
+- declaration: found 30% of 23 pages, right 100% of the time
+- data_sheet: found 20% of 81 pages, right 100% of the time
+- certificate: found 100% of 4 pages, right 100% of the time
+- other: found 100% of 3 pages, right 4% of the time
+Set B: 47 pages (0 scanned without text), accuracy 45%, macro F1 0.55
+- declaration: found 100% of 8 pages, right 89% of the time
+- manual: found 14% of 29 pages, right 80% of the time
+- other: found 90% of 10 pages, right 32% of the time
+Most frequent mistakes (true -> guessed): data_sheet -> other: 65; manual -> other: 19; declaration -> other: 16; manual -> data_sheet: 5; other -> manual: 1

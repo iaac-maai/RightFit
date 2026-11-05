@@ -1,0 +1,21 @@
+fixture_es,fixture_en,cold_min_ls,dhw_min_ls,source
+Lavamanos,hand basin (small),0.05,0.03,CTE DB-HS4 Tabla 2.1 p82
+Lavabo,washbasin,0.10,0.065,CTE DB-HS4 Tabla 2.1 p82
+Ducha,shower,0.20,0.10,CTE DB-HS4 Tabla 2.1 p82
+Bañera de 1.40 m o más,bathtub 1.40 m or more,0.30,0.20,CTE DB-HS4 Tabla 2.1 p82
+Bañera de menos de 1.40 m,bathtub under 1.40 m,0.20,0.15,CTE DB-HS4 Tabla 2.1 p82
+Bidé,bidet,0.10,0.065,CTE DB-HS4 Tabla 2.1 p82
+Inodoro con cisterna,WC with cistern,0.10,,CTE DB-HS4 Tabla 2.1 p82
+Inodoro con fluxor,WC with flush valve,1.25,,CTE DB-HS4 Tabla 2.1 p82
+Urinarios con grifo temporizado,urinal with timed tap,0.15,,CTE DB-HS4 Tabla 2.1 p82
+Urinarios con cisterna (c/u),urinal with cistern (each),0.04,,CTE DB-HS4 Tabla 2.1 p82
+Fregadero doméstico,kitchen sink (domestic),0.20,0.10,CTE DB-HS4 Tabla 2.1 p82
+Fregadero no doméstico,kitchen sink (commercial),0.30,0.20,CTE DB-HS4 Tabla 2.1 p82
+Lavavajillas doméstico,dishwasher (domestic),0.15,0.10,CTE DB-HS4 Tabla 2.1 p82
+Lavavajillas industrial (20 servicios),dishwasher (industrial 20 settings),0.25,0.20,CTE DB-HS4 Tabla 2.1 p82
+Lavadero,utility sink,0.20,0.10,CTE DB-HS4 Tabla 2.1 p82
+Lavadora doméstica,washing machine (domestic),0.20,0.15,CTE DB-HS4 Tabla 2.1 p82
+Lavadora industrial (8 kg),washing machine (industrial 8 kg),0.60,0.40,CTE DB-HS4 Tabla 2.1 p82
+Grifo aislado,single tap,0.15,0.10,CTE DB-HS4 Tabla 2.1 p82
+Grifo garaje,garage tap,0.20,,CTE DB-HS4 Tabla 2.1 p82
+Vertedero,slop sink,0.20,,CTE DB-HS4 Tabla 2.1 p82

@@ -1,0 +1,1073 @@
+{
+  "package": "P01",
+  "read_by": "AI reader",
+  "read_on": "2026-10-28",
+  "form": {
+    "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+    "form_no": "IS 015",
+    "revision": 0,
+    "date": "2026-03-16",
+    "discipline": "INSTALATII SANITARE",
+    "works_group": "ALIMENTARE CU APA",
+    "items_raw": [
+      {
+        "name": "Grup pompare apa menajera ; Grup de pompare pentru ape pluviale, montaj submersibi ; Pompe submersibile",
+        "brand": "Grundfos",
+        "model": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A ; UNILIFT_AP1240063 ; UNILIFT_AP1250113 ; DPK15803050D",
+        "origin": "Danemarca"
+      }
+    ],
+    "boq_ref": "IS06-Echipamente",
+    "delivery_raw": "3 saptamani",
+    "delivery_weeks": 3,
+    "used_for_raw": [
+      "Grup de pompare apa menajera - Alimentare cu apa - 1 Electropompa Activa: Q=15 mc/h; H=50 mCA\n- 1 Electropompa Rezerva: Q=15 mc/h; H=50 mCA",
+      "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
+      "Electropompa submersibila evacuare ape accidentale  Q=3 l/s; H=10 mCA",
+      "Electropompa submersibila evacuare ape accidentale  Q=1 l/s; H=10 mCA"
+    ],
+    "attachments_listed": [
+      {
+        "label": "Declaratie de conformitate SLV1",
+        "pages": 1
+      },
+      {
+        "label": "Declaratie de conformitate Unilift AP",
+        "pages": 1
+      },
+      {
+        "label": "FT UNILIFT_AP1240063",
+        "pages": 7
+      },
+      {
+        "label": "FT UNILIFT_AP1250113",
+        "pages": 6
+      },
+      {
+        "label": "FT Hydro Multi-E 2 CME 15-2 U2",
+        "pages": 7
+      },
+      {
+        "label": "FT DPK15803050D",
+        "pages": 10
+      }
+    ],
+    "sample_sent": "No",
+    "status_scale": [
+      "Aprobat",
+      "Aprobat conform notatii",
+      "Revizie si retransmitere",
+      "Neaprobat",
+      "Se solicita mostra"
+    ],
+    "signers": [
+      "subcontractor",
+      "general contractor",
+      "specialist designer",
+      "general designer",
+      "site supervisor",
+      "project manager",
+      "LEED consultant",
+      "client"
+    ]
+  },
+  "documents": [
+    {
+      "file": "Declaration of conformity_SL1, SLV.PDF",
+      "pages": 2,
+      "text_layer": false,
+      "languages": [
+        "multi"
+      ],
+      "method": "page image",
+      "doc_type": "eu_declaration_of_conformity",
+      "covers": [
+        "SL1",
+        "SLV"
+      ],
+      "issuer": "Grundfos",
+      "issue_date": "2016-02-15",
+      "valid_until": null,
+      "cites": [
+        "2006/42/EC",
+        "2014/35/EU",
+        "2014/30/EU",
+        "2014/34/EU"
+      ],
+      "listed_as": "Declaratie de conformitate SLV1",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": "image only (no text layer); 2 pages, the form says 1; LVD part applies below 2.2 kW rated power; valid only as part of the safety instructions (publication 98938948)",
+      "matches": []
+    },
+    {
+      "file": "Declaration of conformity_Unilift AP.PDF",
+      "pages": 2,
+      "text_layer": true,
+      "languages": [
+        "multi"
+      ],
+      "method": "text",
+      "doc_type": "eu_declaration_of_conformity",
+      "covers": [
+        "Unilift AP",
+        "Unilift APB",
+        "Unilift KP"
+      ],
+      "issuer": "Grundfos",
+      "issue_date": "2018-05-10",
+      "valid_until": null,
+      "cites": [
+        "2006/42/EC",
+        "2014/35/EU",
+        "2011/65/EU",
+        "2015/863/EU"
+      ],
+      "listed_as": "Declaratie de conformitate Unilift AP",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": "2 pages, the form says 1; LVD part applies only to pumps with at least 10 m supply cable; valid only as part of the safety instructions (publication 99084629 0719)",
+      "matches": [
+        {
+          "item": "P01-3",
+          "kind": "range",
+          "page": 1,
+          "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
+          "status": "extracted",
+          "checked_by": null
+        },
+        {
+          "item": "P01-4",
+          "kind": "range",
+          "page": 1,
+          "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
+    },
+    {
+      "file": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+      "pages": 7,
+      "text_layer": true,
+      "languages": [
+        "ro"
+      ],
+      "method": "text",
+      "doc_type": "data_sheet",
+      "covers": [
+        "UNILIFT AP12.40.06.3",
+        "96001652"
+      ],
+      "issuer": "Grundfos Product Center",
+      "issue_date": "2026-03-11",
+      "valid_until": null,
+      "cites": [],
+      "listed_as": "FT UNILIFT_AP1240063",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-4",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "UNILIFT AP12.40.06.3",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
+    },
+    {
+      "file": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+      "pages": 6,
+      "text_layer": true,
+      "languages": [
+        "ro"
+      ],
+      "method": "text",
+      "doc_type": "data_sheet",
+      "covers": [
+        "UNILIFT AP12.50.11.3",
+        "96001975"
+      ],
+      "issuer": "Grundfos Product Center",
+      "issue_date": "2026-03-11",
+      "valid_until": null,
+      "cites": [],
+      "listed_as": "FT UNILIFT_AP1250113",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-3",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "UNILIFT AP12.50.11.3",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
+    },
+    {
+      "file": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+      "pages": 7,
+      "text_layer": true,
+      "languages": [
+        "ro"
+      ],
+      "method": "text",
+      "doc_type": "data_sheet",
+      "covers": [
+        "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
+        "92761855"
+      ],
+      "issuer": "Grundfos Product Center",
+      "issue_date": "2026-03-11",
+      "valid_until": null,
+      "cites": [],
+      "listed_as": "FT Hydro Multi-E 2 CME 15-2 U2",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": null,
+      "matches": [
+        {
+          "item": "P01-1",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
+    },
+    {
+      "file": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+      "pages": 10,
+      "text_layer": true,
+      "languages": [
+        "ro"
+      ],
+      "method": "text",
+      "doc_type": "data_sheet",
+      "covers": [
+        "DPK.15.80.30.5.0D",
+        "99478794"
+      ],
+      "issuer": "Grundfos Product Center",
+      "issue_date": "2026-03-11",
+      "valid_until": null,
+      "cites": [],
+      "listed_as": "FT DPK15803050D",
+      "status": "extracted",
+      "checked_by": null,
+      "notes": "pages 5 and 10 show a control panel wiring diagram",
+      "matches": [
+        {
+          "item": "P01-2",
+          "kind": "exact model",
+          "page": 1,
+          "quote": "DPK.15.80.30.5.0D",
+          "status": "extracted",
+          "checked_by": null
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "P01-1",
+      "name": "Domestic water booster set",
+      "family": "pump",
+      "brand": "Grundfos",
+      "model": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
+      "range": "Hydro Multi-E",
+      "values": {
+        "used_for": {
+          "value": "domestic water booster set, 1 duty + 1 standby",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "booster",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare apa menajera - Alimentare cu apa",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_flow": {
+          "value": 15,
+          "unit": "m3/h",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_head": {
+          "value": 50,
+          "unit": "m",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "product_no": {
+          "value": "92761855",
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 1,
+          "quote": "Nr. Produs: 92761855",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "number_of_pumps": {
+          "value": 2,
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 4,
+          "quote": "Număr de pompe: 2",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "flow": {
+          "value": 15,
+          "unit": "m3/h",
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Debitul curent calculat: 15 m³/h",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "head": {
+          "value": 50,
+          "unit": "m",
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Înălţimea de pompare rezultată pentru pompă: 50 m",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "power": {
+          "value": 4,
+          "unit": "kW",
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Putere (P2) pompă principală: 4 kW",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "P2 per pump"
+        },
+        "voltage": {
+          "value": "3 x 380-415 V, 50 Hz",
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Tensiune nominală: 3 x 380-415 V",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "starting_method": {
+          "value": "electronic",
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Metodă de pornire: electronic",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "max_pressure": {
+          "value": 10,
+          "unit": "bar",
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Presiune de funcţionare maximă: 10 bar",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "liquid_temp_range": {
+          "value": "5 .. 60",
+          "unit": "°C",
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Gama temperaturii lichidului: 5 .. 60 °C",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "controller_included": {
+          "value": true,
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 1,
+          "quote": "Regulatorul intern PI reglează numărul de pompe de funcționare",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "bms_protocol": {
+          "value": "LON, Profibus, Modbus, SMS/GSM/GPRS, GRM, BACnet, BACnet IP, Modbus TCP, PROFINET",
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 1,
+          "quote": "Protocoale de comunicare disponibile:",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "bms_included": {
+          "value": false,
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 1,
+          "quote": "Protocoale de comunicare disponibile:",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "protocols are listed as available; the sheet does not say a module is included"
+        },
+        "motor_efficiency_class": {
+          "value": "IE5",
+          "unit": null,
+          "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
+          "page": 2,
+          "quote": "Clasa de eficiență IE: IE5",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        }
+      }
+    },
+    {
+      "id": "P01-2",
+      "name": "Stormwater pump set P1/P2",
+      "family": "pump",
+      "brand": "Grundfos",
+      "model": "DPK15803050D",
+      "range": "DPK",
+      "values": {
+        "used_for": {
+          "value": "stormwater pumps P1/P2",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "stormwater",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare pentru ape pluviale P1/P2",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_flow": {
+          "value": 38,
+          "unit": "m3/h",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_head": {
+          "value": 15,
+          "unit": "m",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "product_no": {
+          "value": "99478794",
+          "unit": null,
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 1,
+          "quote": "Nr. Produs: 99478794",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "flow": {
+          "value": 38.13,
+          "unit": "m3/h",
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 1,
+          "quote": "Debitul curent calculat: 38.13 m³/h",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "head": {
+          "value": 15.11,
+          "unit": "m",
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 1,
+          "quote": "Înălţimea de pompare rezultată pentru pompă: 15.11 m",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "power": {
+          "value": 3,
+          "unit": "kW",
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 2,
+          "quote": "Putere nominală - P2: 3 kW",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "P2 per pump"
+        },
+        "voltage": {
+          "value": "3 x 380-415 V, 50 Hz",
+          "unit": null,
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 2,
+          "quote": "Tensiune nominală: 3 x 380-415 V",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "starting_method": {
+          "value": "DOL",
+          "unit": null,
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 2,
+          "quote": "Metodă de pornire: DOL",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "max_pressure": {
+          "value": 5.7,
+          "unit": "bar",
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 2,
+          "quote": "Presiune de funcţionare maximă: 5.7 bar",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "outlet flange PN 10 (page 2)"
+        },
+        "liquid_temp_range": {
+          "value": "0 .. 40",
+          "unit": "°C",
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 1,
+          "quote": "Gama temperaturii lichidului: 0 .. 40 °C",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "controller_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-10 (a panel wiring diagram is shown on pages 5 and 10, not stated as supplied; the form lists no panel)"
+        },
+        "bms_protocol": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-10"
+        },
+        "bms_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-10"
+        },
+        "motor_efficiency_class": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 2 and 6 (motor efficiency 86.6 % given, no IE class)"
+        }
+      }
+    },
+    {
+      "id": "P01-3",
+      "name": "Drainage pump, accidental water, 3 l/s",
+      "family": "pump",
+      "brand": "Grundfos",
+      "model": "UNILIFT_AP1250113",
+      "range": "Unilift AP",
+      "values": {
+        "used_for": {
+          "value": "drainage pump, accidental water",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "drainage",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_flow": {
+          "value": 3,
+          "unit": "l/s",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_head": {
+          "value": 10,
+          "unit": "m",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "product_no": {
+          "value": "96001975",
+          "unit": null,
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 1,
+          "quote": "Nr. Produs: 96001975",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "flow": {
+          "value": 3.39,
+          "unit": "l/s",
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 1,
+          "quote": "Debitul curent calculat: 3.39 l/s",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "head": {
+          "value": 12.8,
+          "unit": "m",
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 1,
+          "quote": "Înălţimea de pompare rezultată pentru pompă: 12.8 m",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "power": {
+          "value": 1.2,
+          "unit": "kW",
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 2,
+          "quote": "Putere nominală - P2: 1.2 kW",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "P2"
+        },
+        "voltage": {
+          "value": "3 x 400 V, 50 Hz",
+          "unit": null,
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 2,
+          "quote": "Tensiune nominală: 3 x 400 V",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "starting_method": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6"
+        },
+        "max_pressure": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6 (maximum installation depth 7 m given)"
+        },
+        "liquid_temp_range": {
+          "value": "0 .. 55",
+          "unit": "°C",
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 1,
+          "quote": "Gama temperaturii lichidului: 0 .. 55 °C",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "controller_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6 (built-in motor protection: none; thermal protection: external, page 4)"
+        },
+        "float_switch": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6 (no float or level switch mentioned)"
+        },
+        "bms_protocol": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6"
+        },
+        "bms_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6"
+        },
+        "motor_efficiency_class": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-6"
+        }
+      }
+    },
+    {
+      "id": "P01-4",
+      "name": "Drainage pump, accidental water, 1 l/s",
+      "family": "pump",
+      "brand": "Grundfos",
+      "model": "UNILIFT_AP1240063",
+      "range": "Unilift AP",
+      "values": {
+        "used_for": {
+          "value": "drainage pump, accidental water",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "application": {
+          "value": "drainage",
+          "unit": null,
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_flow": {
+          "value": 1,
+          "unit": "l/s",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "duty_head": {
+          "value": 10,
+          "unit": "m",
+          "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
+          "page": 1,
+          "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "product_no": {
+          "value": "96001652",
+          "unit": null,
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 1,
+          "quote": "Nr. Produs: 96001652",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "flow": {
+          "value": 1.08,
+          "unit": "l/s",
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 1,
+          "quote": "Debitul curent calculat: 1.08 l/s",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "head": {
+          "value": 11.56,
+          "unit": "m",
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 1,
+          "quote": "Înălţimea de pompare rezultată pentru pompă: 11.56 m",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "power": {
+          "value": 0.6,
+          "unit": "kW",
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 2,
+          "quote": "Putere nominală - P2: 0.6 kW",
+          "status": "extracted",
+          "checked_by": null,
+          "note": "P2"
+        },
+        "voltage": {
+          "value": "3 x 400 V, 50 Hz",
+          "unit": null,
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 2,
+          "quote": "Tensiune nominală: 3 x 400 V",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "starting_method": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7"
+        },
+        "max_pressure": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7 (maximum installation depth 7 m given)"
+        },
+        "liquid_temp_range": {
+          "value": "0 .. 55",
+          "unit": "°C",
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 1,
+          "quote": "Gama temperaturii lichidului: 0 .. 55 °C",
+          "status": "extracted",
+          "checked_by": null,
+          "note": null
+        },
+        "controller_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7 (built-in motor protection: none; thermal protection: external, page 4)"
+        },
+        "float_switch": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7 (no float or level switch mentioned)"
+        },
+        "bms_protocol": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7"
+        },
+        "bms_included": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7"
+        },
+        "motor_efficiency_class": {
+          "value": null,
+          "unit": null,
+          "source": null,
+          "page": null,
+          "quote": null,
+          "status": "unclear",
+          "checked_by": null,
+          "note": "not found; looked in pages 1-7"
+        }
+      }
+    }
+  ],
+  "notes_for_reviewer": [
+    "The model cell lists 4 models and the name cell 3 names; the item split follows the 'A se folosi la' rows.",
+    "Both declarations have 2 pages; the form lists 1 page each.",
+    "Data sheets are dated 11.03.2026, before the form date 16.03.2026."
+  ],
+  "ai_findings": [
+    {
+      "id": "P01-AI1",
+      "items": [
+        "P01-3",
+        "P01-4"
+      ],
+      "kind": "problem",
+      "title": "Drainage pumps need external motor protection",
+      "finding": "Both Unilift sheets say the motor has no built-in protection and the thermal protection is external. Nothing in the package provides it.",
+      "evidence": [
+        {
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 4,
+          "quote": "Protecţie încorporată în motor: FĂRĂ"
+        },
+        {
+          "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
+          "page": 4,
+          "quote": "Protecţie termică: extern"
+        },
+        {
+          "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
+          "page": 4,
+          "quote": "Protecţie încorporată în motor: FĂRĂ"
+        }
+      ],
+      "suggested_comment": "The Unilift AP12.50.11.3 and AP12.40.06.3 data sheets require external thermal protection; please state how the motors are protected.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P01-AI2",
+      "items": [
+        "P01-2"
+      ],
+      "kind": "question",
+      "title": "Stormwater pumps: duty and standby not stated",
+      "finding": "The form lists P1/P2 without saying whether they run as duty and standby; the data sheet curve shows one of the two pumps running at the duty point.",
+      "evidence": [
+        {
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 4,
+          "quote": "2 x DPK.15.80.30.5.0D, 50Hz"
+        },
+        {
+          "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
+          "page": 4,
+          "quote": "n = 1 x 100 %"
+        }
+      ],
+      "suggested_comment": "Please confirm how the stormwater pumps P1/P2 operate (duty and standby, or alternating).",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    },
+    {
+      "id": "P01-AI3",
+      "items": [
+        "P01-1"
+      ],
+      "kind": "question",
+      "title": "Booster set needs a positive inlet pressure",
+      "finding": "The manufacturer's manual says Hydro Multi-E systems with CME pumps need a positive inlet pressure. The package doesn't say how the booster set is fed (mains or break tank). The manual found is the 2015 edition.",
+      "evidence": [
+        {
+          "source": "Grundfosliterature-3568377.pdf (manufacturer manual, library)",
+          "page": 4,
+          "quote": "Hydro Multi-E systems with CME pumps require a positive inlet pressure during start-up and operation"
+        }
+      ],
+      "suggested_comment": "Please confirm that the booster set has a positive inlet pressure, as the manufacturer requires for CME pumps.",
+      "status": "suggested",
+      "decided_by": null,
+      "note": null
+    }
+  ]
+}

@@ -1,0 +1,355 @@
+{
+  "_about": "RightFit rule library. status 'confirmed' = quoted from the official text in public/regulations (page given). 'confirmed-secondary' = stated in a manufacturer catalogue that cites the regulation; check the EUR-Lex text. 'verify' = not yet checked against the official text. Quotes are the code's own words (Spanish for CTE). checked_on = date the quote was compared with the official text (EUR-Lex, BOE, CTE PDF). applies_to: a rule is only checked on products whose fields match every key (lists = allowed values; *_not = excluded values). params: thresholds the scripts read; change them here, not in code.",
+  "rules": [
+    {
+      "id": "HS4-PMIN",
+      "product": "water supply, booster sets",
+      "rule": "Minimum pressure at points of use: 100 kPa for ordinary taps, 150 kPa for flush valves and water heaters.",
+      "quote": "En los puntos de consumo la presión mínima debe ser: a) 100 kPa para grifos comunes; b) 150 kPa para fluxores y calentadores.",
+      "check": "pressure at the most unfavourable outlet >= 10 m (15 m if flush valves or heaters)",
+      "source": "CTE DB-HS4, 2.1.3.2",
+      "page": 83,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "undersized: top floors below minimum pressure",
+      "params": {
+        "p_min_tap_m": 10,
+        "p_min_flush_heater_m": 15
+      },
+      "applies_to": {}
+    },
+    {
+      "id": "HS4-PMAX",
+      "product": "water supply, booster sets",
+      "rule": "Pressure at any point of use must not exceed 500 kPa.",
+      "quote": "La presión en cualquier punto de consumo no debe superar 500 kPa.",
+      "check": "pressure at the lowest outlet <= 50 m, else pressure-reducing valves",
+      "source": "CTE DB-HS4, 2.1.3.3",
+      "page": 83,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "oversized: lower floors above 500 kPa",
+      "params": {
+        "p_max_m": 50
+      },
+      "applies_to": {
+        "category": [
+          "booster_set"
+        ]
+      },
+      "note_variable_speed": "Variable-speed sets hold the set-point, so full-speed head only reaches the outlets in a fault: report it as information, not a failure."
+    },
+    {
+      "id": "HS4-DHW-TEMP",
+      "product": "domestic hot water generators",
+      "rule": "Hot water at points of use between 50 and 65 C (except dwelling-only buildings not affecting the exterior).",
+      "quote": "La temperatura de ACS en los puntos de consumo debe estar comprendida entre 50ºC y 65ºC",
+      "check": "product.max_outlet_temp_c >= 50 at the furthest outlet",
+      "source": "CTE DB-HS4, 2.1.3.4",
+      "page": 83,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: cannot reach required hot-water temperature",
+      "applies_to": {}
+    },
+    {
+      "id": "HS4-RETURN",
+      "product": "hot water circulation pumps",
+      "rule": "A hot-water return loop is required when the supply pipe to the furthest outlet is 15 m or longer.",
+      "quote": "En las redes de ACS debe disponerse una red de retorno cuando la longitud de la tubería de ida al punto de consumo más alejado sea igual o mayor que 15 m.",
+      "check": "if dhw_pipe_length_m >= 15 then a circulation pump must be submitted",
+      "source": "CTE DB-HS4, 2.3.2",
+      "page": 83,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: circulation pump missing",
+      "applies_to": {}
+    },
+    {
+      "id": "HS4-SET-TYPE",
+      "product": "booster sets",
+      "rule": "Conventional set: auxiliary tank, at least two equal pumps working alternately in parallel, membrane pressure vessels. Variable-speed set: may omit the tank, needs a frequency converter keeping outlet pressure constant.",
+      "quote": "equipo de bombeo, compuesto, como mínimo, de dos bombas de iguales prestaciones y funcionamiento alterno, montadas en paralelo",
+      "check": "conventional: pump_count >= 2 and tank and membrane vessel; variable speed: VFD present",
+      "source": "CTE DB-HS4, 3.2.1.5.1.2",
+      "page": 86,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: set configuration does not meet CTE",
+      "params": {
+        "min_pumps": 2
+      },
+      "applies_to": {
+        "category": [
+          "booster_set"
+        ]
+      }
+    },
+    {
+      "id": "HS4-PUMP-COUNT",
+      "product": "conventional booster sets",
+      "rule": "Number of duty pumps (excluding standby) by total flow: 2 up to 10 l/s, 3 up to 30 l/s, 4 above 30 l/s.",
+      "quote": "Se dispondrán dos bombas para caudales de hasta 10 dm3/s, tres para caudales de hasta 30 dm3/s y 4 para más de 30 dm3/s.",
+      "check": "duty_pumps >= 2 if Q<=10 l/s; >= 3 if Q<=30; >= 4 if Q>30",
+      "source": "CTE DB-HS4, 4.5.2.2.2",
+      "page": 93,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: too few duty pumps for the flow",
+      "params": {
+        "bands_ls": [
+          [
+            10,
+            2
+          ],
+          [
+            30,
+            3
+          ],
+          [
+            1000000000.0,
+            4
+          ]
+        ]
+      },
+      "applies_to": {
+        "category": [
+          "booster_set"
+        ],
+        "speed": [
+          "fixed"
+        ]
+      }
+    },
+    {
+      "id": "HS4-HEAD",
+      "product": "booster sets",
+      "rule": "Start (minimum) pressure = suction height + geometric height + circuit losses + residual pressure at the outlet. Pump flow = peak simultaneous flow.",
+      "quote": "La presión mínima o de arranque (Pb) será el resultado de sumar la altura geométrica de aspiración (Ha), la altura geométrica (Hg), la pérdida de carga del circuito (Pc) y la presión residual en el grifo, llave o fluxor (Pr).",
+      "check": "required_head = Ha + Hg + Pc + Pr; required_flow = peak flow",
+      "source": "CTE DB-HS4, 4.5.2.2.3 and 4.5.2.2.4",
+      "page": 93,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "used for sizing",
+      "params": {
+        "default_mains_m": 0
+      },
+      "note": "Pb is for a set with a break tank (mains pressure lost). Subtract mains pressure only for direct suction, where the water company allows it.",
+      "applies_to": {}
+    },
+    {
+      "id": "HS4-FIXTURE-FLOW",
+      "product": "water supply sizing",
+      "rule": "Minimum instantaneous flow per fixture from Table 2.1 (see data/cte_hs4_fixture_flows.csv). Simultaneity: 'a suitable criterion' (CTE gives none; use UNE 149201 or DIN 1988-300).",
+      "quote": "La instalación debe suministrar a los aparatos y equipos del equipamiento higiénico los caudales que figuran en la tabla 2.1.",
+      "check": "sum of fixture flows x simultaneity = peak flow",
+      "source": "CTE DB-HS4, 2.1.3.1, Tabla 2.1; 4.2.1.3.b",
+      "page": 82,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "used for sizing",
+      "applies_to": {}
+    },
+    {
+      "id": "HS5-PUMP-STATION",
+      "product": "drainage and stormwater pumps",
+      "rule": "Pumping systems: at least two pumps, protected against suspended solids, to guarantee service during breakdowns; connect to the generator if the building has one.",
+      "quote": "Las bombas deben disponer de una protección adecuada contra las materias sólidas en suspensión. Deben instalarse al menos dos",
+      "check": "pump_count >= 2 and solids_mm stated",
+      "source": "CTE DB-HS5, 3.3.2.1.2",
+      "page": 114,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: single pump or no solids handling",
+      "params": {
+        "min_pumps": 2
+      },
+      "applies_to": {
+        "category": [
+          "drainage_pump"
+        ]
+      }
+    },
+    {
+      "id": "HS5-PUMP-FLOW",
+      "product": "drainage and stormwater pumps",
+      "rule": "Each pump's flow must be at least 125% of the inflow; all pumps equal. Head = geometric lift from minimum sump level to highest discharge point + pipe losses.",
+      "quote": "El caudal de cada bomba debe ser igual o mayor que el 125 % del caudal de aportación, siendo todas las bombas iguales.",
+      "check": "product.flow_m3h >= 1.25 x inflow_m3h and head >= lift + losses",
+      "source": "CTE DB-HS5, 4.6.2.1 and 4.6.2.2",
+      "page": 122,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "undersized: sump overflows",
+      "params": {
+        "flow_factor": 1.25
+      },
+      "applies_to": {
+        "category": [
+          "drainage_pump"
+        ]
+      }
+    },
+    {
+      "id": "HS5-SUMP",
+      "product": "drainage sumps",
+      "rule": "Sump useful volume Vu from HS5 eq. (4.2); pumps start at most 12 times per hour; Vu also more than half the mean daily wastewater inflow. As printed, Vu = 0,3 Qb (dm3) with Qb in dm3/s would mean 0.3 s of pumping (3 litres for a 10 l/s pump), which cannot limit starts. Read as m3: Vu = 0.3 x Qb (l/s) m3 = 300 s of pump flow, one 5 min cycle at 12 starts per hour. This reading is ours, not an official erratum.",
+      "quote": "La capacidad del depósito se calcula con la expresión: Vu = 0,3 Qb (dm3) (4.2) siendo Qb caudal de la bomba (dm3/s)",
+      "check": "sump_useful_volume_l >= 300 x pump_flow_ls (unit interpreted, see rule) and >= 0.5 x mean daily inflow",
+      "source": "CTE DB-HS5, 4.6.1.1 to 4.6.1.3, eq. (4.2)",
+      "page": 122,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed (quote); unit interpreted",
+      "on_fail": "return: sump too small, pump short-cycles",
+      "checked_on": "2026-11-02",
+      "params": {
+        "useful_volume_s_of_pump_flow": 300,
+        "max_starts_per_h": 12
+      },
+      "applies_to": {}
+    },
+    {
+      "id": "HS5-RAIN",
+      "product": "stormwater pumps",
+      "rule": "Rainfall intensity i (mm/h) from Table B.1 by pluviometric zone (A/B) and isohyet (see data/cte_hs5_rainfall_intensity.csv). Inflow = area x i.",
+      "quote": "La intensidad pluviométrica i se obtendrá en la tabla B.1 en función de la isoyeta y de la zona pluviométrica",
+      "check": "inflow_m3h = area_m2 x i_mm_h / 1000",
+      "source": "CTE DB-HS5, Appendix B, Table B.1",
+      "page": 136,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "used for sizing",
+      "applies_to": {}
+    },
+    {
+      "id": "HS1-DRAIN-WELL",
+      "product": "groundwater drainage pumps (retaining walls, slabs)",
+      "rule": "Drainage wells and pumping chambers must have two sump pumps.",
+      "quote": "al menos una cámara de bombeo con dos bombas de achique",
+      "check": "pump_count >= 2",
+      "source": "CTE DB-HS1, 2.1.3 (solutions D2/D3)",
+      "page": 13,
+      "file": "public/regulations/ES_CTE_DB-HS.pdf",
+      "url": "https://www.codigotecnico.org/pdf/Documentos/HS/DBHS.pdf",
+      "status": "confirmed",
+      "on_fail": "return: single sump pump",
+      "applies_to": {}
+    },
+    {
+      "id": "PUMP-MEI",
+      "product": "rotodynamic pumps for clean water of the five designs in Art. 2: ESOB, ESCC, ESCCi, MS-V, MSS. Not horizontal multistage pumps, not drainage or wastewater pumps",
+      "rule": "Minimum Efficiency Index MEI >= 0.40 from 1 Jan 2015, stated in the technical documentation.",
+      "quote": "From 1 January 2015, water pumps shall have: — a minimum efficiency at the best efficiency point (BEP) of at least (ηBEP) min requ when measured according to Annex III and calculated with the C-value for MEI = 0,4, according to Annex III,",
+      "check": "product.mei >= 0.40",
+      "source": "Commission Regulation (EU) No 547/2012, Art. 3(2) and Annex II, point 1(b); MEI on or near the rating plate: Annex II, point 2(1)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2012/547",
+      "status": "confirmed",
+      "on_fail": "return: MEI missing or below 0.40",
+      "checked_on": "2026-11-02",
+      "params": {
+        "mei_min": 0.4
+      },
+      "applies_to": {
+        "pump_type": [
+          "ESOB",
+          "ESCC",
+          "ESCCi",
+          "MS-V",
+          "MSS"
+        ]
+      }
+    },
+    {
+      "id": "CE-01",
+      "product": "all pumps and pump sets",
+      "rule": "The EC/EU declaration of conformity must identify the exact machine (model/type, product number where given).",
+      "quote": "The EC declaration of conformity must contain the following particulars: [...] 3. description and identification of the machinery, including generic denomination, function, model, type, serial number and commercial name;",
+      "check": "declaration.models contains product.model or product.product_no",
+      "source": "Directive 2006/42/EC, Annex II, part 1, section A, point 3 (OJ L 157, 9.6.2006). Replaced by Regulation (EU) 2023/1230, which applies from 20 January 2027 (Art. 54 as corrected by the corrigendum in OJ L 169, 4.7.2023; the first OJ text said 14 January). From that date check Annex V of 2023/1230 instead.",
+      "url": "https://eur-lex.europa.eu/eli/dir/2006/42",
+      "status": "confirmed",
+      "on_fail": "return: declaration does not name the submitted model",
+      "checked_on": "2026-11-02",
+      "applies_to": {
+        "category": [
+          "booster_set",
+          "drainage_pump",
+          "pump"
+        ]
+      }
+    },
+    {
+      "id": "MOTOR-IE",
+      "product": "induction motors 0.12 to 1000 kW, 2 to 8 poles, rated for direct on-line operation (Art. 2(1)(a)). Not in scope: motors completely integrated into a pump that cannot be tested on their own (Art. 2(2)(a)), motors made to work wholly immersed in a liquid (Art. 2(2)(e)), permanent magnet motors (not induction motors; see Art. 9(7))",
+      "rule": "From 1 July 2021: IE3 for three-phase motors 0.75 to 1000 kW, 2/4/6/8 poles, not Ex eb; IE2 for 0.12 to 0.75 kW. From 1 July 2023: IE4 for three-phase motors 75 to 200 kW, 2/4/6 poles, not brake, Ex eb or other explosion-protected motors; IE2 for Ex eb motors and for single-phase motors from 0.12 kW.",
+      "quote": "the energy efficiency of three-phase motors with a rated output equal to or above 0,75 kW and equal to or below 1 000 kW, with 2, 4, 6 or 8 poles, which are not Ex eb increased safety motors, shall correspond to at least the IE3 efficiency level set out in Table 2;",
+      "check": "only if the motor is in scope: product.ie_class >= class required for its power and poles; skip submersible and permanent magnet motors",
+      "source": "Commission Regulation (EU) 2019/1781, Annex I, point 1(a)(i), (a)(ii), (b)(i), (b)(ii); scope Art. 2(1)(a); exemptions Art. 2(2)(a) and (e). Quoted from the original OJ text (L 272, 25.10.2019); amended by Regulation (EU) 2021/341, check the consolidated text.",
+      "url": "https://eur-lex.europa.eu/eli/reg/2019/1781",
+      "status": "confirmed",
+      "on_fail": "return: motor class below EU minimum",
+      "checked_on": "2026-11-02",
+      "params": {
+        "bands": [
+          [
+            0.12,
+            0.75,
+            "IE2"
+          ],
+          [
+            0.75,
+            1000,
+            "IE3"
+          ]
+        ],
+        "ie4_band_from_2023": [
+          75,
+          200
+        ]
+      },
+      "applies_to": {
+        "motor_type": [
+          "induction"
+        ],
+        "submersible": [
+          false
+        ]
+      }
+    },
+    {
+      "id": "LEG-01",
+      "product": "domestic hot water installations (final storage, circulation). Not in scope: buildings used only as dwellings, unless the installation affects the outside of the building (RD 487/2022, Art. 3.2)",
+      "rule": "Final DHW storage uniformly at 60 C minimum (double tank storage 70 C minimum); hot water above 50 C at every terminal point and in the return pipe; the installation must be able to reach 70 C for thermal disinfection.",
+      "quote": "Asegurará, en toda el agua almacenada en los acumuladores de agua caliente finales, es decir, inmediatamente anteriores a consumo, una temperatura homogénea y mínima de 60 ºC. [...] Mantendrá la temperatura del agua, en el circuito de agua caliente, por encima de 50 ºC en todos los puntos terminales del circuito y en la tubería de retorno, si disponen de la misma, utilizando un equilibrado por temperatura. La instalación permitirá que el agua alcance una temperatura de 70 ºC en caso que se necesite realizar un tratamiento térmico de desinfección.",
+      "check": "if in scope: product.max_outlet_temp_c >= 70 (or a booster heater is submitted) and storage setpoint >= 60",
+      "source": "Spain, Real Decreto 487/2022, Anexo III, I, Parte A, punto 7, letras c) y f)",
+      "url": "https://www.boe.es/eli/es/rd/2022/06/21/487",
+      "status": "confirmed",
+      "on_fail": "return: legionella requirements not met",
+      "checked_on": "2026-11-02",
+      "params": {
+        "storage_min_c": 60,
+        "terminal_min_c": 50,
+        "disinfection_c": 70
+      },
+      "applies_to": {
+        "building_use_not": [
+          "dwelling_only"
+        ]
+      }
+    }
+  ]
+}

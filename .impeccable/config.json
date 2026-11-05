@@ -1,0 +1,80 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "tight-leading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-29T14:47:54.763Z",
+        "reason": "agent's call: decision sketch from a closed round, kept only as the critique reference, never shipped"
+      },
+      {
+        "rule": "skipped-heading",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-10-29T14:47:54.783Z",
+        "reason": "agent's call: decision sketch from a closed round, kept only as the critique reference, never shipped"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-10-29T14:47:54.804Z",
+        "reason": "agent's call: the canon card shows the category standard on purpose; never shipped"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "next condensed\",\"arial narrow\",sans-serif",
+        "files": [
+          ".impeccable/mocks/decision/pick-stamp.html"
+        ],
+        "createdAt": "2026-10-29T15:03:19.823Z",
+        "reason": "agent's call: unchosen card from the closed decision round, git-ignored, never shipped"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "next condensed\",sans-serif",
+        "files": [
+          ".impeccable/mocks/decision/pick-stamp.html"
+        ],
+        "createdAt": "2026-10-29T15:03:19.841Z",
+        "reason": "agent's call: unchosen card from the closed decision round, git-ignored, never shipped"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "alternate\",\"sf mono\",monospace",
+        "files": [
+          ".impeccable/mocks/decision/challenger-gate-board.html"
+        ],
+        "createdAt": "2026-10-29T15:03:19.858Z",
+        "reason": "agent's call: unchosen card from the closed decision round, git-ignored, never shipped"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "inter",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-10-29T15:03:19.874Z",
+        "reason": "agent's call: unchosen card from the closed decision round, git-ignored, never shipped"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "app/review/demo/index.html"
+        ],
+        "createdAt": "2026-11-04T23:51:56.387Z",
+        "reason": "user pinned the look: Luca asked that the demo look like Jeff's recording, whose ground is #F3EEE4"
+      }
+    ]
+  }
+}
