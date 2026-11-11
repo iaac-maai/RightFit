@@ -1,4 +1,4 @@
-# Feature spec: MAF checker for MEP equipment (proposal)
+# Feature spec: MAF checker for MEP equipment
 
 Status: proposed by Luca on 28 Oct 2026, agreed by the team on 5 Nov 2026 (see docs/decisions.md).
 
@@ -10,7 +10,7 @@ RightFit checks a material approval form (MAF; in Romania "fișă pentru transmi
 - not in this feature: visual search, product suggestions, doors, the space check.
 
 ## 2. How it fits the constitution
-Unchanged: the data rule (value, unit, source, page, status, checked_by), deterministic checks in checks/ with no AI, results as pass, flag or unclear with sources, humans decide, nothing confidential in Git, decisions in docs/decisions.md, Python, pytest, Streamlit.
+Unchanged: the data rule (value, unit, source, page, status, checked_by), deterministic checks in checks/ with no AI, results as pass, flag or unclear with sources, humans decide, nothing confidential in Git, decisions in docs/decisions.md, Python, pytest.
 
 Changed by the team's decision: the first use case becomes the MAF review of MEP equipment instead of hood selection; the user becomes the reviewer instead of the interior designer; FEAT-02 and FEAT-03 (visual and keyword search) are not needed for it.
 
@@ -44,11 +44,11 @@ Originals in data/raw/P01 and data/raw/P02: git-ignored, never committed. Famili
 location (RO or ES), review date, delivery date (form date + delivery weeks unless given), requirements from the specification or BOQ when available.
 
 ## 4. Reading (ingest/)
-Claude Code reads each attachment and writes data/maf/extracted/<package>.json.
+An AI reader reads each attachment and writes data/maf/extracted/<package>.json.
 
 Per document: file, pages, text_layer, languages, method (text or page image); doc_type (data_sheet, eu_declaration_of_conformity, declaration_of_performance, product_certificate, other_certificate, selection_report, manual, other); covers (the ranges or models it names; for declarations, the exact list declared); issuer, issue_date, valid_until; for declarations, the directives, regulations and standards cited; listed_as (the form's attachment label it corresponds to, or null).
 
-Per item: the values in section 5, each as value, unit, source (file), page, quote (at most 15 words, never a name from data/raw/NAMES.txt), status and checked_by. Values read by Claude Code start as extracted. Luca verifies them in the app; verified values get status verified and checked_by Luca. A value not found is empty, with status unclear and a note on where it was looked for. Never guess. File names are never trusted for what a document is.
+Per item: the values in section 5, each as value, unit, source (file), page, quote (at most 15 words, never a name from data/raw/NAMES.txt), status and checked_by. Values read by the AI reader start as extracted. Luca verifies them in the app; verified values get status verified and checked_by Luca. A value not found is empty, with status unclear and a note on where it was looked for. Never guess. File names are never trusted for what a document is.
 
 ## 5. Values per family
 - pump: model, product number, flow and head at the duty point, motor power P2, voltage, starting method, maximum working pressure (PN), liquid temperature range, controller or panel included, BMS communication (protocol; module included or optional), motor efficiency class if given;
@@ -86,14 +86,15 @@ In the earlier register, missing declarations led to a reminder for the delivery
 One sentence per flag or unclear, from a template per check, in English, in the tone of the reviewers' past comments. A language model may only rephrase them, never add values. Example for D2: "The declaration of conformity attached for {covers} matches no product in the MAF; please attach the declarations for {items}."
 
 ## 9. Interface (app/)
-- two pages over the same checks: the Streamlit page (`app/maf_app.py`) and the PoC page (`app/review_server.py` with `app/review/`), which runs only on the laptop;
-- package picker (P01, P02), location switch (RO, ES), review date, delivery date;
-- header: form fields with roles only; draft status with its reasons;
-- documents table: file, type found, listed as, covers, valid until, pages, method;
-- values per item with source, page, quote and status; a button to verify each value (checked_by Luca);
-- checks grouped D, V, E, C, R, each with result, reason and rule id; override with a note;
-- draft comments with a copy button;
-- exports: overrides.csv, and approved_values.csv (item, value, unit, source, page) for the certification consultant and the O&M file.
+One application over the checks, `app/review_server.py` with `app/review/`, which runs only on the laptop:
+- Packages: the packages already read, each with its draft answer and what is left, and the packages not read yet; a search and a discipline filter;
+- the review of one package, in three steps (Problems, Confirm readings, Answer), under a header with the form, the draft answer and its reasons, and how much is left;
+- Problems: one finding at a time, grouped by product, then the whole package, then the AI suggestions, with the real page open beside it and the quoted line marked; the reviewer keeps it in the answer, marks it "not a problem" with a reason, or goes to the next;
+- Confirm readings: document by document and page by page, each reading marked on the page, with a tick that records who confirmed it (checked_by); a page without a text layer says so and lists what to look for on it;
+- Answer: the draft with one comment per issue, what was checked and what could not be checked; only here can the country and the dates be changed;
+- exports: the answer, the confirmed values (item, value, unit, source, page) for the certification consultant and the O&M file, and the findings marked "not a problem" with their reasons;
+- Add a package, Booster sizing and Standby test: the pump workflow of the midterm, as screens of the same application;
+- Rules: every rule for a location, with its source and status.
 
 ## 10. Tests and evaluation
 - pytest unit tests for every check, with hand written cases approved by Luca;

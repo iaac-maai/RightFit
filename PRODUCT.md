@@ -10,8 +10,6 @@ web
 
 Plain HTML, CSS and JavaScript, served by a small Python script that uses only the standard library. The checks stay in Python (`checks/maf/`) and the page asks them for results. Chosen by Luca on 29 Oct 2026. It runs on Luca's laptop for the PoC. Nothing is hosted.
 
-The Streamlit page (`app/maf_app.py`) stays in the repository as it is.
-
 ## Users
 
 The primary user is the MEP consultant who reviews and signs a material approval form (MAF) that the contractor submitted. Luca confirmed this user ("most often the consultant"). They sit at a desk with the form (an old .xls file) and its PDF attachments, and must send back one status with comments:
@@ -77,6 +75,7 @@ The evidence for the problem comes from Luca's last project. Of 80 MEP approval 
   - mark a finding "not a problem", with a reason;
   - decide on AI suggestions;
   - confirm readings, which records who checked them.
+- **MCP.** Four read-only tools let an agent list the packages, review one, list the rules and classify a package's pages. Confirming a reading stays on the page.
 - **Constraints:**
   - the interface is in English;
   - no data is invented;
@@ -85,9 +84,8 @@ The evidence for the problem comes from Luca's last project. Of 80 MEP approval 
   - the tool never certifies;
   - no client, project, company or personal names and no prices go into Git. Manufacturer names and model codes are fine.
 - **Undecided or later:**
-  - uploading a new package from the page. Luca wants it in the future, not in the PoC;
-  - the reading itself runs offline, not in the page;
-  - the MCP connection is planned for 12 Nov.
+  - adding a package of any family. Today the page reads an added pump package on the spot; the other families are read offline;
+  - reading the 49 packages of the second batch, which the Packages screen lists as not read yet.
 
 ## Brand Commitments
 

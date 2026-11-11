@@ -1,6 +1,6 @@
 # Mission — RightFit
 
-Draft for the MAF checker, 28 Oct 2026; the team agreed to it on 5 Nov 2026, and the full version is due on 12 Nov. Open questions are marked [O].
+Full version for 12 Nov 2026, built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. Problem
 
@@ -75,6 +75,40 @@ The checklist comes from the register's comments, so we never evaluate it on the
 - Scanned PDFs without a text layer are read from the page image and need a closer look.
 - Some returns no check can catch: coordination with the architecture, a design that isn't approved yet, a reviewer asking for a sample.
 - A rule is only as current as its last check, so each one keeps its source and the date it was checked.
-- Two packages make a demonstration, not an evaluation. [O] More packages from Luca's practice, anonymised.
+- Two packages make a demonstration, not an evaluation. 48 more packages from the same project are on the laptop and not read yet. [O] Packages from other projects.
+
+## 8. Why AI, and why not a general chatbot
+
+Reading is the part rules can't do. The packages come from dozens of manufacturers, in several languages, and no two data sheets look alike. The 50 packages we hold have about 1,400 PDF pages, and 34 of the 300 PDFs have no text layer at all. On the pages of the two packages we have tested, a keyword search named the right kind of document only 27 % of the time.
+
+Deciding is the part AI has to stay out of. The person who signs must be able to defend each comment, so the same package has to give the same result every time and each result has to name its rule. That is why the checks are plain Python.
+
+Every AI part is measured against the plain way of doing the same job, and the results stay in the repository whichever way they go.
+
+| AI part | Compared with | Result so far |
+|---|---|---|
+| Our page classifier, trained from scratch | Keyword search | First version, on real package pages: 25 % right against 27 %. On manuals with declarations inside: 87 % against 45 %. It didn't beat the keywords on real packages. The second version also trains on real packages: on 184 locked pages of the second batch it gets 62 % right against 35 %, and finds 69 % of the data sheet pages against 9 % |
+| AI matching of documents to products | Text matching | The same answer on all 51 pairs. So far the AI only adds how a document covers a product |
+| AI reading of packages into values | A person reading them | Not measured yet: 1 of 116 values has been confirmed |
+| The whole review | Luca by hand, and general chatbots | By hand: about 10 minutes for P01 (figures only) and 3 hours for P02. Chatbots: the protocol is written (`eval/chatbot_baseline/protocol.md`), no run yet |
+
+At the midterm on 6 Nov the jury's main comment was that RightFit has to differ clearly from any general AI chatbot. A chatbot can read a PDF and give an opinion. RightFit differs in how the result is built:
+
+- the same package gets the same result on every run, and the protocol above measures how much a chatbot's runs differ;
+- every result names its rule, the rule's source and whether anyone has read the official text;
+- nothing passes until a person has confirmed the reading behind it, and the confirmation records who and when;
+- each finding opens next to the real page, with the quoted line marked where the page has a text layer;
+- the checklist comes from what reviewers wrote on 80 real forms, which a chatbot has not seen;
+- an agent can call the checks through MCP, so a chatbot can use RightFit's rules instead of replacing them.
+
+If the chatbots find as much as RightFit at the same quality, we will say so and change course.
+
+## 9. Responsibility and data
+
+The person who signs the form carries the responsibility, and RightFit doesn't take any of it away. It drafts, says what it checked and what it couldn't, and never certifies.
+
+The packages, the forms and the register belong to the project's parties. The originals stay on our laptops, outside Git, and the repository keeps only values, short quotes and counts. Anything we get from other practitioners needs the permission of the company that owns it. [O] Whether real packages may be sent to an online model: the manufacturer documents are public, the forms and the project headers on some pages are not.
+
+All 50 packages come from one project, and the checklist comes from a register Luca kept. He is also the one who judges the results, so a comment that was common there may be rare elsewhere. We reduce this by writing the reference answers before seeing the tool's output and by hiding the source when findings are judged. [O] A second reviewer, and packages from other projects.
 
 Changes to this file are recorded in `docs/decisions.md`.

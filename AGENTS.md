@@ -1,6 +1,6 @@
 # AGENTS.md — RightFit
 
-Instructions for any AI agent (Claude, ChatGPT/Codex, Copilot) and any human contributor working in this repository. Read this file before making changes.
+Instructions for any AI agent and any human contributor working in this repository. Read this file before making changes.
 
 ## Read first
 
@@ -74,6 +74,6 @@ The planned repository structure is in `spec/constitution/tech_stack.md` §6.
 
 Open decisions are the items tagged **[O]** in `spec/constitution/`. This file keeps no separate list.
 
-## Current status (5 Nov 2026)
+## Current status (11 Nov 2026)
 
-Two packages read into `data/maf/extracted/`; all values still `extracted`, none verified. Checks, draft status, draft comments and the Streamlit page built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. A review page without Streamlit and the midterm pump demo, which reads uploaded packages live, run on `app/review_server.py`. The app and every file are in English.
+Two packages read into `data/maf/extracted/`; all values still `extracted`, except one that Luca confirmed. Checks, draft status and draft comments built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. One application, `app/review_server.py` with `app/review/`, holds the packages, the review, confirming readings, the answer, adding a pump package, booster sizing, the standby test and the rules. The same checks are MCP tools an agent can call (`app/mcp_server.py`). The app and every file are in English.

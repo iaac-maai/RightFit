@@ -27,11 +27,10 @@ A check only passes or flags on verified values. Until then it shows `unclear` a
 
 ```
 pip install -r requirements.txt
-brew install tesseract           # OCR for scanned pages in the pump demo (macOS)
+brew install tesseract           # OCR for scanned pages when a pump package is added (macOS)
 pytest
-python app/review_server.py      # the PoC review page: http://127.0.0.1:8520
-                                 # and the pump demo of the midterm: http://127.0.0.1:8520/demo/
-streamlit run app/maf_app.py     # the first review page, in Streamlit
+python app/review_server.py      # the application: http://127.0.0.1:8520
+python app/mcp_server.py         # the checks as MCP tools; an agent starts it from .mcp.json
 ```
 
 The app works from `data/maf/extracted/`, which is in Git. The original PDFs and forms stay on our laptops in `data/raw/`.
