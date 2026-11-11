@@ -95,10 +95,11 @@
         "2014/34/EU"
       ],
       "listed_as": "Declaratie de conformitate SLV1",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "image only (no text layer); 2 pages, the form says 1; LVD part applies below 2.2 kW rated power; valid only as part of the safety instructions (publication 98938948)",
-      "matches": []
+      "matches": [],
+      "verified_on": "2026-11-11"
     },
     {
       "file": "Declaration of conformity_Unilift AP.PDF",
@@ -124,8 +125,8 @@
         "2015/863/EU"
       ],
       "listed_as": "Declaratie de conformitate Unilift AP",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "2 pages, the form says 1; LVD part applies only to pumps with at least 10 m supply cable; valid only as part of the safety instructions (publication 99084629 0719)",
       "matches": [
         {
@@ -144,7 +145,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-11"
     },
     {
       "file": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
