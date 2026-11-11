@@ -14,13 +14,13 @@ Unlike the hood version, which started from data we still had to collect, the MA
 | DS4 | Legal texts | EUR-Lex, Monitorul Oficial / legislatie.just.ro, BOE | Luca | Web pages, PDF | Partly read | Cite clause and edition | The basis of DS3 |
 | DS5 | Reviewers' checklist | Built from the comments in DS2 | Luca | CSV (`data/maf/checklist.csv`) | In Git, 12 items | Never evaluated on DS2, which it came from | Check C |
 | DS6 | Package inventory | DS1 | AI reader | CSV (`data/maf/packages.csv`) | In Git | File names only | Check D4 |
-| DS7 | Extracted values | DS1, read by the AI | Luca verifies | JSON (`data/maf/extracted/`) | In Git, nothing verified yet | Roles only, quotes of 15 words at most, no names | All checks |
+| DS7 | Extracted values | DS1, read by the AI | Luca verifies | JSON (`data/maf/extracted/`) | In Git, 1 of 116 values confirmed | Roles only, quotes of 15 words at most, no names | All checks |
 | DS8 | Reference answers | Luca, before seeing the tool | Luca | Text (`data/maf/reference/`) | Written for P01 and P02 | Never used for tuning | Evaluation |
 | DS9 | Review times, by hand and with the tool | Luca | Luca | In DS8 for now | By hand: about 10 min (P01, figures only) and 3 h (P02) | | Evaluation |
 | DS10 | Overrides and approved values | Exported by the app | Reviewer | CSV | Created when used | Stay local unless anonymised | O&M file, certification consultant |
-| DS11 | More packages | Luca's practice | Luca | As DS1 | [O] which ones, and how we anonymise them | As DS1 | Evaluation on unseen packages |
+| DS11 | More packages | The same project as DS1 | Luca | As DS1 | Held since 6 Nov: 48 packages, 285 PDFs, 1,296 pages, 31 PDFs without text; none read yet. [O] Packages from other projects | As DS1 | Training and locked testing of our models; evaluation on unseen packages |
 | DS13 | Manufacturer documents library | Official manufacturer sites, found by the AI | Luca confirms | JSON (`data/maf/library.json`) + copies in `data/raw/library/` | Started: 2 Grundfos declarations, 1 FläktGroup search without result | Links and short quotes only in Git; copies stay local | D1: a missing document the manufacturer publishes |
-| DS12 | Interviews with reviewers and contractors | Us | Sahil | Notes | [O] not planned in detail | Consent, anonymised | Problem evidence, who would pay |
+| DS12 | Interviews with reviewers and contractors | Us | Sahil | Notes | [O] A questionnaire for four practitioners is drafted; no answers yet | Consent, anonymised | Problem evidence, who would pay |
 
 The hood version listed "79 MEP approval forms" from the v1 research. We use DS2 instead, because it is the copy we can open.
 

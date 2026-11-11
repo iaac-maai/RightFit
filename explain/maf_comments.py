@@ -37,6 +37,46 @@ TEMPLATES = {
     "C.CL-12": "Please complete the electrical data for {item}: {missing}.",
 }
 
+# A short heading for each comment, so a list of findings can be read at a glance.
+TITLES = {
+    "D1.missing": "No {doc}", "D1.published": "No {doc}",
+    "D2.no_match": "Declaration names other products", "D2.extra": "Declaration names other products",
+    "D3.expired": "Certificate has expired", "D3.renew": "Certificate runs out before delivery",
+    "D4.not_found": "Listed attachment is missing", "D4.type": "Attachment is not what the form says",
+    "V1.below": "Duty point not reached", "V1.missing": "Duty point not shown",
+    "V2.below": "Working pressure too low", "V2.missing": "Working pressure not stated",
+    "E1.hrs": "Heat recovery below the minimum", "E1.sfp": "SFPint above the limit",
+    "E1.filter": "Filter warning not confirmed", "E1.missing": "{What} not stated",
+    "C.CL-01": "Exact model not marked on the data sheet", "C.CL-03": "Where it is used is not stated",
+    "C.CL-04": "BOQ components not confirmed", "C.CL-08": "BMS not shown as included",
+    "C.CL-09": "No control panel listed", "C.CL-09.float": "No float switch or panel listed",
+    "C.CL-12": "{Missing} not stated",
+}
+
+
+def readable(params):
+    """The values of a check result in the words a sentence needs: 'starting_method' becomes 'starting method'."""
+    out = dict(params)
+    if "doc_type" in out:
+        out["doc"] = DOC_NAMES.get(out["doc_type"], out["doc_type"])
+    if "missing" in out:
+        out["missing"] = out["missing"].replace("_", " ")
+        out["Missing"] = out["missing"].capitalize()
+    if "what" in out:
+        out["What"] = str(out["what"]).capitalize()
+    return out
+
+
+def open_verdict(r):
+    """True when a result needs a comment: a result unclear only because nobody verified it counts as what it would be."""
+    return (r["would_be"] if r["result"] == "unclear" else r["result"]) in ("flag", "unclear")
+
+
+def title(r):
+    """The short heading of one check result, or None when it has no comment to head."""
+    template = TITLES.get(r["code"])
+    return template.format(**readable(r["params"])) if template and open_verdict(r) else None
+
 
 def comment(r):
     """The draft comment for one check result, or None when it needs none.
@@ -44,11 +84,7 @@ def comment(r):
     A result that is unclear only because nobody verified its values yet is commented as what it would be:
     the reviewer verifies before sending, and a would-be pass needs no comment.
     """
-    verdict = r["would_be"] if r["result"] == "unclear" else r["result"]
     template = TEMPLATES.get(r["code"])
-    if verdict not in ("flag", "unclear") or not template:
+    if not open_verdict(r) or not template:
         return None
-    params = dict(r["params"])
-    if "doc_type" in params:
-        params["doc"] = DOC_NAMES.get(params["doc_type"], params["doc_type"])
-    return template.format(**params)
+    return template.format(**readable(r["params"]))

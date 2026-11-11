@@ -1,572 +1,526 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-29T15:01:05+00:00",
+  "generatedAt": "2026-11-11T11:05:57+00:00",
   "title": "Design System: RightFit",
   "extensions": {
     "colorMeta": {
-      "drafting-ink": {
+      "bottle-green": {
         "role": "primary",
-        "displayName": "Drafting Ink",
-        "canonical": "#1D2125",
-        "cssVariable": "--ink",
+        "displayName": "Bottle Green",
+        "canonical": "#0E3B2E",
         "tonalRamp": [
-          "#0B0B0C",
-          "#252729",
-          "#424549",
-          "#62676B",
-          "#858A8E",
-          "#ABAEB2",
-          "#CFD1D3",
-          "#EEEEEF"
+          "#040E0A",
+          "#152A23",
+          "#2B493F",
+          "#446B5D",
+          "#648C7E",
+          "#8DAEA1",
+          "#B7D0C6",
+          "#E4F2ED"
         ]
       },
-      "ink-secondary": {
-        "role": "neutral",
-        "displayName": "Ink Secondary",
-        "canonical": "#464B51",
-        "cssVariable": "--ink-2",
+      "bottle-green-hover": {
+        "role": "primary",
+        "displayName": "Bottle Green, Lifted",
+        "canonical": "#1B5A47",
         "tonalRamp": [
-          "#0B0B0C",
-          "#242729",
-          "#41454A",
-          "#62676C",
-          "#858A90",
-          "#AAAEB3",
-          "#CFD1D4",
-          "#EEEEEF"
+          "#020E09",
+          "#0E2B22",
+          "#214B3D",
+          "#376D5B",
+          "#598F7C",
+          "#84B09F",
+          "#B1D2C5",
+          "#E0F4EC"
         ]
       },
-      "ink-tertiary": {
+      "form-ground": {
         "role": "neutral",
-        "displayName": "Ink Tertiary",
-        "canonical": "#62676D",
-        "cssVariable": "--ink-3",
+        "displayName": "Form Ground",
+        "canonical": "#E7F0E8",
         "tonalRamp": [
-          "#0B0B0C",
-          "#252729",
-          "#42454A",
-          "#62676C",
-          "#858A8F",
-          "#AAAEB3",
-          "#CFD1D4",
-          "#EEEEEF"
+          "#0A0C0A",
+          "#232623",
+          "#3E443F",
+          "#5C635D",
+          "#7D857E",
+          "#A1A7A1",
+          "#C6CBC6",
+          "#ECEFED"
         ]
       },
-      "hairline": {
+      "band": {
         "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "#D9DAD5",
-        "cssVariable": "--rule",
+        "displayName": "Band",
+        "canonical": "#DCE9DF",
         "tonalRamp": [
-          "#0B0B0B",
-          "#262725",
-          "#454542",
-          "#666663",
-          "#898A85",
-          "#AEAEAB",
-          "#D1D1CF",
-          "#EEEEEE"
+          "#090C0A",
+          "#212723",
+          "#3C443E",
+          "#5A645C",
+          "#7B867D",
+          "#9FA8A1",
+          "#C4CBC6",
+          "#EBF0EC"
         ]
       },
-      "drafting-film": {
+      "rail-soft": {
         "role": "neutral",
-        "displayName": "Drafting Film",
-        "canonical": "#F7F7F4",
-        "cssVariable": "--ground",
+        "displayName": "Rail Soft",
+        "canonical": "#B7D1C0",
         "tonalRamp": [
-          "#0B0B0B",
-          "#262625",
-          "#454543",
-          "#666664",
-          "#898987",
-          "#AEAEAC",
-          "#D1D1D0",
-          "#EEEEEE"
+          "#070D09",
+          "#1D2821",
+          "#36473C",
+          "#52675A",
+          "#72897A",
+          "#98AA9E",
+          "#BFCDC4",
+          "#E8F1EB"
         ]
       },
-      "sheet-white": {
+      "sheet": {
         "role": "neutral",
-        "displayName": "Sheet White",
+        "displayName": "Sheet",
         "canonical": "#FFFFFF",
-        "cssVariable": "--sheet",
         "tonalRamp": [
           "#0B0B0B",
-          "#262626",
-          "#454545",
-          "#666666",
-          "#898989",
-          "#AEAEAE",
-          "#D1D1D1",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
           "#EEEEEE"
         ]
       },
-      "on-ink": {
+      "line": {
         "role": "neutral",
-        "displayName": "On Ink",
-        "canonical": "#FFFFFF",
-        "cssVariable": "--on-ink",
+        "displayName": "Line",
+        "canonical": "#C5D6CA",
         "tonalRamp": [
-          "#0B0B0B",
-          "#262626",
-          "#454545",
-          "#666666",
-          "#898989",
-          "#AEAEAE",
-          "#D1D1D1",
-          "#EEEEEE"
+          "#090C0A",
+          "#202722",
+          "#3B453E",
+          "#58655C",
+          "#78877C",
+          "#9DA9A0",
+          "#C3CCC5",
+          "#EAF0EC"
         ]
       },
-      "on-ink-secondary": {
+      "line-soft": {
         "role": "neutral",
-        "displayName": "On Ink Secondary",
-        "canonical": "#BCC1C7",
-        "cssVariable": "--on-ink-2",
+        "displayName": "Line Soft",
+        "canonical": "#E5EDE7",
         "tonalRamp": [
-          "#0B0B0C",
-          "#252729",
-          "#424549",
-          "#62666B",
-          "#858A8F",
-          "#ABAEB2",
-          "#CFD1D3",
-          "#EEEEEF"
+          "#0A0C0A",
+          "#232624",
+          "#3F4340",
+          "#5D635E",
+          "#7E847F",
+          "#A1A7A2",
+          "#C6CAC7",
+          "#EDEFED"
         ]
       },
-      "markup-red": {
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#B9CDBF",
+        "tonalRamp": [
+          "#080C09",
+          "#1F2722",
+          "#39463D",
+          "#56665B",
+          "#76877B",
+          "#9BA99F",
+          "#C1CCC5",
+          "#EAF0EC"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#15191A",
+        "tonalRamp": [
+          "#0A0B0C",
+          "#232526",
+          "#3F4343",
+          "#5E6263",
+          "#7F8384",
+          "#A2A6A7",
+          "#C7CACA",
+          "#EDEFEF"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "#3D4A42",
+        "tonalRamp": [
+          "#090C0A",
+          "#202723",
+          "#3B453F",
+          "#58655D",
+          "#79867E",
+          "#9DA8A1",
+          "#C3CCC6",
+          "#EBF0ED"
+        ]
+      },
+      "label": {
+        "role": "neutral",
+        "displayName": "Label",
+        "canonical": "#4A5D51",
+        "tonalRamp": [
+          "#080C09",
+          "#1E2822",
+          "#38463D",
+          "#55665B",
+          "#75887C",
+          "#9AAA9F",
+          "#C1CDC5",
+          "#E9F1EC"
+        ]
+      },
+      "carbon": {
         "role": "secondary",
-        "displayName": "Markup Red",
-        "canonical": "#D23A2E",
-        "cssVariable": "--red",
+        "displayName": "Carbon Violet",
+        "canonical": "#4A32B8",
         "tonalRamp": [
-          "#150705",
-          "#490D09",
-          "#850705",
-          "#B42E24",
-          "#DE5748",
-          "#F78B7C",
-          "#FEBFB5",
-          "#FFE8E4"
+          "#090525",
+          "#211757",
+          "#3B2F8C",
+          "#584AC3",
+          "#766DEA",
+          "#9997FE",
+          "#BEC0FF",
+          "#E7EAFF"
         ]
       },
-      "markup-red-ink": {
+      "carbon-wash": {
         "role": "secondary",
-        "displayName": "Markup Red Ink",
-        "canonical": "#B3261E",
-        "cssVariable": "--red-ink",
+        "displayName": "Carbon Wash",
+        "canonical": "#F4F2FF",
         "tonalRamp": [
-          "#140706",
-          "#47100C",
-          "#81130E",
-          "#AF352B",
-          "#D95C4E",
-          "#F38E80",
-          "#FCC0B7",
-          "#FFE9E5"
+          "#0B0B0D",
+          "#252429",
+          "#424148",
+          "#61606A",
+          "#82818B",
+          "#A5A4AD",
+          "#C9C8CF",
+          "#EEEEF2"
         ]
       },
-      "markup-red-wash": {
+      "carbon-line": {
         "role": "secondary",
-        "displayName": "Markup Red Wash",
-        "canonical": "#FBEDEB",
-        "cssVariable": "--red-wash",
+        "displayName": "Carbon Rule",
+        "canonical": "#DAD5F2",
         "tonalRamp": [
-          "#0C0B0B",
-          "#2A2524",
-          "#4C4341",
-          "#6E6362",
-          "#918685",
-          "#B5ABAA",
-          "#D5CFCF",
-          "#F0EEEE"
+          "#0B0A10",
+          "#25232F",
+          "#423F51",
+          "#625E75",
+          "#837F97",
+          "#A5A2B6",
+          "#C9C7D7",
+          "#EFEDF7"
         ]
       },
-      "suggestion-blue": {
+      "problem-red": {
         "role": "tertiary",
-        "displayName": "Suggestion Blue",
-        "canonical": "#2B5FB4",
-        "cssVariable": "--blue",
+        "displayName": "Problem Red",
+        "canonical": "#C4311E",
         "tonalRamp": [
-          "#060B14",
-          "#112548",
-          "#1A4283",
-          "#3664B0",
-          "#5888D8",
-          "#88AFEF",
-          "#BBD2F7",
-          "#E7EFFD"
+          "#1F0000",
+          "#4B0400",
+          "#7B1407",
+          "#AD2918",
+          "#D5503D",
+          "#EF816E",
+          "#FFB0A0",
+          "#FFE0D6"
         ]
       },
-      "suggestion-blue-ink": {
+      "problem-wash": {
         "role": "tertiary",
-        "displayName": "Suggestion Blue Ink",
-        "canonical": "#24519C",
-        "cssVariable": "--blue-ink",
+        "displayName": "Problem Wash",
+        "canonical": "#FBEDEA",
         "tonalRamp": [
-          "#070B13",
-          "#132645",
-          "#20437D",
-          "#3C65A9",
-          "#5E89D1",
-          "#8CAFE9",
-          "#BED2F4",
-          "#E7EFFB"
+          "#0D0A0A",
+          "#292422",
+          "#48403E",
+          "#695E5C",
+          "#8B7F7D",
+          "#ACA2A0",
+          "#CFC7C6",
+          "#F2EDEC"
         ]
       },
-      "suggestion-blue-wash": {
+      "question-ochre": {
         "role": "tertiary",
-        "displayName": "Suggestion Blue Wash",
-        "canonical": "#EDF2FA",
-        "cssVariable": "--blue-wash",
+        "displayName": "Question Ochre",
+        "canonical": "#8A5A00",
         "tonalRamp": [
-          "#0B0B0C",
-          "#252629",
-          "#42454A",
-          "#62666C",
-          "#858990",
-          "#ABAEB3",
-          "#CFD1D4",
-          "#EEEEEF"
+          "#140800",
+          "#362000",
+          "#5B3A00",
+          "#83570E",
+          "#A67838",
+          "#C49E6C",
+          "#E1C49F",
+          "#FDECD5"
         ]
       },
-      "confirmed-green": {
+      "question-wash": {
         "role": "tertiary",
-        "displayName": "Confirmed Green",
-        "canonical": "#2F7A4D",
-        "cssVariable": "--green",
+        "displayName": "Question Wash",
+        "canonical": "#FAF1DF",
         "tonalRamp": [
-          "#070D08",
-          "#102D1B",
-          "#165230",
-          "#35754D",
-          "#599A6F",
-          "#8ABC99",
-          "#BDD9C5",
-          "#E7F1EA"
-        ]
-      },
-      "confirmed-green-wash": {
-        "role": "tertiary",
-        "displayName": "Confirmed Green Wash",
-        "canonical": "#E9F3ED",
-        "cssVariable": "--green-wash",
-        "tonalRamp": [
-          "#0A0B0B",
-          "#242725",
-          "#404743",
-          "#616864",
-          "#838B87",
-          "#A9B0AC",
-          "#CED2D0",
-          "#EDEFEE"
-        ]
-      },
-      "hold-amber": {
-        "role": "tertiary",
-        "displayName": "Hold Amber",
-        "canonical": "#8F5C10",
-        "cssVariable": "--hold",
-        "tonalRamp": [
-          "#0F0A05",
-          "#362106",
-          "#623B00",
-          "#895B1E",
-          "#AE7E44",
-          "#CDA67A",
-          "#E3CDB4",
-          "#F5EDE4"
-        ]
-      },
-      "hold-amber-wash": {
-        "role": "tertiary",
-        "displayName": "Hold Amber Wash",
-        "canonical": "#FAF1E3",
-        "cssVariable": "--hold-wash",
-        "tonalRamp": [
-          "#0C0B0A",
-          "#292621",
-          "#4A443B",
-          "#6C655A",
-          "#8F887D",
-          "#B3ADA4",
-          "#D4D0CB",
-          "#EFEEEC"
+          "#0D0B07",
+          "#28251D",
+          "#474137",
+          "#676052",
+          "#898173",
+          "#ABA498",
+          "#CDC9BF",
+          "#F1EEE8"
         ]
       }
     },
     "typographyMeta": {
-      "display": {
-        "displayName": "Status Letter",
-        "purpose": "The single A, B or C status letter in its colored 5px frame; 72px on phones."
-      },
       "headline": {
-        "displayName": "Status Phrase",
-        "purpose": "Uppercase status phrase beside the letter; 30px on phones."
+        "displayName": "Headline",
+        "purpose": "The title of a screen."
+      },
+      "answer": {
+        "displayName": "Answer",
+        "purpose": "The draft answer beside its letter in the package head."
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Selected finding heading (26px); package heading and answer letter head at 22px."
-      },
-      "title-small": {
-        "displayName": "Title Small",
-        "purpose": "Step tabs, group headings and list headings in uppercase DIN (15-18px)."
+        "purpose": "The open problem, the document card and the answer letter sheet."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Finding comments and evidence quotes, max 62-78ch."
+        "purpose": "All running text, with tabular figures."
       },
-      "body-small": {
-        "displayName": "Body Small",
-        "purpose": "Table cells, descriptions, file names and notes."
+      "small": {
+        "displayName": "Small",
+        "purpose": "Notes, tags, captions and page links."
       },
       "label": {
-        "displayName": "Label",
-        "purpose": "Uppercase column heads, fact labels and decision tags."
+        "displayName": "Printed Label",
+        "purpose": "Uppercase field labels and table column heads."
       },
-      "numeral": {
-        "displayName": "Numeral",
-        "purpose": "Tabular DIN Alternate for counts, pages, values, sources and delta numbers."
+      "typed-value": {
+        "displayName": "Typed Value",
+        "purpose": "Values read from the documents, in bold Courier."
+      },
+      "typed-figure": {
+        "displayName": "Typed Figure",
+        "purpose": "Large result figures on the tool screens."
+      },
+      "answer-letter": {
+        "displayName": "Answer Letter",
+        "purpose": "The draft-answer letter in its filled square."
       }
     },
-    "fontStacks": {
-      "--din": "\"DIN Condensed\", \"Bahnschrift Condensed\", \"Bahnschrift\", \"Arial Narrow\", sans-serif",
-      "--din-num": "\"DIN Alternate\", \"Bahnschrift\", -apple-system, system-ui, sans-serif",
-      "--sans": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Segoe UI\", system-ui, sans-serif"
-    },
-    "lineWeights": [
-      {
-        "name": "hairline",
-        "value": "1px solid #D9DAD5",
-        "purpose": "Dividers between rows, columns and list items."
-      },
-      {
-        "name": "ink-rule",
-        "value": "1px solid #1D2125",
-        "purpose": "Table tops, table heads, tab baseline, control dividers."
-      },
-      {
-        "name": "control-frame",
-        "value": "1.5px solid #1D2125",
-        "purpose": "Buttons, segmented control, reason field, draft stamp (white on the bar)."
-      },
-      {
-        "name": "heavy-rule",
-        "value": "2px solid #1D2125",
-        "purpose": "End of the status block, notes, save bar, answer sign-off."
-      },
-      {
-        "name": "status-frame",
-        "value": "5px solid (green A, amber B, red C)",
-        "purpose": "The status letter frame only; 4px on phones."
-      }
-    ],
     "shadows": [
       {
+        "name": "paper",
+        "value": "0 0 0 1px #DDE5DF, 0 2px 8px rgba(14, 59, 46, .08)",
+        "purpose": "The rendered document page only."
+      },
+      {
+        "name": "float",
+        "value": "0 8px 24px rgba(14, 59, 46, .18)",
+        "purpose": "The popover that explains the draft answer."
+      },
+      {
         "name": "toast",
-        "value": "0 8px 24px rgba(29, 33, 37, .22)",
-        "purpose": "The confirmation toast, which floats over the page."
+        "value": "0 8px 24px rgba(14, 59, 46, .28)",
+        "purpose": "The confirmation toast."
       },
       {
-        "name": "sliding-sheet",
-        "value": "-12px 0 40px rgba(29, 33, 37, .16)",
-        "purpose": "The detail panel when it slides over the page below 1240px."
+        "name": "selection-frame",
+        "value": "inset 0 0 0 1.5px #0E3B2E",
+        "purpose": "The open problem and the current page group; a frame, not a lift."
       },
       {
-        "name": "current-outline",
-        "value": "inset 0 0 0 1px #1D2125",
-        "purpose": "The selected attachment in the rail; an outline, not a lift."
+        "name": "focus",
+        "value": "outline: 2px solid #4A32B8; outline-offset: 2px",
+        "purpose": "Every focusable element; white on the rail."
       }
     ],
     "motion": [
       {
         "name": "ease",
         "value": "cubic-bezier(.16, 1, .3, 1)",
-        "purpose": "Long-tail ease for every transition."
+        "purpose": "The soft ease used by the re-ink, the page marks, the toast and progress bars."
       },
       {
-        "name": "cloud-draw",
-        "value": "stroke-dashoffset .7s, 140ms stagger per cloud",
-        "purpose": "Revision clouds draw themselves when a finding is selected."
+        "name": "re-ink",
+        "value": "0.46s clip-path wipe, left to right",
+        "purpose": "A confirmed reading turns from carbon violet to ink black."
       },
       {
-        "name": "sheet-slide",
-        "value": "transform .35s",
-        "purpose": "Detail sheet sliding in on narrower screens."
+        "name": "page-mark",
+        "value": "0.36s clip-path wipe, left to right",
+        "purpose": "A quoted line is marked on the document page."
+      },
+      {
+        "name": "control-hover",
+        "value": "background 0.12s",
+        "purpose": "Button hover."
       },
       {
         "name": "toast",
-        "value": "opacity .25s, transform .35s",
-        "purpose": "Toast rises 20px into place."
-      },
-      {
-        "name": "chevron",
-        "value": "transform .2s",
-        "purpose": "Disclosure chevron rotates on open."
-      },
-      {
-        "name": "busy-dim",
-        "value": "opacity .2s to .55",
-        "purpose": "Rail and centre dim while checks run."
+        "value": "opacity and 16px rise, 0.18s",
+        "purpose": "The toast enters from below."
       },
       {
         "name": "reduced-motion",
-        "value": "all transitions off",
-        "purpose": "prefers-reduced-motion removes every transition; clouds appear drawn."
+        "value": "animations 0.001s, no transitions",
+        "purpose": "Respects the reduced-motion preference."
       }
     ],
     "breakpoints": [
       {
-        "name": "wide-meta",
-        "value": "1280px",
-        "purpose": "Below it the bar drops the package meta."
-      },
-      {
-        "name": "two-column",
-        "value": "1240px",
-        "purpose": "Below it the detail panel becomes a sliding sheet."
+        "name": "narrow",
+        "value": "1100px",
+        "purpose": "Rail becomes a top bar; work split 5 to 7; document page fixed at 640px; decision buttons pinned at the bottom of the open problem."
       },
       {
         "name": "phone",
         "value": "760px",
-        "purpose": "Bar wraps to 100px, rail behind a toggle, rows collapse."
+        "purpose": "One scrolling column; document page fills the width; secondary table columns hidden."
       }
-    ],
-    "layout": {
-      "barHeight": "56px (100px on phones)",
-      "columns": "300px rail, fluid centre, 440px detail",
-      "rowGrid": "34px, fluid, 190px, 112px with 12px gap"
-    }
+    ]
   },
   "components": [
-    {
-      "name": "Button",
-      "kind": "button",
-      "refersTo": "button",
-      "description": "Default outlined control for secondary actions.",
-      "html": "<button class=\"ds-btn\">Not a problem…</button>",
-      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--ink); background: var(--sheet); color: var(--ink); padding: 7px 13px; font: 14px/1.45 var(--sans); border-radius: 2px; cursor: pointer; } .ds-btn:hover { background: var(--ground); } .ds-btn:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; } .ds-btn:disabled { opacity: .45; cursor: default; }"
-    },
     {
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Ink-filled control for the one main action in a group.",
-      "html": "<button class=\"ds-btn-primary\"><svg viewBox=\"0 0 20 20\"><rect x=\"6.5\" y=\"6.5\" width=\"10\" height=\"10\" rx=\"1.5\"/><path d=\"M13.5 4.5v-1a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1\"/></svg>Copy the answer</button>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; border: 1.5px solid var(--ink); background: var(--ink); color: var(--on-ink); padding: 7px 13px; font: 14px/1.45 var(--sans); border-radius: 2px; cursor: pointer; } .ds-btn-primary:hover { background: #33393F; } .ds-btn-primary:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; } .ds-btn-primary svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }"
+      "description": "The main action on a screen or an open problem: Next, Add a package, Copy the answer.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Next <svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M4 10h12m-5-5 5 5-5 5\"/></svg></button>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-btn { display: inline-flex; align-items: center; gap: 7px; font: 600 14.5px/1 var(--sans); padding: 10px 14px; border-radius: 4px; border: 1.5px solid var(--green); background: var(--sheet); color: var(--green); cursor: pointer; transition: background .12s; } .ds-btn:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; } .ds-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; } .ds-btn-primary { background: var(--green); color: #fff; } .ds-btn-primary:hover { background: var(--green-2); border-color: var(--green-2); }"
     },
     {
-      "name": "Segmented Decision",
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Every other action: outlined green on white.",
+      "html": "<button class=\"ds-btn\">Open the page</button>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-btn { display: inline-flex; align-items: center; gap: 7px; font: 600 14.5px/1 var(--sans); padding: 10px 14px; border-radius: 4px; border: 1.5px solid var(--green); background: var(--sheet); color: var(--green); cursor: pointer; transition: background .12s; } .ds-btn:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; } .ds-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; } .ds-btn:hover { background: var(--band); }"
+    },
+    {
+      "name": "Decision Control",
       "kind": "custom",
-      "refersTo": "segmented-option-selected",
-      "description": "Decision on an AI suggestion; the chosen option fills blue.",
-      "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button role=\"radio\" aria-checked=\"true\">In my answer</button><button role=\"radio\" aria-checked=\"false\">Not relevant</button></div>",
-      "css": ".ds-seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 2px; } .ds-seg button { border: 0; background: var(--sheet); color: var(--ink); padding: 7px 12px; font: 14px/1.45 var(--sans); cursor: pointer; } .ds-seg button + button { border-left: 1px solid var(--ink); } .ds-seg button[aria-checked=\"true\"] { background: var(--blue); color: #fff; } .ds-seg button:hover:not([aria-checked=\"true\"]) { background: var(--blue-wash); } .ds-seg button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }"
+      "refersTo": "decision-control",
+      "description": "The reviewer's answer to an AI suggestion, outlined in carbon violet; the chosen segment fills.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\" aria-label=\"Your decision\"><button role=\"radio\" aria-checked=\"true\">Keep</button><button role=\"radio\" aria-checked=\"false\">Not a problem</button></div>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-seg { display: inline-flex; border: 1.5px solid var(--carbon); border-radius: 4px; overflow: hidden; } .ds-seg button { font: 600 14.5px/1.42 var(--sans); border: 0; border-right: 1px solid var(--carbon); background: var(--sheet); color: var(--carbon); padding: 9px 12px; cursor: pointer; } .ds-seg button:last-child { border-right: 0; } .ds-seg button[aria-checked='true'] { background: var(--carbon); color: #fff; } .ds-seg button:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }"
     },
     {
       "name": "Field",
       "kind": "input",
       "refersTo": "field",
-      "description": "Compact select or date field in the rail context block.",
-      "html": "<input class=\"ds-field\" value=\"19.03.2026\">",
-      "css": ".ds-field { border: 1px solid #A9ACA6; border-radius: 2px; background: var(--sheet); color: var(--ink); padding: 4px 6px; font: 13px/1.45 var(--sans); caret-color: var(--red); } .ds-field:hover { border-color: var(--ink); } .ds-field:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }"
+      "description": "Text, search, date and select fields: white with a rule border that turns green on hover.",
+      "html": "<label class=\"ds-fieldwrap\"><span class=\"ds-lab\">Submitted set</span><input class=\"ds-field\" type=\"text\" placeholder=\"model\"></label>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-fieldwrap { display: grid; gap: 4px; max-width: 240px; } .ds-lab { font-size: 11px; line-height: 1.3; letter-spacing: .07em; text-transform: uppercase; color: var(--label); font-weight: 500; } .ds-field { font: inherit; background: var(--sheet); border: 1.5px solid var(--rule); border-radius: 4px; padding: 7px 9px; } .ds-field:hover { border-color: var(--green); } .ds-field:focus-visible { outline: 2px solid var(--carbon); outline-offset: 2px; }"
     },
     {
-      "name": "Top Bar",
+      "name": "Rail",
       "kind": "nav",
-      "refersTo": "top-bar",
-      "description": "Ink bar with the wordmark, package tabs and the draft stamp.",
-      "html": "<header class=\"ds-bar\"><span class=\"ds-brand\">RightFit</span><nav class=\"ds-packages\"><a href=\"#\">P01 · Domestic water booster set</a><a href=\"#\" aria-current=\"page\">P02 · Air handling unit</a></nav><span class=\"ds-draft\">Draft · not signed</span></header>",
-      "css": ".ds-bar { height: 56px; display: flex; align-items: center; gap: 24px; padding: 0 24px; background: var(--ink); color: var(--on-ink); } .ds-brand { font: 28px/1 var(--din); letter-spacing: .02em; padding-top: 4px; } .ds-packages { display: flex; gap: 2px; align-self: stretch; } .ds-packages a { display: flex; align-items: center; padding: 0 14px; color: var(--on-ink-2); text-decoration: none; font: 14px var(--sans); border-top: 3px solid transparent; border-bottom: 3px solid transparent; } .ds-packages a:hover { color: var(--on-ink); } .ds-packages a[aria-current=\"page\"] { color: var(--on-ink); border-bottom-color: var(--red); } .ds-packages a:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; } .ds-draft { margin-left: auto; font: 17px/1 var(--din); letter-spacing: .04em; text-transform: uppercase; border: 1.5px solid var(--on-ink); padding: 6px 10px 3px; }"
+      "refersTo": "rail",
+      "description": "The bottle-green navigation rail; the current link sits on the form ground.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-brand\" href=\"#\">RightFit</a><a href=\"#\" aria-current=\"page\">Packages</a><a href=\"#\">Add a package</a><span class=\"ds-sep\">Tools</span><a href=\"#\">Booster sizing</a></nav>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-rail { width: 196px; background: var(--green); color: var(--band); padding: 20px 12px 16px; display: flex; flex-direction: column; gap: 2px; } .ds-brand { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: -.01em; padding: 0 10px 18px; text-decoration: none; } .ds-rail a:not(.ds-brand) { color: var(--band); text-decoration: none; padding: 8px 10px; border-radius: 4px; } .ds-rail a:not(.ds-brand):hover { background: var(--green-2); } .ds-rail a[aria-current='page'] { background: var(--ground); color: var(--green); font-weight: 600; } .ds-sep { margin: 14px 10px 6px; font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: #B7D1C0; } .ds-rail a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }"
     },
     {
-      "name": "Step Tabs",
-      "kind": "nav",
-      "refersTo": null,
-      "description": "Numbered review steps with an ink underline on the selected step.",
-      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab\" role=\"tab\" aria-selected=\"true\">1 · Findings <span class=\"ds-count\">6</span></button><button class=\"ds-tab\" role=\"tab\" aria-selected=\"false\">2 · Confirm readings <span class=\"ds-count\">68</span></button></div>",
-      "css": ".ds-tabs { display: flex; border-bottom: 1px solid var(--ink); } .ds-tab { border: 0; background: none; padding: 10px 16px 8px; font: 18px/1 var(--din); letter-spacing: .03em; text-transform: uppercase; color: var(--ink-3); border-bottom: 3px solid transparent; margin-bottom: -1px; cursor: pointer; } .ds-tab:hover { color: var(--ink); } .ds-tab[aria-selected=\"true\"] { color: var(--ink); border-bottom-color: var(--ink); } .ds-tab:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; } .ds-count { font: 14px var(--din-num); margin-left: 4px; color: var(--ink-3); }"
-    },
-    {
-      "name": "Revision Delta",
+      "name": "Chips",
       "kind": "chip",
-      "refersTo": "delta-rule",
-      "description": "Numbered triangle marking a finding; color follows the Markup Code Rule.",
-      "html": "<span class=\"ds-delta\">1</span> <span class=\"ds-delta q\">4</span> <span class=\"ds-delta ai\">A1</span> <span class=\"ds-delta ok\"></span> <span class=\"ds-delta big\">2</span>",
-      "css": ".ds-delta { display: inline-grid; place-items: center; width: 26px; height: 23px; padding-top: 6px; box-sizing: border-box; font: 13px/1 var(--din-num); color: #fff; clip-path: polygon(50% 0, 100% 100%, 0 100%); background: var(--red); vertical-align: middle; } .ds-delta.q { background: var(--hold); } .ds-delta.ai { background: var(--blue); } .ds-delta.ok { background: var(--green); } .ds-delta.big { width: 46px; height: 40px; padding-top: 12px; font-size: 20px; }"
+      "refersTo": "chip-fail",
+      "description": "Check results in tables: red on wash for a failure, green on band for a pass, grey when unknown.",
+      "html": "<span class=\"ds-chip ds-fail\">Fail</span> <span class=\"ds-chip ds-pass\">Pass</span> <span class=\"ds-chip ds-na\">Unclear</span>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-chip { display: inline-block; padding: 3px 7px; font-size: 12.5px; font-weight: 600; border-radius: 3px; } .ds-fail { background: var(--red-wash); color: var(--red); } .ds-pass { background: var(--band); color: var(--green); } .ds-na { background: #EEF2EF; color: var(--label); }"
     },
     {
-      "name": "Revision Cloud Evidence",
+      "name": "Reading: unconfirmed and confirmed",
       "kind": "custom",
-      "refersTo": "evidence-sheet",
-      "description": "Quoted evidence on drafting film, enclosed in a scalloped revision cloud with its delta pinned.",
-      "html": "<div class=\"ds-sheet\"><span class=\"ds-qwrap\"><svg class=\"ds-cloud\" width=\"300\" height=\"60\" viewBox=\"0 0 300 60\"><path d=\"M0 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 20 0 a10 10 0 0 1 0 20 a10 10 0 0 1 0 20 a10 10 0 0 1 0 20 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 -20 0 a10 10 0 0 1 0 -20 a10 10 0 0 1 0 -20 a10 10 0 0 1 0 -20 Z\"/></svg><q>Covers AS-/AST- residential split air conditioners</q></span></div>",
-      "css": ".ds-sheet { padding: 18px 20px 14px; background: var(--ground); border: 1px solid var(--rule); } .ds-qwrap { position: relative; display: inline-block; width: 300px; height: 60px; box-sizing: border-box; padding: 10px 14px; margin: 14px 0; font: 15px/1.55 var(--sans); color: var(--ink); } .ds-cloud { position: absolute; left: 0; top: 0; overflow: visible; } .ds-cloud path { fill: none; stroke: var(--red); stroke-width: 2; stroke-linejoin: round; }"
+      "refersTo": "typed-value",
+      "description": "A printed label with its typed value: carbon violet dashed while only the AI read it, ink black solid once a person confirms.",
+      "html": "<div class=\"ds-f\"><span class=\"ds-lab\">Rated flow</span><span class=\"ds-typed\"><span class=\"ds-un\">12.5 m3/h</span></span></div><div class=\"ds-f\"><span class=\"ds-lab\">Rated head</span><span class=\"ds-typed\"><span class=\"ds-co\">48 m</span></span></div>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-f { display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); align-items: baseline; } .ds-lab { font-size: 11px; line-height: 1.3; letter-spacing: .07em; text-transform: uppercase; color: var(--label); font-weight: 500; } .ds-typed { font-family: var(--type); font-weight: 700; letter-spacing: -.01em; font-size: 16px; } .ds-un { color: var(--carbon); border-bottom: 1.5px dashed var(--carbon); } .ds-co { color: var(--ink); border-bottom: 1.5px solid var(--ink); }"
     },
     {
-      "name": "Finding Row",
+      "name": "Problem List",
       "kind": "card",
-      "refersTo": "finding-row-selected",
-      "description": "Row in the revision table: delta, finding, product, source; selected row fills with the red wash.",
-      "html": "<button class=\"ds-row\" aria-current=\"true\"><span class=\"ds-d\">2</span><span class=\"ds-what\"><b>Declaration matches the products</b><span>The declaration of conformity attached matches no product in the MAF.</span></span><span class=\"ds-prod\">Package</span><span class=\"ds-src\">04</span></button>",
-      "css": ".ds-row { width: 100%; display: grid; grid-template-columns: 34px minmax(0,1fr) 120px 60px; gap: 12px; align-items: start; padding: 11px 8px 11px 4px; border: 0; border-bottom: 1px solid var(--rule); background: none; text-align: left; cursor: pointer; font: 13px/1.35 var(--sans); color: var(--ink); } .ds-row:hover { background: rgba(29,33,37,.035); } .ds-row[aria-current=\"true\"] { background: var(--red-wash); } .ds-row:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; } .ds-d { display: inline-grid; place-items: center; width: 26px; height: 23px; padding-top: 6px; box-sizing: border-box; font: 13px/1 var(--din-num); color: #fff; clip-path: polygon(50% 0,100% 100%,0 100%); background: var(--red); } .ds-what b { display: block; font-weight: 600; font-size: 14px; } .ds-what span { display: block; color: var(--ink-2); margin-top: 2px; } .ds-prod { color: var(--ink-2); } .ds-src { font-family: var(--din-num); font-variant-numeric: tabular-nums; color: var(--ink-2); }"
+      "refersTo": "sheet",
+      "description": "A white sheet: a product group band, a plain row, and the open problem in its green selection frame.",
+      "html": "<div class=\"ds-list\"><div class=\"ds-g\"><span class=\"ds-typed\">Circulation pump</span><small>2 open</small></div><div class=\"ds-r\"><span class=\"ds-box\"></span><span>The declared efficiency index is missing.</span><span class=\"ds-tag ds-ai\">AI, not decided</span></div><div class=\"ds-r\"><span class=\"ds-box\"></span><span>Is the motor class stated for 50 Hz?</span><span class=\"ds-tag ds-q\">Question</span></div></div>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-list { background: var(--sheet); border: 1px solid var(--line); max-width: 520px; } .ds-g { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; background: var(--band); padding: 7px 14px; font-weight: 600; } .ds-g small { font-size: 12.5px; font-weight: 500; color: var(--ink-2); } .ds-typed { font-family: var(--type); font-weight: 700; font-size: 13px; } .ds-r { display: flex; gap: 10px; align-items: center; padding: 8px 14px; border-top: 1px solid var(--line-soft); cursor: pointer; } .ds-r:hover { background: #F4F8F5; } .ds-box { width: 15px; height: 15px; border: 1.5px solid #7F9587; border-radius: 2px; flex: none; } .ds-tag { margin-left: auto; font-size: 12.5px; white-space: nowrap; } .ds-ai { color: var(--carbon); } .ds-q { color: var(--ochre); }"
+    },
+    {
+      "name": "Answer Letter",
+      "kind": "custom",
+      "refersTo": "answer-letter-return",
+      "description": "The draft answer: a white letter on a filled square, green for A, red for B and C.",
+      "html": "<div class=\"ds-ans\"><i class=\"ds-letter ds-b\">B</i><b>At least one problem or open question</b></div>",
+      "css": ":host { --green: #0E3B2E; --green-2: #1B5A47; --band: #DCE9DF; --ground: #E7F0E8; --sheet: #FFFFFF; --line: #C5D6CA; --line-soft: #E5EDE7; --rule: #B9CDBF; --ink: #15191A; --ink-2: #3D4A42; --label: #4A5D51; --carbon: #4A32B8; --red: #C4311E; --red-wash: #FBEDEA; --ochre: #8A5A00; --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif; --type: Courier, 'Courier New', monospace; --ease: cubic-bezier(.16, 1, .3, 1); font: 14.5px/1.42 var(--sans); color: var(--ink); } .ds-ans { display: flex; align-items: center; gap: 12px; } .ds-letter { display: block; font: 800 30px/44px var(--sans); width: 44px; text-align: center; color: #fff; border-radius: 4px; font-style: normal; } .ds-b { background: var(--red); } .ds-ans b { font-size: 21px; letter-spacing: -.01em; line-height: 1.15; }"
     }
   ],
   "narrative": {
-    "northStar": "The Drawing Under Review",
-    "overview": "**Creative North Star: \"The Drawing Under Review\"**\n\nThe page reads like an engineering drawing that a checker has marked up. The ground is drafting film, the frame is a single dark ink, and everything is held together by 1px hairlines instead of boxes and fills. Every finding is a numbered revision delta, the small triangle a checker draws beside a change, and the quote it rests on in the evidence is enclosed in a hand-drawn revision cloud. The same number appears in the finding list, on the cloud and in the answer, so the reviewer can follow one item across the whole review.\n\nDensity is that of a working document: three columns, compact tables, 13px reference text, and no decorative space. Color is not decoration. Each hue is a markup pen with one meaning, and the absence of color is the default state. Lettering is DIN, condensed and uppercase, the way a title block is lettered; anything meant to be read as a sentence is set in the system sans.\n\nThe world deliberately refuses the dashboard: there are no status pills, KPI tiles, card grids or gradient fills. The status is a single letter in a heavy frame, and the counts are bare numerals over plain labels.",
+    "northStar": "The Approval Form in Triplicate",
+    "overview": "**Creative North Star: \"The Approval Form in Triplicate\"**\n\nThe whole application is drawn as the paper form an engineer fills in, signs and files in copies. A bottle-green rail holds the navigation; the work sits on a pale form-green ground; every working surface is a plain white sheet with a thin green-grey border and no rounded card corners. Labels are printed: small capitals, wide tracking, quiet grey-green. Values are typed: bold Courier, the way a form filled on a typewriter looks. The page of the real document sits beside the work at a fixed scale, with the quoted lines marked on it.\n\nThe system is built around one distinction: who wrote a value. What the AI read and nobody has confirmed is carbon violet with a dashed underline, like a carbon copy. Once a person confirms it, it becomes black with a solid underline, and the change is drawn as ink running from left to right, on the sheet and on the page at the same time. Every other color is held to one job: red for problems, ochre for questions, bottle green for what you can press or follow.\n\nDensity is that of a working form: 14.5px body, tight rows, tabular figures, no decoration. Depth comes from borders and tinted bands, not from shadows.",
     "keyCharacteristics": [
-      "Drafting-film ground, ink top bar, white sheet only where a document or the selected finding sits.",
-      "Hierarchy by line weight: hairline, 1px ink, 2px ink, then the 5px status frame.",
-      "Four markup colors with fixed meanings: red rules, blue AI, green confirmed, amber on hold.",
-      "Triangular revision deltas and scalloped revision clouds are the only non-rectangular forms.",
-      "DIN lettering for labels, headings and numbers; system sans for reading."
+      "Bottle-green rail, form-green ground, white sheets with thin borders.",
+      "Printed labels in small capitals; values typed in bold Courier.",
+      "Carbon violet dashed for unconfirmed AI readings, black solid once a person confirms.",
+      "Red, ochre and green each keep a single meaning.",
+      "System faces only; no font files ship."
     ],
     "rules": [
       {
-        "name": "The Markup Code Rule",
-        "body": "Red means the rules found it, blue means the AI suggests it, green means a person confirmed it, amber means it still waits on someone. A markup color never appears without that meaning, and a meaning never appears in another color.",
+        "name": "The Carbon Copy Rule",
+        "body": "Carbon violet with a dashed underline (1.5px on text, 2px on the page mark) means the AI read it and no person has confirmed it. Nothing else may be violet and dashed together. Once a person confirms, the value turns ink black with a solid underline.",
         "section": "colors"
       },
       {
-        "name": "The One Ink Rule",
-        "body": "Hierarchy comes from line weight in the one ink (1px hairline, 1px ink, 2px ink, 5px status frame), not from extra greys, tinted panels or fills.",
+        "name": "The One Meaning Rule",
+        "body": "Red is only for problems and the draft-answer letter. Ochre is only for questions. Bottle green is only for links, selection frames, buttons and navigation. A color never borrows another's job.",
         "section": "colors"
       },
       {
-        "name": "The Lettering Rule",
-        "body": "Labels, headings and numbers are lettered in DIN; anything read as a sentence is set in the sans. Never set a paragraph in DIN or a column head in the sans.",
-        "section": "typography"
-      },
-      {
-        "name": "The Tabular Figures Rule",
-        "body": "Every number that can be compared (counts, pages, values, references) uses DIN Alternate with tabular figures.",
+        "name": "The Typed Value Rule",
+        "body": "Courier bold is reserved for values entered on the form: readings, model names, figures. Labels, sentences and controls are never typed.",
         "section": "typography"
       },
       {
         "name": "The Flat Sheet Rule",
-        "body": "Nothing that lies on the drawing casts a shadow. A shadow means the element floats over the page and will go away.",
+        "body": "Working surfaces never cast shadows. Only the document page and things that float over the work may.",
         "section": "elevation"
-      },
-      {
-        "name": "The Square Corner Rule",
-        "body": "Corners stay at 2px or less. The triangle and the cloud are the only non-rectangular forms, and they are reserved for findings.",
-        "section": "shapes"
       }
     ],
     "dos": [
-      "Do give every finding one number and show that same number on its delta in the list, on its cloud and in the answer.",
-      "Do keep each markup color to its one meaning: red rules, blue AI, green confirmed by a person, amber waiting.",
-      "Do separate content with 1px hairlines and step up to 1px or 2px ink for structure, before reaching for any fill.",
-      "Do letter labels, headings and numbers in uppercase DIN, and set sentences in the system sans.",
-      "Do use tabular DIN numerals for counts, pages, values and references.",
-      "Do keep corners at 2px or square.",
-      "Do strike through dismissed or rejected findings so the decision stays visible."
+      "Do show every value the AI read in carbon violet with a dashed underline until a person confirms it, and in ink black with a solid underline after.",
+      "Do type values in bold Courier and print their labels in 11px small capitals with 0.07em tracking.",
+      "Do keep working surfaces as white sheets with a 1px line border on the form-green ground.",
+      "Do put the real document page beside the problem, with the quoted lines marked on it.",
+      "Do use the system faces in the two stacks given; no font files ship.",
+      "Do give every focusable element the 2px carbon-violet outline."
     ],
     "donts": [
-      "Don't add status pills, KPI tiles or card grids; status is the framed letter and counts are bare numerals.",
-      "Don't use a markup color for decoration, branding or emphasis without its meaning.",
-      "Don't put shadows on anything that lies on the drawing; only the toast and the sliding sheet float.",
-      "Don't use the triangle or the cloud for anything other than findings and their evidence.",
-      "Don't set body text in DIN or column heads in the sans."
+      "Don't use red for anything but problems and the draft-answer letter, or ochre for anything but questions.",
+      "Don't use bottle green for anything but links, selection frames, buttons and navigation.",
+      "Don't put a violet dashed underline on anything a person has confirmed, or a black solid one on anything nobody has.",
+      "Don't set labels, sentences or buttons in Courier.",
+      "Don't add shadows to sheets, rows or buttons; only the document page and floating layers lift.",
+      "Don't round sheets or tables; corners stay square, controls stay at 3 to 4px."
     ]
   }
 }

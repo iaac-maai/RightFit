@@ -1,6 +1,6 @@
 # Tech Stack — RightFit
 
-Draft for the MAF checker, 28 Oct 2026; the team agreed to it on 5 Nov 2026. Open questions are marked [O].
+Full version for 12 Nov 2026, built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. Tools
 
@@ -10,11 +10,12 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, private), VS Code 
 |---|---|
 | xlrd | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`) |
 | pytest | Tests for every check (`tests/`) |
-| Streamlit, with pandas | The first review page (`app/maf_app.py`) |
-| Python's standard library (`http.server`), with plain HTML, CSS and JavaScript | The PoC review page (`app/review_server.py`, `app/review/`), which runs only on the laptop |
+| Python's standard library (`http.server`), with plain HTML, CSS and JavaScript | The application (`app/review_server.py`, `app/review/`), which runs only on the laptop |
+| pypdf and PyMuPDF (`pymupdf`) | The text of each PDF page, page images, marking quoted lines on the page, and pump curves from a data sheet's vector drawing |
+| Tesseract with `pytesseract` | OCR of scanned pages when a pump package is added |
+| scikit-learn | Our own page classifier (`model/`), trained from scratch and compared with a keyword search |
 | An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
-
-Still planned: the official MCP Python SDK, to expose the checks as tools an agent can call (12 Nov).
+| The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): four read-only tools an agent can call to list the packages, review one, list the rules with their status and classify a package's pages; `.mcp.json` tells the agent how to start it |
 
 The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
 
@@ -23,9 +24,10 @@ The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baselin
 | Source | What for | Where it stands |
 |---|---|---|
 | The two MAF packages (form and attachments) | Everything the checks read | Held; originals in `data/raw/`, outside Git |
+| 48 more packages from the same project (285 PDFs, 1,296 pages) | Training and locked testing of our own models; the evaluation on unseen packages | Held since 6 Nov, in `data/raw/`, outside Git; listed in the app, not read yet |
 | The register of 80 MAFs from Luca's last project | Evidence for the problem, and the source of the checklist | Held; anonymised, outside Git; counts in `docs/maf_register_findings.md` |
 | EU texts on EUR-Lex (machinery, low voltage, construction products, ecodesign of ventilation units) | Rules for documents and ecodesign | Partly read; several rows still "to confirm" |
-| Romanian law (Law 10/1995) and Spanish CTE and RITE | National rules and delivery reminders | Read on secondary sites; [O] official journals before the midterm |
+| Romanian law (Law 10/1995) and Spanish CTE and RITE | National rules and delivery reminders | Read on secondary sites; [O] the official journals |
 | Manufacturer data sheets and declarations | Values per product | Only those inside the packages |
 
 The full list is in `docs/data_map.md`.
@@ -46,7 +48,10 @@ checks/maf/  plain Python, no AI, rules from data/maf/   -> pass / flag / unclea
 explain/     comments filled from templates              -> one sentence per issue
         |
         v
-app/         review pages (Streamlit, and the PoC page)  -> draft status, overrides, exports
+app/         the application                             -> draft status, overrides, exports
+             the same checks as MCP tools                -> any agent that speaks MCP (read only)
+
+model/       our page classifier                         -> what kind of document each page is; a hint, labelled as AI
 ```
 
 Nothing in `checks/` may import or call an AI model.
@@ -82,8 +87,11 @@ RightFit/
 |   `-- maf/               rules, checklist, inventory, extracted/, reference/
 |-- ingest/                form reader
 |-- checks/maf/            the checks and the draft status
+|-- checks/pumps/          pump rules, booster sizing and the standby test
 |-- explain/               comment templates
-|-- app/                   Streamlit page, and the PoC review page (review/)
+|-- model/                 our page classifier
+|-- eval/                  labels, sources and results of every comparison with a baseline
+|-- app/                   the application (review/) and the MCP server
 `-- tests/                 tests
 ```
 
@@ -93,7 +101,8 @@ We create a folder only when work in it starts.
 
 - The Python version and environment manager. We have tested with Python 3.14 so far.
 - Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not.
-- Where the page runs for the final demo, on a laptop or hosted.
+- Where the application runs for the final demo, on a laptop or hosted.
+- Which agent the team uses with the MCP server.
 
 ## 7. Dependencies
 
