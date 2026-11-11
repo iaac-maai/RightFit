@@ -3,7 +3,10 @@ import copy
 import json
 from pathlib import Path
 
-from app.review_server import confirm, decide, original, review
+import pymupdf
+
+from app.review_server import confirm, decide, find_marks, original, package_list, page_png, review
+from explain.maf_comments import comment, title
 
 P02 = json.loads((Path(__file__).resolve().parents[1] / "data/maf/extracted/P02.json").read_text())
 
@@ -76,3 +79,54 @@ def test_originals_are_served_only_from_the_package_folder(tmp_path):
     assert original("P09", pkg, 2, raw=tmp_path) is None
     assert original("P09", pkg, 3, raw=tmp_path) is None
     assert original("P09", pkg, 0, raw=tmp_path) is None and original("P09", pkg, 4, raw=tmp_path) is None
+
+
+def sheet(tmp_path):
+    """A one-page PDF where a label and its value are two separate pieces of text, as on the data sheets."""
+    doc = pymupdf.open()
+    page = doc.new_page()
+    page.insert_text((60, 100), "Rated power - P2:")
+    page.insert_text((300, 100), "1.2 kW")
+    page.insert_text((60, 140), "Rated power - P1:")
+    page.insert_text((300, 140), "1.9 kW")
+    path = tmp_path / "sheet.pdf"
+    doc.save(path)
+    return path
+
+
+def test_a_label_and_its_value_are_marked_as_one_line(tmp_path):
+    marks = find_marks(sheet(tmp_path), 1, ["Rated power - P2: 1.2 kW", "Rated power - P1: 1.9 kW", "Motor speed: 2785 rpm"])
+    (x, y, w, _), = marks[0]
+    assert x < 15 and w > 40 and y < 15   # from the label across to the value, on the first line only
+    assert marks[1][0][1] > y   # the second quote is on the second line
+    assert marks[2] == []   # a quote that is not on the page gets no mark
+
+
+def test_a_page_is_an_image_and_a_missing_page_is_nothing(tmp_path):
+    path = sheet(tmp_path)
+    assert page_png(path, 1).startswith(b"\x89PNG")
+    assert page_png(path, 2) is None and page_png(b"not a pdf", 1) is None
+
+
+def test_the_package_list_never_carries_the_zip_name(tmp_path):
+    (tmp_path / "batch2_inventory.csv").write_text(
+        "package,code,revision,discipline,product,files,pdf_pages,pdfs_without_text,zip\n"
+        "P02,IV 004,4,HVAC,air handling unit,0,0,0,secret.zip\nP03,IS 013,0,plumbing,pipe insulation,3,17,0,secret.zip\n")
+    data = Path(__file__).resolve().parents[1] / "data/maf/extracted"
+    listing = package_list(data, tmp_path)
+    assert "secret" not in json.dumps(listing)
+    assert [p["id"] for p in listing] == ["P01", "P02", "P03"]   # P02 is read, so its inventory row does not repeat it
+    assert listing[1]["letter"] == "B" and listing[2]["letter"] is None and listing[2]["discipline"] == "Plumbing"
+
+
+def test_findings_have_a_short_title_and_plain_words():
+    r = {"code": "C.CL-12", "params": {"item": "UNILIFT", "missing": "starting_method"}, "result": "flag", "would_be": "flag"}
+    assert title(r) == "Starting method not stated"
+    assert comment(r) == "Please complete the electrical data for UNILIFT: starting method."
+    assert all(x["title"] for x in review(fresh())["results"])
+
+
+def test_a_dismissed_problem_keeps_its_title():
+    p = next(r for r in review(fresh())["results"] if r["verdict"] == "flag" and r["title"] != r["check_name"])
+    after = next(r for r in review(fresh(), dismissed={p["key"]: "ok"})["results"] if r["key"] == p["key"])
+    assert after["title"] == p["title"]

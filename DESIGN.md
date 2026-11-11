@@ -1,302 +1,313 @@
 ---
 name: RightFit
-description: An MAF review page drawn like a drawing under review, with numbered revision deltas and markup colors.
+description: A material approval review drawn as the approval form in triplicate, where the ink says whether a person has confirmed a value.
 colors:
-  drafting-ink: "#1D2125"
-  ink-secondary: "#464B51"
-  ink-tertiary: "#62676D"
-  hairline: "#D9DAD5"
-  drafting-film: "#F7F7F4"
-  sheet-white: "#FFFFFF"
-  on-ink: "#FFFFFF"
-  on-ink-secondary: "#BCC1C7"
-  markup-red: "#D23A2E"
-  markup-red-ink: "#B3261E"
-  markup-red-wash: "#FBEDEB"
-  suggestion-blue: "#2B5FB4"
-  suggestion-blue-ink: "#24519C"
-  suggestion-blue-wash: "#EDF2FA"
-  confirmed-green: "#2F7A4D"
-  confirmed-green-wash: "#E9F3ED"
-  hold-amber: "#8F5C10"
-  hold-amber-wash: "#FAF1E3"
+  bottle-green: "#0E3B2E"
+  bottle-green-hover: "#1B5A47"
+  form-ground: "#E7F0E8"
+  band: "#DCE9DF"
+  rail-soft: "#B7D1C0"
+  sheet: "#FFFFFF"
+  line: "#C5D6CA"
+  line-soft: "#E5EDE7"
+  rule: "#B9CDBF"
+  ink: "#15191A"
+  ink-2: "#3D4A42"
+  label: "#4A5D51"
+  carbon: "#4A32B8"
+  carbon-wash: "#F4F2FF"
+  carbon-line: "#DAD5F2"
+  problem-red: "#C4311E"
+  problem-wash: "#FBEDEA"
+  question-ochre: "#8A5A00"
+  question-wash: "#FAF1DF"
 typography:
-  display:
-    fontFamily: "DIN Condensed, Bahnschrift Condensed, Bahnschrift, Arial Narrow, sans-serif"
-    fontSize: "104px"
-    fontWeight: 400
-    lineHeight: 0.8
   headline:
-    fontFamily: "DIN Condensed, Bahnschrift Condensed, Bahnschrift, Arial Narrow, sans-serif"
-    fontSize: "44px"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "0.01em"
-  title:
-    fontFamily: "DIN Condensed, Bahnschrift Condensed, Bahnschrift, Arial Narrow, sans-serif"
-    fontSize: "26px"
-    fontWeight: 400
-    lineHeight: 1.05
-    letterSpacing: "0.02em"
-  title-small:
-    fontFamily: "DIN Condensed, Bahnschrift Condensed, Bahnschrift, Arial Narrow, sans-serif"
-    fontSize: "18px"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "0.03em"
-  body:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, system-ui, sans-serif"
-    fontSize: "15px"
-    fontWeight: 400
-    lineHeight: 1.45
-  body-small:
-    fontFamily: "-apple-system, BlinkMacSystemFont, SF Pro Text, Segoe UI, system-ui, sans-serif"
-    fontSize: "13px"
-    fontWeight: 400
-    lineHeight: 1.35
-  label:
-    fontFamily: "DIN Condensed, Bahnschrift Condensed, Bahnschrift, Arial Narrow, sans-serif"
-    fontSize: "13px"
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: "0.04em"
-  numeral:
-    fontFamily: "DIN Alternate, Bahnschrift, -apple-system, system-ui, sans-serif"
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
     fontSize: "24px"
+    fontWeight: 700
+    letterSpacing: "-0.015em"
+  answer:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "21px"
+    fontWeight: 700
+    lineHeight: 1.15
+    letterSpacing: "-0.01em"
+  title:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "18px"
+    fontWeight: 700
+    letterSpacing: "-0.01em"
+  body:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "14.5px"
     fontWeight: 400
-    lineHeight: 1.1
+    lineHeight: 1.42
     fontFeature: "\"tnum\""
+  small:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "13.5px"
+    fontWeight: 400
+  label:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "11px"
+    fontWeight: 500
+    lineHeight: 1.3
+    letterSpacing: "0.07em"
+  typed-value:
+    fontFamily: "Courier, \"Courier New\", monospace"
+    fontSize: "16px"
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: "-0.01em"
+  typed-figure:
+    fontFamily: "Courier, \"Courier New\", monospace"
+    fontSize: "30px"
+    fontWeight: 700
+    lineHeight: 1.1
+    letterSpacing: "-0.01em"
+  answer-letter:
+    fontFamily: "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", Arial, sans-serif"
+    fontSize: "30px"
+    fontWeight: 800
+    lineHeight: "44px"
 rounded:
-  none: "0px"
-  hairline: "2px"
+  sm: "3px"
+  md: "4px"
 spacing:
   xs: "4px"
   sm: "8px"
   md: "12px"
-  lg: "16px"
-  section: "22px"
-  gutter: "28px"
+  row: "14px"
+  gutter-narrow: "16px"
+  gap: "18px"
+  gutter: "26px"
 components:
-  button:
-    backgroundColor: "{colors.sheet-white}"
-    textColor: "{colors.drafting-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "7px 13px"
-  button-hover:
-    backgroundColor: "{colors.drafting-film}"
   button-primary:
-    backgroundColor: "{colors.drafting-ink}"
-    textColor: "{colors.on-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "7px 13px"
+    backgroundColor: "{colors.bottle-green}"
+    textColor: "{colors.sheet}"
+    rounded: "{rounded.md}"
+    padding: "10px 14px"
   button-primary-hover:
-    backgroundColor: "#33393F"
-  segmented-option-selected:
-    backgroundColor: "{colors.suggestion-blue}"
-    textColor: "{colors.on-ink}"
-    padding: "7px 12px"
+    backgroundColor: "{colors.bottle-green-hover}"
+  button-secondary:
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.bottle-green}"
+    rounded: "{rounded.md}"
+    padding: "10px 14px"
+  button-secondary-hover:
+    backgroundColor: "{colors.band}"
+  button-mini:
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.bottle-green}"
+    rounded: "{rounded.sm}"
+    height: "28px"
+    padding: "0 7px"
+  decision-control:
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.carbon}"
+    rounded: "{rounded.md}"
+    padding: "9px 12px"
+  decision-control-chosen:
+    backgroundColor: "{colors.carbon}"
+    textColor: "{colors.sheet}"
   field:
-    backgroundColor: "{colors.sheet-white}"
-    textColor: "{colors.drafting-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "4px 6px"
-  top-bar:
-    backgroundColor: "{colors.drafting-ink}"
-    textColor: "{colors.on-ink}"
-    height: "56px"
-    padding: "0 24px"
-  delta-rule:
-    backgroundColor: "{colors.markup-red}"
-    textColor: "{colors.on-ink}"
-    typography: "{typography.numeral}"
-    width: "26px"
-    height: "23px"
-  delta-question:
-    backgroundColor: "{colors.hold-amber}"
-    textColor: "{colors.on-ink}"
-    width: "26px"
-    height: "23px"
-  delta-ai:
-    backgroundColor: "{colors.suggestion-blue}"
-    textColor: "{colors.on-ink}"
-    width: "26px"
-    height: "23px"
-  delta-confirmed:
-    backgroundColor: "{colors.confirmed-green}"
-    textColor: "{colors.on-ink}"
-    width: "26px"
-    height: "23px"
-  finding-row-selected:
-    backgroundColor: "{colors.markup-red-wash}"
-    padding: "11px 8px 11px 4px"
-  finding-row-ai-selected:
-    backgroundColor: "{colors.suggestion-blue-wash}"
-  evidence-sheet:
-    backgroundColor: "{colors.drafting-film}"
-    padding: "18px 20px 14px"
-  answer-sheet:
-    backgroundColor: "{colors.sheet-white}"
-    padding: "28px 32px"
+    backgroundColor: "{colors.sheet}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "7px 9px"
+  rail:
+    backgroundColor: "{colors.bottle-green}"
+    textColor: "{colors.band}"
+    width: "196px"
+  rail-link-current:
+    backgroundColor: "{colors.form-ground}"
+    textColor: "{colors.bottle-green}"
+    rounded: "{rounded.md}"
+    padding: "8px 10px"
+  answer-letter-a:
+    backgroundColor: "{colors.bottle-green}"
+    textColor: "{colors.sheet}"
+    typography: "{typography.answer-letter}"
+    rounded: "{rounded.md}"
+    width: "44px"
+  answer-letter-return:
+    backgroundColor: "{colors.problem-red}"
+    textColor: "{colors.sheet}"
+    typography: "{typography.answer-letter}"
+    rounded: "{rounded.md}"
+    width: "44px"
+  chip-fail:
+    backgroundColor: "{colors.problem-wash}"
+    textColor: "{colors.problem-red}"
+    rounded: "{rounded.sm}"
+    padding: "3px 7px"
+  chip-pass:
+    backgroundColor: "{colors.band}"
+    textColor: "{colors.bottle-green}"
+    rounded: "{rounded.sm}"
+    padding: "3px 7px"
   hold-note:
-    backgroundColor: "{colors.hold-amber-wash}"
-    textColor: "#6E470C"
-    padding: "10px 12px"
+    backgroundColor: "{colors.carbon-wash}"
+    padding: "9px 14px"
+  question-note:
+    backgroundColor: "{colors.question-wash}"
+    textColor: "{colors.question-ochre}"
+    rounded: "{rounded.md}"
+    padding: "8px 12px"
 ---
 
 # Design System: RightFit
 
 ## Overview
 
-**Creative North Star: "The Drawing Under Review"**
+**Creative North Star: "The Approval Form in Triplicate"**
 
-The page reads like an engineering drawing that a checker has marked up. The ground is drafting film, the frame is a single dark ink, and everything is held together by 1px hairlines instead of boxes and fills. Every finding is a numbered revision delta, the small triangle a checker draws beside a change, and the quote it rests on in the evidence is enclosed in a hand-drawn revision cloud. The same number appears in the finding list, on the cloud and in the answer, so the reviewer can follow one item across the whole review.
+The whole application is drawn as the paper form an engineer fills in, signs and files in copies. A bottle-green rail holds the navigation; the work sits on a pale form-green ground; every working surface is a plain white sheet with a thin green-grey border and no rounded card corners. Labels are printed: small capitals, wide tracking, quiet grey-green. Values are typed: bold Courier, the way a form filled on a typewriter looks. The page of the real document sits beside the work at a fixed scale, with the quoted lines marked on it.
 
-Density is that of a working document: three columns, compact tables, 13px reference text, and no decorative space. Color is not decoration. Each hue is a markup pen with one meaning, and the absence of color is the default state. Lettering is DIN, condensed and uppercase, the way a title block is lettered; anything meant to be read as a sentence is set in the system sans.
+The system is built around one distinction: who wrote a value. What the AI read and nobody has confirmed is carbon violet with a dashed underline, like a carbon copy. Once a person confirms it, it becomes black with a solid underline, and the change is drawn as ink running from left to right, on the sheet and on the page at the same time. Every other color is held to one job: red for problems, ochre for questions, bottle green for what you can press or follow.
 
-The world deliberately refuses the dashboard: there are no status pills, KPI tiles, card grids or gradient fills. The status is a single letter in a heavy frame, and the counts are bare numerals over plain labels.
+Density is that of a working form: 14.5px body, tight rows, tabular figures, no decoration. Depth comes from borders and tinted bands, not from shadows.
 
 **Key Characteristics:**
-- Drafting-film ground, ink top bar, white sheet only where a document or the selected finding sits.
-- Hierarchy by line weight: hairline, 1px ink, 2px ink, then the 5px status frame.
-- Four markup colors with fixed meanings: red rules, blue AI, green confirmed, amber on hold.
-- Triangular revision deltas and scalloped revision clouds are the only non-rectangular forms.
-- DIN lettering for labels, headings and numbers; system sans for reading.
+- Bottle-green rail, form-green ground, white sheets with thin borders.
+- Printed labels in small capitals; values typed in bold Courier.
+- Carbon violet dashed for unconfirmed AI readings, black solid once a person confirms.
+- Red, ochre and green each keep a single meaning.
+- System faces only; no font files ship.
 
 ## Colors
 
-One near-black ink on warm-white film, with four markup pens that each mean exactly one thing.
+A cool green paper palette with one violet ink for machine readings and two signal colors held to single meanings.
 
 ### Primary
-- **Drafting Ink** (drafting-ink): The top bar, the primary button, heavy rules under the status and the table heads, the selected tab underline, and all main text. It is the frame of the page.
+- **Bottle Green** (bottle-green): the rail, every button, links, navigation, the selection frame around the open problem and the active tab underline. Also the progress ticks for decided items and the "A" answer letter and passing chips.
+- **Bottle Green, Lifted** (bottle-green-hover): hover on the rail links and on primary buttons only.
 
 ### Secondary
-- **Markup Red** (markup-red): Deltas and revision clouds for findings the deterministic rules raised; the active package tab underline; the text caret. **Markup Red Ink** (markup-red-ink) is its text form, for "Problem" labels. **Markup Red Wash** (markup-red-wash) fills the selected finding row and the error box.
+- **Carbon Violet** (carbon): only what the AI read and nobody confirmed, the AI tags on problem rows, the "your decision" control, the focus ring, text selection and the text cursor. On the document page its 17% tint fills the marked lines.
+- **Carbon Wash** (carbon-wash) and **Carbon Rule** (carbon-line): the note above the problem list that says what is still on hold.
 
 ### Tertiary
-- **Suggestion Blue** (suggestion-blue): Deltas, clouds and the selected decision for AI suggestions, and the focus ring. **Suggestion Blue Ink** (suggestion-blue-ink) is every link and the AI group heading. **Suggestion Blue Wash** (suggestion-blue-wash) fills a selected AI row.
-- **Confirmed Green** (confirmed-green): A finding a person marked as not a problem, a ticked reading, the checkbox accent, and the A status frame. **Confirmed Green Wash** (confirmed-green-wash) fills staged readings and the dismissed note.
-- **Hold Amber** (hold-amber): Questions that wait on a confirmation or the contractor, the B status frame, and the hold line under the status. **Hold Amber Wash** (hold-amber-wash) fills the hold note in the detail panel.
+- **Problem Red** (problem-red): problems only. Failing chips, the "return" answer banner, figures that fail a check, error text, and the B and C draft-answer letters. **Problem Wash** (problem-wash) backs the failing chip.
+- **Question Ochre** (question-ochre): questions only. The "Question" tag on a row and the notice that a page is a scan. **Question Wash** (question-wash) backs that notice.
 
 ### Neutral
-- **Drafting Film** (drafting-film): The page ground and the evidence strip.
-- **Sheet White** (sheet-white): The detail panel, the answer letter, buttons and fields; it marks "a document" against the film.
-- **Ink Secondary** (ink-secondary): Supporting text, column heads, descriptions.
-- **Ink Tertiary** (ink-tertiary): The quietest text: document kinds, inactive tabs, tags.
-- **Hairline** (hairline): Every 1px divider between rows, columns and list items.
-- **On Ink / On Ink Secondary** (on-ink, on-ink-secondary): Text on the top bar, active and inactive.
+- **Form Ground** (form-ground): the page behind every sheet, and the current rail link.
+- **Band** (band): group headers in the problem list, table headers, the passed section, button hover; also the text color of the rail.
+- **Rail Soft** (rail-soft): the rail's group label and footnote.
+- **Sheet** (sheet): every working surface, fields and secondary buttons.
+- **Line** (line), **Line Soft** (line-soft), **Rule** (rule): sheet borders, row separators inside a sheet, and the field and tab-bar strokes, in that order of weight.
+- **Ink** (ink): body text and confirmed values; also the toast and the progress fill.
+- **Ink 2** (ink-2): secondary sentences, notes and captions.
+- **Label** (label): printed labels, table headers and small metadata.
 
 ### Named Rules
-**The Markup Code Rule.** Red means the rules found it, blue means the AI suggests it, green means a person confirmed it, amber means it still waits on someone. A markup color never appears without that meaning, and a meaning never appears in another color.
+**The Carbon Copy Rule.** Carbon violet with a dashed underline (1.5px on text, 2px on the page mark) means the AI read it and no person has confirmed it. Nothing else may be violet and dashed together. Once a person confirms, the value turns ink black with a solid underline.
 
-**The One Ink Rule.** Hierarchy comes from line weight in the one ink (1px hairline, 1px ink, 2px ink, 5px status frame), not from extra greys, tinted panels or fills.
+**The One Meaning Rule.** Red is only for problems and the draft-answer letter. Ochre is only for questions. Bottle green is only for links, selection frames, buttons and navigation. A color never borrows another's job.
 
 ## Typography
 
-**Display Font:** DIN Condensed (with Bahnschrift Condensed, Bahnschrift, Arial Narrow)
-**Body Font:** System sans (-apple-system, Segoe UI, system-ui)
-**Label/Mono Font:** DIN Alternate for numerals, with tabular figures
+**Body Font:** the system sans (-apple-system, SF Pro Text, Helvetica Neue, Arial)
+**Typed Font:** Courier, then Courier New, then the system monospace
 
-**Character:** Title-block lettering against plain reading text. The condensed DIN is always uppercase and lightly tracked; the sans stays in sentence case and does the explaining.
+**Character:** a printed form with typewritten entries. The sans does every heading, label and sentence; Courier appears only where a value has been entered, so the eye can tell a field's name from its content at a glance. Both are the system's own faces: the project owner decided on 11 Nov 2026 not to ship self-hosted fonts.
 
 ### Hierarchy
-- **Display** (400, 104px, 0.8): The single status letter (A, B or C) inside its colored frame. One per page. 72px on phones.
-- **Headline** (400, 44px, 1, uppercase): The status phrase beside the letter, such as "Approved as noted". 30px on phones.
-- **Title** (400, 22–26px, 1.05, uppercase): The selected finding's heading (26px), the package heading in the rail and the answer letter head (22px).
-- **Title Small** (400, 15–18px, 1, uppercase): Step tabs, group headings, the attachment list heading, the evidence heading. The "DRAFT · NOT SIGNED" stamp uses the same lettering at 17px in a 1.5px frame.
-- **Body** (400, 15px, 1.45): Finding comments and evidence quotes, held to 62ch in the detail panel and 70–78ch for lead text and the answer.
-- **Body Small** (400–600, 13–14px, 1.3–1.35): Table cells, row descriptions, file names, notes. Finding names in rows are 600 weight at 14px.
-- **Label** (400, 12–13px, 0.04em, uppercase): Table column heads, fact labels, decision tags.
-- **Numeral** (400, 24px, 1.1, tabular): Counts under the status; the same face at 11–15px for page references, values, sources and delta numbers.
+- **Headline** (700, 24px, -0.015em): the title of a screen.
+- **Answer** (700, 21px, line-height 1.15): the draft answer beside its letter in the package head; the answer banner uses 22px.
+- **Title** (700, 18px, -0.01em): the open problem, the document card and the answer letter sheet.
+- **Body** (400, 14.5px, line-height 1.42, tabular figures): all running text.
+- **Small** (400, 13.5px; 13px for captions, 12.5px for row metadata): notes, tags, page links.
+- **Label** (500, 11px, 0.07em, uppercase): the printed field label above or beside a typed value, and table column heads.
+- **Typed value** (Courier 700, 16px, -0.01em): a value read from the documents; 13px inside group headers, 22px and 30px for the large figures on the tool screens.
+- **Answer letter** (sans 800, 30px in a 44px square; 16px in a 26px square when small): the draft-answer letter.
 
 ### Named Rules
-**The Lettering Rule.** Labels, headings and numbers are lettered in DIN; anything read as a sentence is set in the sans. Never set a paragraph in DIN or a column head in the sans.
-
-**The Tabular Figures Rule.** Every number that can be compared (counts, pages, values, references) uses DIN Alternate with tabular figures.
+**The Typed Value Rule.** Courier bold is reserved for values entered on the form: readings, model names, figures. Labels, sentences and controls are never typed.
 
 ## Layout
 
-A full-height three-column desk below a 56px sticky top bar: a 300px attachments rail, a fluid centre for the status and the revision table, and a 440px detail panel on white. Columns are separated by 1px hairlines and each scrolls on its own. The centre has 22px top and 28px side padding; rail and panel use 18–24px.
+The application is a two-column grid: a 196px rail and the main area, which scrolls on its own while the window stays fixed. Screens pad 22px top and 26px at the sides and stop at 1320px.
 
-Finding rows are a four-column grid (34px delta, fluid finding, 190px product, 112px source) with a 12px gap and hairline bottoms; the table top is a 1px ink rule. The status block ends with a 2px ink rule, and so do the notes and the sticky save bar. Spacing moves in small steps (4, 8, 12, 16, 22, 28px) and is tight by design.
+The package review is three stacked bands: a head row (form number, package, answer letter, ticks for what remains), a tab bar (1 Problems, 2 Confirm readings, 3 Answer), and the work area. The work area splits into the problem sheet on the left and the document sheet on the right (54%), 18px apart. Rows inside sheets pad 14px at the sides and 7 to 9px vertically. The document page renders at up to 640px wide, centered on a faintly green scroll area.
 
-Responsive behavior: at 1280px the bar drops the package meta. At 1240px the layout becomes two columns (260px rail) and the detail panel turns into a 460px sheet that slides in from the right. At 760px the bar grows to 100px and wraps the package tabs onto their own line, the rail hides behind a toggle, rows collapse to two columns, and the table heads disappear.
+Responsive behavior:
+- **Up to 1100px:** the rail turns into a horizontal bar across the top, the work split becomes 5 to 7, gutters drop to 16px, the tool screens stack to one column. Between 761 and 1100px the document page renders at a fixed 640px width (the sheet scrolls sideways if needed) and the decision buttons stay pinned at the bottom of the open problem.
+- **Up to 760px:** the whole page scrolls as one, the problem sheet and the document stack, the page fills the width, field labels move above their values, and the packages table hides its secondary columns.
+
+Reduced motion shortens every animation to nothing and removes transitions.
 
 ## Elevation & Depth
 
-The drawing is flat. Depth comes from the film/white contrast and from line weight, not shadow. Only two things float above the drawing and cast a shadow: the toast and the sliding detail sheet on narrower screens. The current attachment is marked with a 1px inset ink outline, not a lift.
+The system is flat. Sheets are separated from the ground by a 1px line and from each other by tinted bands, never by shadow. Only three things lift: the document page, which carries a hairline ring and a faint green shadow so it reads as paper; and the two things that float over the work, the "why" popover and the toast.
 
 ### Shadow Vocabulary
-- **Toast** (`box-shadow: 0 8px 24px rgba(29, 33, 37, .22)`): The short confirmation message at the bottom centre.
-- **Sliding sheet** (`box-shadow: -12px 0 40px rgba(29, 33, 37, .16)`): The detail panel when it overlays the page below 1240px.
-- **Current outline** (`box-shadow: inset 0 0 0 1px #1D2125`): The selected attachment in the rail.
+- **Paper** (`box-shadow: 0 0 0 1px #DDE5DF, 0 2px 8px rgba(14, 59, 46, .08)`): the rendered document page only.
+- **Float** (`box-shadow: 0 8px 24px rgba(14, 59, 46, .18)`): the popover that explains the draft answer.
+- **Toast** (`box-shadow: 0 8px 24px rgba(14, 59, 46, .28)`): the confirmation toast at the bottom.
+- **Selection frame** (`box-shadow: inset 0 0 0 1.5px` bottle green): the open problem and the current page group; a frame, not a lift.
 
 ### Named Rules
-**The Flat Sheet Rule.** Nothing that lies on the drawing casts a shadow. A shadow means the element floats over the page and will go away.
+**The Flat Sheet Rule.** Working surfaces never cast shadows. Only the document page and things that float over the work may.
 
 ## Shapes
 
-Rectangles with square or barely softened corners (2px on buttons, fields, segmented controls and the toast; 0 everywhere else). Borders are the main form device: hairlines between things, 1.5px ink around controls and the draft stamp, 5px around the status letter in the status color. Two shapes break the rectangle, and both come from drawing practice: the revision delta, an upward triangle cut with a clip path, and the revision cloud, a closed path of 10px-radius scallops drawn around the quoted evidence.
-
-**The Square Corner Rule.** Corners stay at 2px or less. The triangle and the cloud are the only non-rectangular forms, and they are reserved for findings.
+Square paper with barely softened controls. Sheets, tables and file rows have square corners. Controls take a 4px radius (buttons, fields, the decision control, notes, the answer letter, the banner); small things take 3px (page buttons, chips, the small letter). Checkboxes are 15px squares with a 2px radius. Strokes are 1px for sheet borders and separators and 1.5px for controls and for the ink underlines. The only round shape is the loading spinner. Icons are 16px line drawings on a 20-unit grid, 1.8px stroke, round caps and joins, drawn in the current text color.
 
 ## Components
 
 ### Buttons
-Plain drafting-office controls: outlined, square, quiet.
-- **Shape:** Nearly square (2px), with a 1.5px ink border.
-- **Default:** White fill, ink text, 14px sans, 7px 13px padding, optional 16px line icon with a 1.6 stroke.
-- **Primary:** Ink fill with white text; one per action group ("Mark as not a problem", "Copy the answer").
-- **Hover / Focus:** Default hover shifts to the film color; primary hover lightens slightly. Focus is a 2px blue outline offset by 2px, everywhere.
+Plain, outlined, green.
+- **Shape:** gently softened corners (4px), 1.5px bottle-green border, 600 weight, 10px by 14px padding, an optional 16px icon 7px from the text.
+- **Primary:** bottle-green fill with white text; hover lifts to the lighter green.
+- **Secondary:** white with green text and border; hover fills with the band color.
+- **Mini:** the page-turn and zoom buttons beside the document, 28px tall, 1px rule border, 3px corners.
+- **Link button:** green underlined text with no box, for secondary actions inside rows.
 - **Disabled:** 45% opacity.
-- **Link button:** Blue ink text with a 1px underline offset 3px, no box; used for "Cancel", file references and "Open the PDF".
 
-### Segmented decision
-The AI decision control: options sit side by side inside one 1.5px ink frame, separated by 1px ink lines. The chosen option fills with Suggestion Blue and white text; others hover to the blue wash. It is blue because it decides on AI output.
+### Decision control
+Keep, Not a problem and the other decisions on an open problem sit in one segmented control outlined in carbon violet, because the choice answers an AI suggestion. Unchosen segments are white with violet text; the chosen one fills violet with white text. It uses radio semantics.
 
-### Inputs / Fields
-- **Style:** White fill, 1px mid-grey border (#A9ACA6), 2px corners, 13px text in the rail; the reason box uses a 1.5px ink border and 64px minimum height.
-- **Focus:** The shared 2px blue outline; the caret is red.
-- **Hover:** Border darkens to ink.
+### Chips and tags
+- **Chips:** 12.5px, 600 weight, 3px corners. Failing: red on the problem wash. Passing: green on the band. Not applicable or unknown: label grey on a pale green-grey.
+- **Row tags:** plain colored text at the end of a problem row: violet for AI suggestions, ochre for questions, grey for "Not a problem".
+
+### Sheets and rows
+- **Sheet:** white, 1px line border, square corners, no shadow.
+- **Group header:** a full-width band with the product name in typed Courier and a count in small text.
+- **Row:** checkbox, sentence and tag, 8px by 14px padding, a soft line above, a pale green hover. A dismissed row is struck through in label grey.
+- **Open problem:** the selected row expands in place inside a 1.5px bottle-green frame on a pale green fill, showing its title, its sentence, its readings as label and typed value pairs, and its decision buttons.
+
+### Fields
+- **Style:** white, 1.5px rule border, 4px corners, 7px by 9px padding. Hover turns the border bottle green. Checkboxes use the green accent.
+- **Focus:** every focusable element takes a 2px carbon-violet outline offset by 2px; on the rail the outline is white.
 
 ### Navigation
-- **Package tabs:** In the ink bar, 14px sans in the secondary on-ink color; the current package turns white and gets a 3px red underline.
-- **Step tabs:** DIN 18px uppercase, numbered ("1 · Findings 6"), with a tabular count; the selected tab gets a 3px ink underline sitting on the 1px ink rule. Long labels drop on phones.
+- **Rail:** 196px of bottle green, the product name in white 20px bold, links in band-colored text with 8px by 10px padding and 4px corners. Hover fills with the lighter green; the current link fills with the form ground and turns green and semi-bold. A small-capital group label separates the tools. Below 1100px it becomes a top bar.
+- **Tabs:** numbered steps with 600 weight; the current tab gets a white fill and a 3px green underline.
 
-### Revision delta (signature)
-A filled upward triangle carrying the finding number in white tabular DIN. Red for a rule finding, amber for a question, blue for an AI suggestion (numbered A1, A2 until accepted), green and empty for one marked not a problem. Three sizes: 20px in the rail markers, 26px in rows and the answer, 46px at the head of the detail panel. The number is the same wherever the finding appears.
+### The Re-ink (signature)
+Confirming a reading redraws it in ink: the black copy wipes across the violet one from left to right over 0.46s on the soft ease (cubic-bezier(.16, 1, .3, 1)), and the dashed underline becomes solid. The same mark on the document page fills from left to right over 0.36s when it appears, violet-tinted with a dashed bottom edge while unconfirmed and a faint grey with a solid black edge once confirmed.
 
-### Revision cloud (signature)
-The evidence quote sits on a strip of drafting film with a hairline border, and a scalloped cloud is drawn around it in a 2px red stroke (blue for AI evidence), with the finding's delta pinned to its top-right corner. On selection the cloud draws itself along its length over 0.7s with the long-tail ease, staggered 140ms per cloud; with reduced motion it simply appears.
-
-### Finding rows
-Full-width buttons in the revision table: delta, name and two-line description, product, source. Hover adds a faint ink tint; the selected row fills with the red wash (blue wash for AI rows). A finding marked not a problem or an AI suggestion rejected is struck through, not hidden.
-
-### Status block
-The status letter in a 5px frame (green A, amber B, red C) beside the uppercase status phrase, a row of bare numeral counts with plain labels, an expandable "Why" with a drawn chevron, and an amber hold line. It closes with a 2px ink rule.
-
-### Attachment list
-Numbered rows (DIN number, file name, kind and pages) with an extent bar: a 3px ink line whose length is the document's page count against the longest one. Small deltas on the right show which findings point at that document.
-
-### Answer letter
-A white sheet with a hairline border, up to 78ch wide, a DIN head, numbered lines each led by its delta, and a sign-off under a 2px ink rule.
-
-### Notes
-Hold and dismissed notes are flat wash blocks (amber, green) with a darker text ink of the same hue (#6E470C, #1F5535) and 10px 12px padding. Errors use a 1.5px red border on the red wash.
+### Answer letter and progress ticks
+The draft answer is a single white letter on a filled square: green for A, red for B and C. Beside it, a row of 14 by 7px ticks shows each item: grey-green to do, green decided, black confirmed.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** give every finding one number and show that same number on its delta in the list, on its cloud and in the answer.
-- **Do** keep each markup color to its one meaning: red rules, blue AI, green confirmed by a person, amber waiting.
-- **Do** separate content with 1px hairlines and step up to 1px or 2px ink for structure, before reaching for any fill.
-- **Do** letter labels, headings and numbers in uppercase DIN, and set sentences in the system sans.
-- **Do** use tabular DIN numerals for counts, pages, values and references.
-- **Do** keep corners at 2px or square.
-- **Do** strike through dismissed or rejected findings so the decision stays visible.
+- **Do** show every value the AI read in carbon violet with a dashed underline until a person confirms it, and in ink black with a solid underline after.
+- **Do** type values in bold Courier and print their labels in 11px small capitals with 0.07em tracking.
+- **Do** keep working surfaces as white sheets with a 1px line border on the form-green ground.
+- **Do** put the real document page beside the problem, with the quoted lines marked on it.
+- **Do** use the system faces in the two stacks given; no font files ship.
+- **Do** give every focusable element the 2px carbon-violet outline.
 
 ### Don't:
-- **Don't** add status pills, KPI tiles or card grids; status is the framed letter and counts are bare numerals.
-- **Don't** use a markup color for decoration, branding or emphasis without its meaning.
-- **Don't** put shadows on anything that lies on the drawing; only the toast and the sliding sheet float.
-- **Don't** use the triangle or the cloud for anything other than findings and their evidence.
-- **Don't** set body text in DIN or column heads in the sans.
+- **Don't** use red for anything but problems and the draft-answer letter, or ochre for anything but questions.
+- **Don't** use bottle green for anything but links, selection frames, buttons and navigation.
+- **Don't** put a violet dashed underline on anything a person has confirmed, or a black solid one on anything nobody has.
+- **Don't** set labels, sentences or buttons in Courier.
+- **Don't** add shadows to sheets, rows or buttons; only the document page and floating layers lift.
+- **Don't** round sheets or tables; corners stay square, controls stay at 3 to 4px.

@@ -1,6 +1,4 @@
 # Tested with Python 3.14. Versions are not pinned until the environment is chosen (spec/constitution/tech_stack.md).
-streamlit>=1.58
-pandas
 pytest>=9
 xlrd>=2.0
 pypdf>=6.0

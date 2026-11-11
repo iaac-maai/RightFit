@@ -3,33 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RightFit · MAF review</title>
-<link rel="stylesheet" href="review.css">
-<script src="review.js" defer></script>
+<title>RightFit</title>
+<link rel="stylesheet" href="app.css">
+<script type="module" src="app.js"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-copy" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M13.5 4.5v-1a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1"/></symbol>
-  <symbol id="i-down" viewBox="0 0 20 20"><path d="M10 3v10m-4-4 4 4 4-4M4 16.5h12"/></symbol>
-  <symbol id="i-chev" viewBox="0 0 20 20"><path d="m7 4 6 6-6 6"/></symbol>
-  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15"/></symbol>
+  <symbol id="i-next" viewBox="0 0 20 20"><path d="M4 10h12m-5-5 5 5-5 5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 20 20"><path d="m12 4-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 20 20"><path d="m8 4 6 6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 20 20"><path d="m4 8 6 6 6-6"/></symbol>
   <symbol id="i-open" viewBox="0 0 20 20"><path d="M11 4h5v5M16 4l-7 7M8 5H4.5a.5.5 0 0 0-.5.5v10a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V12"/></symbol>
-  <symbol id="i-list" viewBox="0 0 20 20"><path d="M4 5.5h12M4 10h12M4 14.5h12"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 20 20"><rect x="6.5" y="6.5" width="10" height="10" rx="1.5"/><path d="M13.5 4.5v-1a1 1 0 0 0-1-1h-9a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h1"/></symbol>
+  <symbol id="i-save" viewBox="0 0 20 20"><path d="M10 3v10m-4-4 4 4 4-4M4 16.5h12"/></symbol>
+  <symbol id="i-up" viewBox="0 0 20 20"><path d="M10 14V4M6 8l4-4 4 4M4 13v3.5h12V13"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.5"/><path d="m13.5 13.5 3.5 3.5M9 6.5v5M6.5 9h5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><path d="m4.5 10.5 3.5 3.5 7.5-8"/></symbol>
 </svg>
 
-<header class="bar">
-  <span class="brand">RightFit</span>
-  <nav class="packages" aria-label="Packages" id="packages"></nav>
-  <span class="meta" id="meta"></span>
-  <span class="draft" id="draft">Draft · not signed</span>
-</header>
+<nav class="rail" aria-label="Main">
+  <a class="brand" href="#/packages">RightFit</a>
+  <div class="rail-links">
+    <a href="#/packages" data-nav="packages p">Packages</a>
+    <a href="#/add" data-nav="add">Add a package</a>
+    <span class="rail-sep">Tools</span>
+    <a href="#/booster" data-nav="booster">Booster sizing</a>
+    <a href="#/standby" data-nav="standby">Standby test</a>
+    <a href="#/rules" data-nav="rules">Rules</a>
+  </div>
+  <p class="rail-note">A draft for the reviewer. You decide and you sign.</p>
+</nav>
 
-<div class="layout" id="layout">
-  <aside class="rail" id="rail" aria-label="Package"></aside>
-  <main class="center" id="center"></main>
-  <section class="detail" id="detail" aria-label="Details" aria-live="polite"></section>
-</div>
-
+<main id="app"></main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
