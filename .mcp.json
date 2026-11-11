@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "rightfit": {
+      "command": "python3",
+      "args": ["app/mcp_server.py"]
+    }
+  }
+}
