@@ -46,7 +46,7 @@ The hood features (image search, keyword baseline, re-ranking from a designer's 
 | MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; 1 of 116 values confirmed so far |
 | MAF-02 | Reading the form (.xls), roles only | Plain Python | Done |
 | MAF-03 | Document checks D1–D4 | Rules | Done, tested |
-| MAF-04 | Value checks V1, V2 and ecodesign E1 | Rules | Done, tested; no tolerance on the duty point (Luca) |
+| MAF-04 | Value checks V1, V2, V3 and ecodesign E1 | Rules | Done, tested; no tolerance on the duty point (Luca) |
 | MAF-05 | Reviewers' checklist (C) and delivery reminders by location (R) | Rules | Done, tested |
 | MAF-06 | Draft status and draft comments | Written rules and templates | Done; the status rules wait for Luca |
 | MAF-07 | Review application | Standard library server, plain HTML, CSS and JavaScript | New version 11 Nov: one application for the packages, the review, confirming readings and the answer; it replaces the Streamlit page and the midterm page |
@@ -87,7 +87,7 @@ Every check has unit tests with hand written cases, which Luca approves. Data te
 | Two packages are very few | 48 more from the same project are on the laptop, not read yet; results stay a demonstration until they are |
 | All packages come from one project | We say so with every result; packages from other practitioners need the owning company's permission [O] |
 | The AI misreads or misses a value | Every value starts as `extracted`, with page and quote; checks wait for a person to verify it |
-| Some rules were read on secondary sites | Each rule carries its status and the app says how many were read on the official text, none so far; reading them on the official journals is still to do |
+| Some rules were read on secondary sites | Each rule carries its status and the app says how many were read on the official text: the Romanian articles since 12 Nov; the EU and Spanish ones are still to do |
 | A general chatbot finds as much as RightFit | We measure it (MAF-20), keep the result whichever way it goes, and change course if it does |
 | Luca built the checklist and is also the only reviewer | He writes the reference before seeing the tool; [O] a second reviewer |
 | Scanned PDFs without text | They are read from the page image and marked for a closer check |

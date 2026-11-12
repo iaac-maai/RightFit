@@ -5,7 +5,7 @@ The check engine is the same in every country. What changes with the project's l
 ## Layers
 A project collects its rules from layers, from the most general to the most specific:
 1. EU: product rules (declarations of conformity, construction products, ecodesign). Same for every EU country.
-2. Country: national rules (Romania: Law 10/1995 and the site supervisor's practice; Spain: CTE, RITE).
+2. Country: national rules (Romania: Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026, and the site supervisor's practice; Spain: CTE, RITE).
 3. Region and city, where they exist (Catalonia, Barcelona). None is needed for the MAF checks in v0.1.
 4. Project: the specification and the BOQ, the most specific layer.
 
@@ -14,8 +14,8 @@ Ids follow ISO 3166: EU, RO, ES, ES-CT (Catalonia), ES-CT-BCN (Barcelona). Pract
 ## One rule, one row (data/maf/rules.csv)
 rule_id, jurisdiction, topic, check, code, clause, requirement, param, operator, value, unit, applies_to, valid_from, valid_to, quote, source_url, status, verified_on, notes.
 - topic groups the rules that answer the same question, whatever the country: doc.eu_declaration_of_conformity, doc.reception_control, ahu.hrs_efficiency;
-- applies_to: the product families (pump, ahu, outdoor_unit, dx_kit, fire_valve) or all;
-- valid_from and valid_to: the window in which that version applies; the project date picks the version (the Machinery Directive until 19 Jan 2027, the Machinery Regulation from 20 Jan 2027);
+- applies_to: the product families (pump, ahu, outdoor_unit, dx_kit, fire_damper and the others named in data/maf/family_documents.csv) or all;
+- valid_from and valid_to: the window in which that version applies; the project date picks the version (the Machinery Directive until 19 Jan 2027, the Machinery Regulation from 20 Jan 2027; in Romania Law 10/1995 until 24 Aug 2026, the construction Code from 25 Aug 2026);
 - status: verified, verified_secondary, to_confirm, practice (from past reviewers), engineer_input.
 
 ## How the engine resolves the rules for a project

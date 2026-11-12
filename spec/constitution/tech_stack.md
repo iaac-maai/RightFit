@@ -10,6 +10,7 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, private), VS Code 
 |---|---|
 | xlrd | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`) |
 | pytest | Tests for every check (`tests/`) |
+| The Claude command line (`claude -p`, Haiku, no tools) | The AI the application asks: a rule typed in words, what a BOQ line asks (`app/ai.py`) |
 | Python's standard library (`http.server`), with plain HTML, CSS and JavaScript | The application (`app/review_server.py`, `app/review/`), which runs only on the laptop |
 | pypdf and PyMuPDF (`pymupdf`) | The text of each PDF page, page images, marking quoted lines on the page, and pump curves from a data sheet's vector drawing |
 | Tesseract with `pytesseract` | OCR of scanned pages when a pump package is added |
@@ -27,7 +28,7 @@ The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baselin
 | 48 more packages from the same project (285 PDFs, 1,296 pages) | Training and locked testing of our own models; the evaluation on unseen packages | Held since 6 Nov, in `data/raw/`, outside Git; listed in the app, not read yet |
 | The register of 80 MAFs from Luca's last project | Evidence for the problem, and the source of the checklist | Held; anonymised, outside Git; counts in `docs/maf_register_findings.md` |
 | EU texts on EUR-Lex (machinery, low voltage, construction products, ecodesign of ventilation units) | Rules for documents and ecodesign | Partly read; several rows still "to confirm" |
-| Romanian law (Law 10/1995) and Spanish CTE and RITE | National rules and delivery reminders | Read on secondary sites; [O] the official journals |
+| Romanian law (Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026) and Spanish CTE and RITE | National rules and delivery reminders | The Romanian articles read on legislatie.just.ro on 12 Nov; the Spanish ones on secondary sites, [O] the BOE |
 | Manufacturer data sheets and declarations | Values per product | Only those inside the packages |
 
 The full list is in `docs/data_map.md`.

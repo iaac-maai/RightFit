@@ -7,7 +7,16 @@ outdoor_unit,ANY,data_sheet,maf,ANY-DATASHEET,
 outdoor_unit,EU,eu_declaration_of_conformity,maf_and_delivery,EU-MACH-DOC;EU-MACH-REG;EU-LVD-DOC,pressure equipment and refrigerant rules may add requirements: to confirm
 dx_kit,ANY,data_sheet,maf,ANY-DATASHEET,
 dx_kit,EU,eu_declaration_of_conformity,maf_and_delivery,EU-LVD-DOC,to confirm which directives apply; it may be covered by the outdoor unit declaration
-fire_valve,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP,next family
-all,RO,declaration_quality_certificate_guarantee,delivery,RO-L10-11-3;RO-PRACTICE-DELIVERY,"reminder, Info at MAF stage"
+fire_damper;radiator;elastomeric_insulation;fire_detection_panel;fire_alarm_power_supply;voice_alarm_control;visual_alarm_device;voice_alarm_loudspeaker;cable,ANY,data_sheet,maf,ANY-DATASHEET,first families of the second batch
+fire_damper,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-15650,
+radiator,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-442-1,
+elastomeric_insulation,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-14304,pipe and duct insulation
+fire_detection_panel,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-54-2,the electrical declaration of conformity is not asked for yet
+fire_alarm_power_supply,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-54-4,only when it supplies a fire detection or voice alarm system
+voice_alarm_control,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-54-16,
+visual_alarm_device,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-54-23,
+voice_alarm_loudspeaker,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-54-24,
+cable,EU,declaration_of_performance,maf_and_delivery,EU-CPR-DOP;EU-HEN-50575,general cables only; fire resistant cables are not decided
+all,RO,declaration_quality_certificate_guarantee,delivery,RO-L10-11-3;RO-L169-378-3;RO-PRACTICE-DELIVERY,"reminder, Info at MAF stage"
 all,ES,reception_documents,delivery,ES-CTE-7-2,"reminder, Info at MAF stage"
 ahu;outdoor_unit;dx_kit,ES,manufacturer_guarantee_and_conformity,delivery,ES-RITE-20,thermal installations only

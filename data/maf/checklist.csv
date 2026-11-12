@@ -7,7 +7,6 @@ CL-05,pipe,maximum working pressure stated and at least the design pressure,PN i
 CL-06,support,fixed points for vertical and horizontal runs,a fixed point solution in the package,Flag,yes,R11;R12,
 CL-07,roof_drain_heated,defrost design and control diagram,both in the package,Flag,yes,R68,
 CL-08,pump;ahu;meter,"BMS communication stated and included, not optional",protocol or module named as included,Flag,no,R59;R52,
-CL-09,pump,a control panel listed for pump groups that need one,a controller or panel among the items or in the data sheet as included,Flag,no,R59,"circulation and stormwater: required; booster: recommended (Info); drainage: a float switch is enough (ENG-PUMP-PANEL)"
 CL-10,visible_item,colour and position approved by the architect,visible items are routed to the architect,Info,no,R05;R08;R50;R51,
 CL-11,all,delivery documents reminder for the location,always shown for RO and ES,Info,no,R03;R04;R07;R10;R11;R13,"see RO-PRACTICE-DELIVERY, ES-CTE-7-2, ES-RITE-20"
 CL-12,pump;ahu;fan,"electrical data stated: voltage, power, starting method",values present in the data sheet,Flag,no,R34,the reviewer asked for the starting method of the jet fans

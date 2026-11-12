@@ -64,9 +64,12 @@ The evidence for the problem comes from Luca's last project. Of 80 MEP approval 
   - P02, a FläktGroup air handling unit with Hisense outdoor units and a DX kit, at revision 4.
 - **Checks:**
   - D1–D4, the documents;
-  - V1–V2, the duty point and the pressure rating;
+  - V1–V3, the duty point, the pressure rating and the liquid temperature;
   - E1, ecodesign;
+  - H1, the approval for contact with drinking water;
   - C, the reviewers' checklist;
+  - P, the consultant's own rules, typed in words on the Rules screen;
+  - Q, what the product's line in the project's BOQ asks for;
   - R, the delivery reminder.
 
   They produce pass, flag, unclear or info, and a draft status A, B or C with its reasons.

@@ -69,7 +69,9 @@ def list_packages() -> dict:
 @server.tool(annotations=READ_ONLY)
 def review_package(package: str, location: str = "RO", review_date: str | None = None) -> dict:
     """Run RightFit's checks on one package and return its draft answer (A approved, B approved with comments,
-    C revise and resubmit), the problems and the open questions, each with file, page and rules.
+    C revise and resubmit), the problems and the open questions, each with file, page and rule ids (list_rules
+    gives each rule's text and source; a CR- rule is the consultant's own, not the law). Check Q compares the
+    product with its line in the project's BOQ, when that line has already been read.
 
     location is RO (Romania) or ES (Spain). review_date (YYYY-MM-DD) defaults to the form's date; the delivery
     date follows from the form's lead time. Passed checks are only counted, to keep the answer short."""
@@ -79,8 +81,14 @@ def review_package(package: str, location: str = "RO", review_date: str | None =
         day = date.fromisoformat(review_date) if review_date else None
     except ValueError:
         raise ToolError("review_date must look like 2026-11-12") from None
-    v = review(package_file(package), location, day)
-    pick = lambda verdict: [{k: r[k] for k in RESULT_FIELDS} for r in v["results"] if r["verdict"] == verdict]  # noqa: E731
+    from app.review_server import boq_links
+    pkg = package_file(package)
+    v = review(pkg, location, day, boq=boq_links(pkg, read=False))   # only BOQ lines already read
+    # Rules as id and status only, to keep the answer short; list_rules gives their text and source.
+    # Empty fields are left out for the same reason.
+    short = lambda r: {k: x for k, x in {**{k: r[k] for k in RESULT_FIELDS}, "rules": [  # noqa: E731
+        {"id": x["id"], "status": x["status"]} for x in r["rules"]]}.items() if x not in (None, "", [])}
+    pick = lambda verdict: [short(r) for r in v["results"] if r["verdict"] == verdict]  # noqa: E731
     return {"package": v["package"], "location": location, "review_date": v["review"], "delivery_date": v["delivery"],
             "form": v["form"], "draft_answer": v["status"], "counts": v["counts"],
             "problems": pick("flag"), "questions": pick("unclear"),
@@ -92,7 +100,9 @@ def review_package(package: str, location: str = "RO", review_date: str | None =
 def list_rules(location: str = "RO") -> dict:
     """The rules RightFit checks for a location (EU rules, the country's rules and reviewers' practice), each with
     its legal source, clause and status: verified_official (read in the official journal), verified_secondary
-    (read in a copy, to check), to_confirm, practice or engineer_input (a value set by the team's engineer)."""
+    (read in a copy, to check), to_confirm, practice or engineer_input (a value set by the team's engineer).
+    valid_from and valid_to are the dates between which a rule applies: a rule with a valid_to in the past was
+    replaced or repealed, so do not cite it for a review dated after it."""
     from app.review_server import rules_for_location
     check_location(location)
     return {"location": location, "rules": rules_for_location(location)}

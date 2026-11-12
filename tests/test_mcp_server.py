@@ -8,7 +8,7 @@ import pytest
 from mcp import Client, StdioServerParameters
 
 from app.mcp_server import MODEL, RAW, server
-from app.review_server import review
+from app.review_server import boq_links, review
 from model.page_classifier import CLASSES
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +36,8 @@ def test_the_agent_sees_four_tools_and_all_of_them_only_read():
 def test_review_package_gives_the_review_page_answer():
     error, text = call("review_package", package="P02")
     got = json.loads(text)
-    page = review(json.loads((ROOT / "data/maf/extracted/P02.json").read_text()))
+    pkg = json.loads((ROOT / "data/maf/extracted/P02.json").read_text())
+    page = review(pkg, boq=boq_links(pkg, read=False))   # the tool, like the page, uses the BOQ lines already read
     assert not error
     assert got["draft_answer"]["letter"] == page["status"]["letter"] == "B"
     assert got["answer_text"] == page["answer"]["text"]
@@ -65,6 +66,8 @@ def test_rules_for_romania_leave_out_spain():
     error, text = call("list_rules", location="RO")
     rules = json.loads(text)["rules"]
     assert not error and rules and {r["jurisdiction"] for r in rules} <= {"EU", "RO", "ANY"}
+    # A repealed rule says until when it applied, so an agent does not cite it for a later review.
+    assert next(r for r in rules if r["rule_id"] == "RO-L10-11-3")["valid_to"] == "2026-08-24"
 
 
 @pytest.mark.skipif(not (RAW / "P01").is_dir() or not MODEL.exists(),

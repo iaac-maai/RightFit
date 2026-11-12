@@ -21,19 +21,20 @@ import pymupdf
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from checks.maf.checks import DOC_LABELS, context, run_all  # noqa: E402
-from checks.maf.rules import CHAINS, load, tables  # noqa: E402
+from checks.maf.checks import DOC_LABELS, KINDS, context, run_all  # noqa: E402
+from checks.maf.rules import CHAINS, DATA, load, tables  # noqa: E402
 from checks.maf.status import LABELS, draft_status  # noqa: E402
 from explain.maf_comments import comment, title  # noqa: E402
-from app import pump_demo  # noqa: E402
+from app import ai, pump_demo  # noqa: E402
+from ingest.boq import find_line, read_boq, sheets_for  # noqa: E402
 
 PAGE = Path(__file__).with_name("review")
 RAW = ROOT / "data/raw"   # the original PDFs, on the laptop only (git-ignored)
 # shortcut: one reviewer name for every confirmation; add a login when more reviewers use it.
 REVIEWER = "Luca"
 CHECK_NAMES = {"D1": "Required documents", "D2": "Declaration matches the products", "D3": "Certificate in date",
-               "D4": "Attachment is what the form says", "V1": "Duty point", "V2": "Pressure rating",
-               "E1": "Ecodesign", "C": "Reviewers' checklist", "R": "Delivery reminder"}
+               "D4": "Attachment is what the form says", "V1": "Duty point", "V2": "Pressure rating", "V3": "Liquid temperature",
+               "E1": "Ecodesign", "H1": "Drinking water approval", "C": "Reviewers' checklist", "P": "Consultant's rules", "Q": "BOQ line", "R": "Delivery reminder"}
 VALUE_NAMES = {"used_for": "Used for (form)", "duty_flow": "Required flow (form)", "duty_head": "Required head (form)",
                "duty_airflow_supply": "Required supply airflow (form)",
                "duty_airflow_extract": "Required extract airflow (form)", "flow": "Flow at the duty point",
@@ -55,8 +56,11 @@ def key_of(r):
     return "|".join(str(x) for x in (r["check"], r["item"], r["doc"], ",".join(r["rules"]), r["code"]))
 
 
-def rule_info(rule_id, status, rules, checklist):
+def rule_info(rule_id, status, rules, checklist, consultant=None):
     """One rule or checklist item in plain fields, for the reviewer who asks what a finding rests on."""
+    if consultant and rule_id in consultant:
+        return {"id": rule_id, "status": "consultant", "text": consultant[rule_id]["text"],
+                "source": "The consultant's own rule, not a legal requirement", "url": ""}
     if rule_id in rules:
         r = rules[rule_id]
         return {"id": rule_id, "status": status, "text": r["requirement"], "source": " ".join(x for x in (r["code"], r["clause"]) if x),
@@ -65,20 +69,104 @@ def rule_info(rule_id, status, rules, checklist):
     return {"id": rule_id, "status": status, "text": item.get("item", ""), "source": "Past reviewers' comments", "url": ""}
 
 
+# The consultant's own rules (spec section 6, check P). The Rules screen adds them and switches them on or off.
+CONSULTANT = DATA / "consultant_rules.csv"
+CONSULTANT_FIELDS = ["rule_id", "family", "application", "kind", "field", "operator", "value", "unit", "effect", "text",
+                     "source", "added_on", "active"]
+WORDS = re.compile(r"[a-z0-9_]+([;|][a-z0-9_]+)*")
+
+
+def new_consultant_rule(body, rows, today=None):
+    """A rule typed on the Rules screen, checked field by field before it is written; raises ValueError."""
+    clean = {k: " ".join(str(body.get(k) or "").split()) for k in CONSULTANT_FIELDS}
+    kind, family = clean["kind"], clean["family"].lower() or "all"
+    if kind not in KINDS:
+        raise ValueError(f"kind must be one of {', '.join(KINDS)}")
+    if clean["effect"] not in ("B", "C", "info"):
+        raise ValueError("effect must be B, C or info")
+    if not WORDS.fullmatch(family) or (clean["application"] and not WORDS.fullmatch(clean["application"].lower())):
+        raise ValueError("family and application are words like pump or circulation;stormwater")
+    if not 3 <= len(clean["text"]) <= 200:
+        raise ValueError("say in a few words what the rule asks (3 to 200 characters)")
+    if kind in ("value", "document", "included") and not WORDS.fullmatch(clean["field"]):
+        raise ValueError("say which reading or document the rule looks at")
+    if kind == "brand" and not clean["value"]:
+        raise ValueError("give the accepted brands, separated by ;")
+    if kind == "value":
+        if clean["operator"] not in (">=", "<=", "="):
+            raise ValueError("operator must be >=, <= or =")
+        if clean["operator"] != "=":
+            float(clean["value"])   # a ValueError here says the limit is not a number
+    # Only the fields the kind uses are kept, so a rule reads the way it works.
+    used = {"brand": ("value",), "value": ("field", "operator", "value", "unit"), "document": ("field",),
+            "included": ("field",), "reminder": ()}[kind]
+    clean.update({k: "" for k in ("field", "operator", "value", "unit") if k not in used})
+    numbers = [int(r["rule_id"][3:]) for r in rows if r["rule_id"][3:].isdigit()]
+    return {**clean, "family": family, "application": clean["application"].lower(),
+            "rule_id": f"CR-{max(numbers, default=0) + 1:02d}", "source": clean["source"] or "added on the Rules screen",
+            "added_on": (today or date.today()).isoformat(), "active": "yes"}
+
+
+def write_consultant_rules(rows):
+    with open(CONSULTANT, "w", newline="", encoding="utf-8") as f:   # CRLF, like the other tables
+        w = csv.DictWriter(f, fieldnames=CONSULTANT_FIELDS, lineterminator="\r\n")
+        w.writeheader()
+        w.writerows(rows)
+
+
+def consultant_screen():
+    """What the Rules screen needs to list the consultant's rules and offer a form for a new one."""
+    return {"rules": load(CONSULTANT.name), "kinds": list(KINDS), "doc_types": DOC_LABELS, "values": VALUE_NAMES,
+            "families": sorted({f for r in load("family_documents.csv") for f in r["family"].split(";")} - {"all"})}
+
+
 def rules_for_location(location):
     """The rules RightFit checks for a location: EU rules, the country's rules and reviewers' practice."""
     return [{k: r[k] for k in ("rule_id", "jurisdiction", "code", "clause", "requirement", "applies_to", "source_url",
-                               "status", "verified_on")}
+                               "status", "verified_on", "valid_from", "valid_to")}
             for r in load("rules.csv") if r["jurisdiction"] in CHAINS[location]]
 
 
-def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=None):
-    """Everything the page shows for one package. dismissed maps a result key to the reviewer's reason."""
+# The project's BOQ files (spec section 6, check Q). They hold prices: data/raw is git-ignored, prices are never read.
+BOQ_DIR = RAW / "boq"
+_boq_lines = {}
+
+
+def boq_files():
+    return sorted(p for p in BOQ_DIR.glob("*.xls*") if not p.name.startswith("~$")) if BOQ_DIR.exists() else []
+
+
+def boq_links(pkg, read=True):
+    """For each item, the BOQ line it answers and what that line asks (AI, cached); None when there is no BOQ."""
+    files = boq_files()
+    if not files:
+        return None
+    lines = []
+    for f in files:
+        stamp = (f, f.stat().st_mtime)
+        if stamp not in _boq_lines:
+            _boq_lines[stamp] = read_boq(f)
+        lines += _boq_lines[stamp]
+    if not sheets_for(lines, pkg["form"].get("boq_ref")):   # the BOQ of another project, or the form gives no code
+        return None
+    found = {i["id"]: find_line(lines, pkg["form"].get("boq_ref"), i) for i in pkg["items"]}
+    readings = sorted({k for i in pkg["items"] for k in i["values"]})
+    try:
+        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, BOQ_DIR / "asks.json", read)
+    except (RuntimeError, OSError, ValueError):   # no AI now: the lines show as not read yet
+        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, BOQ_DIR / "asks.json", False)
+    return {k: {**ln, "requirements": (asks.get(ln["text"]) or {}).get("requirements"), "status": "extracted"}
+            for k, ln in found.items() if ln}
+
+
+def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=None, boq=None):
+    """Everything the page shows for one package. dismissed maps a result key to the reviewer's reason;
+    boq is what boq_links found (None: the BOQ is left out)."""
     form = pkg["form"]
     review_date = review_date or date.fromisoformat(form["date"])
     delivery_date = delivery_date or review_date + timedelta(weeks=form["delivery_weeks"] or 0)
     dismissed = dismissed or {}
-    results = run_all(pkg, context(location, review_date, delivery_date))
+    results = run_all(pkg if boq is None else {**pkg, "boq": boq}, context(location, review_date, delivery_date))
     for r in results:
         r["key"] = key_of(r)
         r["title"] = title(r) or CHECK_NAMES[r["check"]]   # before a dismissal turns the result into a pass
@@ -99,6 +187,7 @@ def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=N
     item_label = {i["id"]: f"{i['name']} ({i['model']})" for i in pkg["items"]}
     rule_table, _, checklist_rows = tables()
     checklist = {row["id"]: row for row in checklist_rows}
+    consultant = {row["rule_id"]: row for row in load(CONSULTANT.name)}
 
     def evidence(r):
         """What the AI read on the pages a result points to, for its product."""
@@ -131,7 +220,8 @@ def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=N
             "product": item_label.get(r["item"]), "doc": r["doc"], "doc_no": doc_no.get(r["doc"]),
             "verdict": r["would_be"], "confirmed": r["result"] == r["would_be"], "reason": r["reason"],
             "sources": r["sources"],
-            "rules": [rule_info(i, r["rule_status"].get(i, "checklist"), rule_table, checklist) for i in r["rules"]],
+            "rules": [rule_info(i, r["rule_status"].get(i, "checklist"), rule_table, checklist, consultant)
+                      for i in r["rules"]],
             "blocking": r["blocking"], "comment": c, "delta": number.get(c), "dismissed": r.get("dismissed"),
             "evidence": evidence(r)})
 
@@ -373,6 +463,10 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             return self.wfile.write(f["data"])
         url = urlparse(self.path)
+        if url.path == "/api/consultant-rules":
+            return self.send_json(consultant_screen())
+        if url.path == "/api/boq":
+            return self.send_json([{"file": f.name, "lines": len(read_boq(f))} for f in boq_files()])
         if url.path == "/api/rules":
             location = parse_qs(url.query).get("location", ["RO"])[0]
             return self.send_json(rules_for_location(location if location in CHAINS else "RO"))
@@ -389,6 +483,18 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path == "/api/upload":   # one file of the package, held in memory for this run only
                 name = unquote(self.headers.get("X-File-Name", ""))
                 return self.send_json({"name": name, "pages": pump_demo.page_count(raw), "token": pump_demo.keep(name, raw)})
+            if self.path == "/api/boq":   # a BOQ file, kept in data/raw/boq (git-ignored: it holds prices)
+                name = Path(unquote(self.headers.get("X-File-Name", ""))).name
+                if not re.fullmatch(r"[\w .()&+,-]{1,120}\.xlsx?", name, re.I) or name.startswith("~$"):
+                    return self.send_json({"error": "A BOQ is an Excel file (.xlsx or .xls)."}, 400)
+                BOQ_DIR.mkdir(parents=True, exist_ok=True)
+                (BOQ_DIR / name).write_bytes(raw)
+                try:
+                    lines = read_boq(BOQ_DIR / name)
+                except Exception:
+                    (BOQ_DIR / name).unlink()
+                    return self.send_json({"error": "This file could not be read as a BOQ."}, 400)
+                return self.send_json({"file": name, "lines": len(lines)})
             body = json.loads(raw or b"{}")
             if self.path == "/api/extract":   # read one page of an upload: its text, or OCR on a scan
                 text, how = pump_demo.read_page(body["token"], int(body["page"]))
@@ -398,6 +504,25 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.send_json({"error": "The server was restarted and no longer has these files. "
                                                     "Add the package again."}, 410)
                 return self.send_json(pump_demo.analyse(body["tokens"]))
+            if self.path == "/api/consultant-rules/draft":   # a rule typed in words: the AI proposes, nothing is saved
+                rows = load(CONSULTANT.name)
+                info = consultant_screen()
+                try:
+                    proposal = ai.rule_from_words(" ".join(str(body.get("words", "")).split())[:300], info["families"],
+                                                  list(info["values"]), list(info["doc_types"]))
+                except RuntimeError as e:
+                    return self.send_json({"error": str(e)}, 503)
+                return self.send_json({"rule": new_consultant_rule(proposal, rows)})
+            if self.path == "/api/consultant-rules":   # a new rule from the Rules screen
+                rows = load(CONSULTANT.name)
+                write_consultant_rules(rows + [new_consultant_rule(body, rows)])
+                return self.send_json(consultant_screen())
+            if self.path == "/api/consultant-rules/active":   # switch one rule on or off
+                rows = load(CONSULTANT.name)
+                row = next(r for r in rows if r["rule_id"] == body["rule_id"])
+                row["active"] = "yes" if body["active"] else "no"
+                write_consultant_rules(rows)
+                return self.send_json(consultant_screen())
             if self.path == "/api/pumps/sets":
                 return self.send_json(pump_demo.booster_sets())
             if self.path == "/api/pumps/booster":
@@ -426,7 +551,7 @@ class Handler(SimpleHTTPRequestHandler):
             elif self.path != "/api/review":
                 return self.send_json({"error": "unknown address"}, 404)
             self.send_json(review(pkg, body.get("location") or "RO", day(body.get("review")),
-                                  day(body.get("delivery")), body.get("dismissed")))
+                                  day(body.get("delivery")), body.get("dismissed"), boq_links(pkg)))
         except (KeyError, ValueError, StopIteration, TypeError, IndexError) as e:
             self.send_json({"error": f"{type(e).__name__}: {e}"}, 400)
         except Exception as e:   # an upload no library can read still gets an answer the page can show

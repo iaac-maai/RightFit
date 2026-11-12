@@ -130,3 +130,23 @@ def test_a_dismissed_problem_keeps_its_title():
     p = next(r for r in review(fresh())["results"] if r["verdict"] == "flag" and r["title"] != r["check_name"])
     after = next(r for r in review(fresh(), dismissed={p["key"]: "ok"})["results"] if r["key"] == p["key"])
     assert after["title"] == p["title"]
+
+
+def test_a_consultant_rule_from_the_rules_screen_is_checked_before_it_is_written():
+    from datetime import date
+    from app.review_server import new_consultant_rule
+    rows = [{"rule_id": "CR-01"}, {"rule_id": "CR-07"}]
+    r = new_consultant_rule({"family": "pump", "kind": "brand", "value": "Grundfos", "effect": "B",
+                             "text": "pumps only from Grundfos"}, rows, date(2026, 11, 12))
+    assert (r["rule_id"], r["active"], r["added_on"]) == ("CR-08", "yes", "2026-11-12")
+    odd = new_consultant_rule({"family": "pump", "kind": "brand", "field": "used_for", "operator": ">=", "value": "Wilo",
+                               "effect": "B", "text": "pumps only from Wilo"}, rows)
+    assert (odd["field"], odd["operator"], odd["value"]) == ("", "", "Wilo")
+    for bad in ({"kind": "anything"}, {"kind": "brand", "effect": "B", "text": "x"},
+                {"kind": "value", "field": "max_pressure", "operator": ">=", "value": "ten", "effect": "B", "text": "PN"},
+                {"kind": "brand", "value": "IMI", "effect": "B", "text": "only IMI", "family": "../x"}):
+        try:
+            new_consultant_rule(bad, rows)
+        except ValueError:
+            continue
+        raise AssertionError(f"accepted {bad}")

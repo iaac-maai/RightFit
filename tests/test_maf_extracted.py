@@ -4,9 +4,12 @@ from pathlib import Path
 
 import pytest
 
+from checks.maf.rules import load
+
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = sorted((ROOT / "data/maf/extracted").glob("*.json"))
-FAMILIES = {"pump", "ahu", "outdoor_unit", "dx_kit"}
+# A family has to be in the documents table before a package of it is committed.
+FAMILIES = {name for r in load("family_documents.csv") for name in r["family"].split(";")} - {"all"}
 # Document types listed in the spec, section 4.
 DOC_TYPES = {"data_sheet", "eu_declaration_of_conformity", "declaration_of_performance", "product_certificate",
              "other_certificate", "selection_report", "manual", "other"}

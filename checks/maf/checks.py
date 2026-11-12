@@ -1,7 +1,7 @@
 """Deterministic MAF checks (spec/features/maf_checker.md, section 6). No AI here.
 
 Each check returns result dicts:
-  check     D1, D2, D3, D4, V1, V2, E1, C or R
+  check     D1, D2, D3, D4, V1, V2, V3, E1, H1, C, P, Q or R
   item/doc  what the result is about
   result    pass, flag, unclear or info (what the reviewer sees)
   would_be  the verdict on the values as they are, before anyone verified them
@@ -12,7 +12,7 @@ Each check returns result dicts:
 import re
 from datetime import date
 
-from checks.maf.rules import CHAINS, active_ids, documents_for, for_family, library, rules_for, tables
+from checks.maf.rules import CHAINS, active_ids, documents_for, for_family, library, load, rules_for, tables
 
 DECL = "eu_declaration_of_conformity"
 MAF_STAGES = ("maf", "maf_and_delivery")
@@ -23,6 +23,7 @@ DOC_LABELS = {
     "product_certificate": "product certificate",
     "other_certificate": "other certificate",
     "selection_report": "selection report",
+    "drinking_water_approval": "approval for contact with drinking water",
     "declaration_quality_certificate_guarantee": "declaration of performance or conformity, quality certificate "
                                                  "and guarantee",
     "reception_documents": "reception documents (supply documents, guarantee, conformity and CE marking)",
@@ -30,12 +31,14 @@ DOC_LABELS = {
 }
 
 
-def context(location, review_date, delivery_date, requirements=None, data=None, lib=None):
-    """Everything a check needs besides the package. data = (rules, family_docs, checklist) and lib for tests."""
+def context(location, review_date, delivery_date, requirements=None, data=None, lib=None, consultant=None):
+    """Everything a check needs besides the package. data = (rules, family_docs, checklist), lib and consultant
+    (the consultant's rules) for tests."""
     rules, family_docs, checklist = data or tables()
     return {"location": location, "review_date": review_date, "delivery_date": delivery_date,
             "requirements": requirements or {}, "rules": rules, "family_docs": family_docs,
-            "checklist": checklist, "library": lib if lib is not None else library()}
+            "checklist": checklist, "library": lib if lib is not None else library(),
+            "consultant": consultant if consultant is not None else load("consultant_rules.csv")}
 
 
 def result(check, verdict, reason, inputs=(), item=None, doc=None, rules=(), code=None, params=None,
@@ -108,7 +111,12 @@ def d1_required_documents(pkg, ctx):
     """Every document the family needs at MAF stage is present and names the item."""
     out = []
     for item in pkg["items"]:
-        for row in documents_for(ctx["family_docs"], ctx["location"], item["family"], MAF_STAGES):
+        rows = documents_for(ctx["family_docs"], ctx["location"], item["family"], MAF_STAGES)
+        if not rows:
+            # A family the table does not list yet: say so, rather than let the item through unchecked.
+            out.append(result("D1", "unclear", f"no documents are listed yet for the family {item['family']}; "
+                              "check its documents by hand", item=item["id"]))
+        for row in rows:
             ids = active_ids(row["rule_id"], ctx["rules"], ctx["review_date"])
             if not ids:
                 continue
@@ -200,7 +208,7 @@ def d3_in_date(pkg, ctx):
 
 
 # Words in the form's attachment labels and the document type they announce.
-LABEL_TYPES = ((" ft ", "data_sheet"), ("fisa tehnica", "data_sheet"), ("declara", DECL),
+LABEL_TYPES = (("aviz sanitar", "drinking_water_approval"), (" ft ", "data_sheet"), ("fisa tehnica", "data_sheet"), ("declara", DECL),
                ("raport", "selection_report"), ("certificat", "product_certificate"),
                ("tuv", "product_certificate"), ("eurovent", "product_certificate"))
 
@@ -303,6 +311,51 @@ def v2_pressure(pkg, ctx):
     return out
 
 
+# "5 .. 60" or "-10 .. +120", as the data sheets print the range.
+TEMP_RANGE = re.compile(r"([-+]?\d+(?:[.,]\d+)?)\s*\.\.\s*([-+]?\d+(?:[.,]\d+)?)")
+
+
+def temp_range(v):
+    """(low, high) in °C from a reading like '5 .. 60', or None when it can't be read."""
+    m = TEMP_RANGE.search(str(v["value"])) if has(v) and v["unit"] == "°C" else None
+    return tuple(float(x.replace(",", ".")) for x in m.groups()) if m else None
+
+
+# Pumps that move domestic hot water (Luca, 12 Nov 2026): the recirculation pump, and the pump between the hot water
+# store and its heat exchanger. They carry drinking water, and the law sets the temperature they must take.
+DHW = ("dhw_circulation", "dhw_charging")
+
+
+def v3_liquid_temperature(pkg, ctx):
+    """The pump's liquid temperature range covers the project's range for its application; for hot water pumps
+    with no project range, at least the temperature the location's hot water rules ask for."""
+    needs, out = ctx["requirements"].get("liquid_temp_c", {}), []
+    for item in pkg["items"]:
+        if item["family"] != "pump":
+            continue
+        got, application = val(item, "liquid_temp_range"), val(item, "application")
+        need, have = needs.get(application["value"]), temp_range(got)
+        rules = ["ANY-PRACTICE-LIQUID-TEMP"]
+        if need is None and application["value"] in DHW:
+            law = rules_for(ctx["rules"], ctx["location"], item["family"], "value.dhw_temp", ctx["review_date"])
+            if law:
+                need, rules = (None, max(float(r["value"]) for r in law)), [r["rule_id"] for r in law]
+        req = "" if need is None else (f"at least {need[1]:g} °C" if need[0] is None else f"{need[0]} .. {need[1]} °C")
+        params = {"item": item["model"], "got": fmt(got), "req": req}
+        if need is None:
+            seen = fmt(got) if has(got) else "not found"
+            out.append(result("V3", "info", f"no project temperature given; data sheet: {seen}", item=item["id"],
+                              rules=rules))
+        elif have is None:
+            out.append(result("V3", "unclear", f"liquid temperature range not found ({got.get('note') or fmt(got)})",
+                              item=item["id"], rules=rules, code="V3.missing", params=params))
+        else:
+            ok = (need[0] is None or have[0] <= need[0]) and have[1] >= need[1]
+            out.append(result("V3", "pass" if ok else "flag", f"{fmt(got)} for {req} required", [got, application],
+                              item=item["id"], rules=rules, code="V3.outside", params=params))
+    return out
+
+
 def no_rule(check, item, what):
     return result(check, "unclear", f"no rule for this location ({what})", item=item["id"])
 
@@ -383,6 +436,8 @@ def _cl03(item, pkg, ctx):
 
 
 def _cl04(item, pkg, ctx):
+    if (pkg.get("boq") or {}).get(item["id"]):
+        return "info", "what the BOQ line asks is checked under Q", [], {}
     if not ctx["requirements"].get("boq"):
         return "unclear", "no BOQ line given", [], {}
     return "unclear", "BOQ comparison not built yet; check by hand", [], {}
@@ -396,28 +451,6 @@ def _cl08(item, pkg, ctx):
     return "missing", f"{seen}not stated as included ({included.get('note') or 'no note'})", [included], {}
 
 
-# What each pump application needs, from Luca on 28 Oct 2026 (rules.csv ENG-PUMP-PANEL).
-PANEL_NEED = {"circulation": "panel", "stormwater": "panel", "booster": "recommended", "drainage": "float"}
-
-
-def _cl09(item, pkg, ctx):
-    application, panel = val(item, "application"), val(item, "controller_included")
-    need = PANEL_NEED.get(application["value"])
-    if need is None:
-        return "unclear", f"application '{application['value']}' has no panel rule in ENG-PUMP-PANEL", [], {}
-    if panel["value"] is True:
-        return "pass", f"controller included: {fmt(panel)}", [application, panel], {}
-    if need == "recommended":
-        return "info", "booster set: a control panel is recommended, none stated", [], {}
-    if need == "float":
-        switch = val(item, "float_switch")
-        if switch["value"] is True:
-            return "pass", f"float switch: {fmt(switch)}", [application, switch], {}
-        return "missing", "drainage pump: no float switch or panel stated", [application, panel, switch], \
-            {"variant": ".float"}
-    return "missing", f"{application['value']} pumps need a control panel; none stated", [application, panel], {}
-
-
 def _cl12(item, pkg, ctx):
     keys = ("voltage", "power", "starting_method")
     gaps = [k for k in keys if not has(val(item, k))]
@@ -428,7 +461,7 @@ def _cl12(item, pkg, ctx):
 
 
 CHECKLIST = {"CL-01": _cl01, "CL-02": lambda *a: ("info", "see D3", [], {}), "CL-03": _cl03, "CL-04": _cl04,
-             "CL-08": _cl08, "CL-09": _cl09, "CL-11": lambda *a: ("info", "see R", [], {}), "CL-12": _cl12}
+             "CL-08": _cl08, "CL-11": lambda *a: ("info", "see R", [], {}), "CL-12": _cl12}
 
 
 def c_checklist(pkg, ctx):
@@ -449,6 +482,136 @@ def c_checklist(pkg, ctx):
     return out
 
 
+# Pumps that need an approval for drinking water (Luca, 12 Nov 2026): booster sets and the hot water pumps.
+# Heating and cooling circulation pumps do not.
+DRINKING_WATER = ("booster",) + DHW
+
+
+def h1_drinking_water(pkg, ctx):
+    """A pump that carries drinking water has a document approving it for contact with drinking water."""
+    out = []
+    for item in pkg["items"]:
+        application = val(item, "application")
+        if application["value"] not in DRINKING_WATER:
+            continue
+        ids = [r["rule_id"] for r in rules_for(ctx["rules"], ctx["location"], item["family"], "doc.drinking_water",
+                                               ctx["review_date"])]
+        if not ids:
+            out.append(no_rule("H1", item, "approval for contact with drinking water"))
+            continue
+        # shortcut: one document type for the national approval and the EU declaration; split it when a package
+        # holds an EU one (from 31 Dec 2026), so the transition of Regulation (EU) 2024/370 art. 11 can be checked.
+        found = [d for d in pkg["documents"] if d["doc_type"] == "drinking_water_approval" and covers(d, item)]
+        if found:
+            out.append(result("H1", "pass", f"approved for drinking water: {', '.join(d['file'] for d in found)}",
+                              with_matches(found, item) + [application], item=item["id"], rules=ids))
+        else:
+            out.append(result("H1", "flag", f"no approval for contact with drinking water names {item['model']} "
+                              f"(it is used as a {application['value']})", [application], item=item["id"], rules=ids,
+                              code="H1.missing", params={"item": item["model"]}))
+    return out
+
+
+# ---------------------------------------------------------------- P: the consultant's rules
+
+OPERATORS = {">=": lambda a, b: a >= b, "<=": lambda a, b: a <= b}
+
+
+def _brand(item, pkg, rule):
+    allowed = [norm(b) for b in rule["value"].split(";") if b.strip()]
+    ok = any(a in norm(item["brand"]) for a in allowed)
+    return ("pass" if ok else "missing"), f"brand {item['brand']}; accepted: {rule['value'].replace(';', ', ')}", []
+
+
+def _value(item, pkg, rule):
+    v = val(item, rule["field"])
+    number = isinstance(v["value"], (int, float)) and not isinstance(v["value"], bool)
+    if not has(v) or (v["unit"] or "") != rule["unit"] or (rule["operator"] != "=" and not number):
+        return "unclear", f"{rule['field'].replace('_', ' ')}: {fmt(v) if has(v) else 'not found'}", []
+    # "=" compares text too (a class such as IE3); ">=" and "<=" compare numbers in the rule's unit.
+    ok = (norm(v["value"]) == norm(rule["value"]) if rule["operator"] == "=" else
+          OPERATORS[rule["operator"]](v["value"], float(rule["value"])))
+    return ("pass" if ok else "missing"), f"{fmt(v)}; asked: {rule['operator']} {rule['value']} {rule['unit']}".rstrip(), [v]
+
+
+def _document(item, pkg, rule):
+    found = [d for d in pkg["documents"] if d["doc_type"] == rule["field"] and covers(d, item)]
+    if found:
+        return "pass", f"{label(rule['field'])}: {', '.join(d['file'] for d in found)}", with_matches(found, item)
+    return "missing", f"no {label(rule['field'])} names {item['model']}", pkg["documents"]
+
+
+def _included(item, pkg, rule):
+    if not any(k in item["values"] for k in rule["field"].split("|")):   # a reading the reader never records
+        return "unclear", f"no reading of {rule['field'].replace('|', ' or ').replace('_', ' ')}; check by hand", []
+    readings = [val(item, k) for k in rule["field"].split("|")]
+    yes = [r for r in readings if r["value"] is True]
+    if yes:
+        return "pass", f"included: {fmt(yes[0])}", yes
+    return "missing", "not stated as included", readings
+
+
+KINDS = {"brand": _brand, "value": _value, "document": _document, "included": _included,
+         "reminder": lambda item, pkg, rule: ("info", "check by hand", [])}
+
+
+def p_consultant_rules(pkg, ctx):
+    """The consultant's own rules (data/maf/consultant_rules.csv): preferences on top of the law, never the law."""
+    out = []
+    for item in pkg["items"]:
+        for rule in ctx["consultant"]:
+            if rule["active"] != "yes" or not for_family(rule["family"], item["family"]):
+                continue
+            application = val(item, "application")
+            if rule["application"] and application["value"] not in rule["application"].split(";"):
+                continue
+            verdict, reason, inputs = KINDS[rule["kind"]](item, pkg, rule)
+            if verdict == "missing":
+                verdict = "info" if rule["effect"] == "info" else "flag"
+            inputs += [application] if rule["application"] else []
+            out.append(result("P", verdict, f"the consultant asks: {rule['text']}; {reason}", inputs, item=item["id"],
+                              rules=[rule["rule_id"]], code="P.rule", params={"item": item["model"], "text": rule["text"]},
+                              blocking=rule["effect"] == "C"))
+    return out
+
+
+# ---------------------------------------------------------------- Q: the BOQ line
+
+# Values a BOQ gives as the designer's estimate, not a limit (Luca, 12 Nov 2026: the motor power).
+ESTIMATES = ("power",)
+
+
+def q_boq_lines(pkg, ctx):
+    """What the item's BOQ line asks for, each checked like a consultant's rule. The server puts the line in
+    pkg["boq"] (ingest/boq.py finds it, an AI lists what it asks); with no BOQ there is nothing to say."""
+    links, out = pkg.get("boq"), []
+    if links is None:
+        return out
+    for item in pkg["items"]:
+        link = links.get(item["id"])
+        if not link:
+            out.append(result("Q", "unclear", "no line of the BOQ has this product's duty under the form's BOQ code",
+                              item=item["id"], code="Q.none", params={"item": item["model"]}))
+            continue
+        where = f"BOQ {link['sheet']}, row {link['row']}"
+        if link.get("requirements") is None:
+            out.append(result("Q", "unclear", f"{where}: what the line asks has not been read yet", item=item["id"],
+                              code="Q.unread", params={"item": item["model"], "where": where}))
+            continue
+        for ask in link["requirements"]:
+            # What the AI read in the BOQ line is an input like any reading: unconfirmed until the reviewer looks.
+            line = {"value": ask["quote"], "status": link.get("status", "extracted"), "source": link["file"], "page": where}
+            verdict, reason, inputs = KINDS[ask["kind"]](item, pkg, ask)
+            if verdict == "missing":
+                verdict = "flag"
+            if ask["kind"] == "value" and ask["field"] in ESTIMATES:
+                verdict, reason = "info", f"the designer's estimate, not a limit; {reason}"
+            out.append(result("Q", verdict, f"{where} asks: {ask['text']} (\"{ask['quote']}\"); {reason}",
+                              inputs + [line], item=item["id"], code="Q.rule",
+                              params={"item": item["model"], "text": ask["text"], "where": where}))
+    return out
+
+
 # ---------------------------------------------------------------- R: location reminders
 
 def r_reminders(pkg, ctx):
@@ -465,7 +628,8 @@ def r_reminders(pkg, ctx):
 
 
 CHECKS = (d1_required_documents, d2_declarations_match, d3_in_date, d4_documents_as_listed, v1_duty_point,
-          v2_pressure, e1_ecodesign, c_checklist, r_reminders)
+          v2_pressure, v3_liquid_temperature, e1_ecodesign, h1_drinking_water, c_checklist, p_consultant_rules,
+          q_boq_lines, r_reminders)
 
 
 def run_all(pkg, ctx):
@@ -473,4 +637,5 @@ def run_all(pkg, ctx):
     for r in results:
         # The status of each rule travels with the verdict (verified_secondary, to_confirm, practice...).
         r["rule_status"] = {i: ctx["rules"][i]["status"] for i in r["rules"] if i in ctx["rules"]}
+        r["rule_status"].update({i: "consultant" for i in r["rules"] if r["check"] == "P"})
     return results

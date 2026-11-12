@@ -1,5 +1,5 @@
 // Every package: the ones RightFit has read open for review, the others wait until the reader has been through them.
-import { $, api, esc, plural } from '../lib.js';
+import { $, api, esc, plural, toast } from '../lib.js';
 
 let all = [];
 const filter = { discipline: '', text: '' };
@@ -29,10 +29,29 @@ function drawTables() {
     ${shown.length ? '' : '<p class="empty">No package matches.</p>'}`;
 }
 
+// The project's bills of quantities. RightFit finds each product's line in them and checks what the line asks.
+async function drawBoq(files) {
+  const box = $('#boq');
+  if (!box?.isConnected) return;
+  box.innerHTML = `<h2 class="section-h">Bills of quantities<small>${files.length}</small></h2>
+    <p class="note">RightFit finds each product's line in the BOQ and checks what that line asks for. Prices stay on this laptop and are never read.</p>
+    <ul class="boq-files">${files.map((f) => `<li><b>${esc(f.file)}</b> <span class="sub">${f.lines} lines</span></li>`).join('') || '<li class="empty">No BOQ yet.</li>'}</ul>
+    <label class="btn">Add a BOQ (Excel)<input type="file" id="boq-file" accept=".xlsx,.xls" hidden></label>`;
+  $('#boq-file').addEventListener('change', async (ev) => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    try {
+      await api('/api/boq', await file.arrayBuffer(), { 'X-File-Name': encodeURIComponent(file.name), 'Content-Type': 'application/octet-stream' });
+      toast(`${file.name} added. Open a package to see its BOQ lines.`);
+      drawBoq(await api('/api/boq'));
+    } catch (e) { toast(e.message); }
+  });
+}
+
 export async function render(root) {
   root.innerHTML = `<div class="screen"><div class="screen-head"><h1>Packages</h1><a class="btn p" href="#/add">Add a package</a></div>
     <div class="tools"><input type="search" id="find" placeholder="Find a form or a product" aria-label="Find a form or a product" value="${esc(filter.text)}"><select id="discipline" aria-label="Discipline"></select></div>
-    <div id="tables"><p class="empty">Loading…</p></div></div>`;
+    <div id="tables"><p class="empty">Loading…</p></div><section id="boq"></section></div>`;
   const el = root.firstElementChild;
   el.addEventListener('click', (ev) => {
     const tr = ev.target.closest('tr.go');
@@ -56,4 +75,5 @@ export async function render(root) {
   const kinds = [...new Set(all.map((p) => p.discipline))].sort();
   $('#discipline').innerHTML = `<option value="">All disciplines</option>${kinds.map((k) => `<option ${k === filter.discipline ? 'selected' : ''}>${esc(k)}</option>`).join('')}`;
   drawTables();
+  api('/api/boq').then(drawBoq).catch(() => {});
 }

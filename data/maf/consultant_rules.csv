@@ -1,0 +1,6 @@
+rule_id,family,application,kind,field,operator,value,unit,effect,text,source,added_on,active
+CR-01,pump,circulation;stormwater,included,controller_included,,,,B,a control panel is included,"Luca, 28 Oct 2026 (was CL-09, register R59)",2026-11-12,yes
+CR-02,pump,drainage,included,controller_included|float_switch,,,,B,a float switch or a control panel is included,"Luca, 28 Oct 2026 (was CL-09)",2026-11-12,yes
+CR-03,pump,booster,included,controller_included,,,,info,a control panel is recommended for booster sets,"Luca, 28 Oct 2026 (was CL-09)",2026-11-12,yes
+CR-04,pump,,brand,used_for,>=,Wilo,,B,pumps only from Wilo,added on the Rules screen,2026-11-12,no
+CR-05,pump,,brand,,,Grundfos,,B,pumps only from Grundfos,"typed by the consultant, turned into a rule by AI (claude-haiku-5-5)",2026-11-12,yes

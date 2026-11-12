@@ -1,20 +1,53 @@
 # Rules behind the MAF document checks
-Last update: 2026-10-28. The status of each rule is in data/maf/rules.csv.
+Last update: 2026-11-12. The status of each rule is in data/maf/rules.csv.
 
 ## EU
 - Machinery: Directive 2006/42/EC. The manufacturer draws up an EC declaration of conformity that comes with the machinery (art. 5(1)(e), from memory: to_confirm on EUR-Lex). The Machinery Regulation (EU) 2023/1230 replaces it from 20 January 2027. Pumps, AHUs and outdoor units are machinery. The Unilift declaration in P01 cites 2006/42/EC with EN 809 and EN 60204-1.
 - Low voltage: Directive 2014/35/EU, also cited in the Unilift declaration (to_confirm on EUR-Lex).
-- Construction products: Regulation (EU) 2024/3110 applies from 8 January 2026. A declaration of performance (and conformity) and CE marking apply to products covered by a harmonised technical specification; the old CPR 305/2011 framework runs alongside during a transition (to_confirm). Relevant for fire protection valves and dampers, not for pumps or AHUs. Source: CIF, Feb 2026 (verified_secondary).
+- Construction products: a product covered by a harmonised standard needs a declaration of performance when it is placed on the market, and the CE marking goes only on products that have one. Regulation (EU) No 305/2011, art. 4(1) and art. 8(2), read on EUR-Lex in the consolidated version of 29 May 2026 (verified_official). Regulation (EU) 2024/3110 applies from 8 January 2026 (art. 96) but keeps articles 4 to 9 of the old regulation until 8 January 2040 (art. 94), and the harmonised standards listed before that date stay valid until they are withdrawn (art. 95(3)). Not for pumps or AHUs.
+- The harmonised standards behind the first families of the second batch. Each is listed in OJ C 92 of 9 March 2018, p. 139, and none is replaced or withdrawn by Implementing Decision (EU) 2019/451 as consolidated on 9 February 2026 (verified_official):
+  - EN 15650:2010, fire dampers;
+  - EN 442-1:2014, radiators and convectors;
+  - EN 14304:2009+A1:2013, flexible elastomeric foam insulation for building equipment;
+  - EN 54-2:1997 with AC:1999 and A1:2006, control and indicating equipment of fire detection systems;
+  - EN 54-4:1997 with AC:1999, A1:2002 and A2:2006, power supply equipment;
+  - EN 54-16:2008, voice alarm control and indicating equipment;
+  - EN 54-23:2010, visual alarm devices;
+  - EN 54-24:2008, loudspeakers of voice alarm systems;
+  - EN 50575:2014 with A1:2016, power, control and communication cables for general applications (reaction to fire).
+  What a declaration has to declare is in each standard's Annex ZA. The standards are not public, so RightFit checks that the declaration is in the package and names the product, not what it declares.
+- Still open for the second batch, with no rule yet:
+  - the electrical declaration of conformity of fire detection and voice alarm equipment (low voltage, EMC, RoHS);
+  - cable trays, conduits and junction boxes: no harmonised standard under the construction products regulation; EN 61537, EN 61386-22, EN 61386-23 and EN 60670-22 are listed under the low voltage directive (Implementing Decision (EU) 2023/2723);
+  - fire resistant cables: E30 and PH30 are not classes of EN 50575;
+  - valves, water tanks, plate heat exchangers and dirt separators: pressure equipment, Directive 2014/68/EU. It applies above 0.5 bar, and below the limits of art. 4 the equipment must not carry the CE marking (art. 4(3)); for water the limits are PS above 10 bar with PS·V above 10,000 bar·L for vessels, and PS above 10 bar, DN above 200 and PS·DN above 5,000 bar for piping. Radiators are outside it (art. 1(2)(t));
+  - door hardware: only on fire doors and escape routes.
 - Ecodesign of ventilation units: Regulation (EU) 1253/2014, Annex III, requirements from 1 January 2018 for non residential bidirectional units: heat recovery thermal efficiency at least 73% (run around coils 68%), SFPint at most SFPint_limit, a visual signal or alarm for the filter. Source: FläktGroup summary (verified_secondary); check the Annex on EUR-Lex.
+- Drinking water (check H1): Commission Delegated Regulation (EU) 2024/370, art. 2(5): once a product meets the minimum hygiene requirements, "manufacturers, or their authorised representatives, shall draw up an EU declaration of conformity". Art. 11: it applies from 31 December 2026, and from 31 December 2032 for products whose national conformity certificate is still valid on 31 December 2026. Delegated Regulation (EU) 2024/371, art. 1: the marking, a symbol and the text "SUITABLE FOR DRINKING WATER", on the product, the documentation and the packaging, also from 31 December 2026. Both read in the Official Journal text through the Publications Office on 12 Nov 2026 (`EU-DW-DOC`, verified_official); EUR-Lex itself no longer answers automated requests. Luca confirmed on 12 Nov 2026 which pumps it concerns (booster sets and hot water pumps).
 
 ## Romania
-- Law 10/1995 on quality in construction, republished in Monitorul Oficial 765 of 30 September 2016:
-  - art. 11 (3): "se interzice utilizarea de produse pentru construcţii fără certificarea şi declararea, în condiţiile legii, a performanţei, respectiv a conformităţii acestora";
-  - art. 25 f): the contractor uses only "produselor şi a procedeelor prevăzute în proiect, certificate", or products with technical approvals (agremente tehnice);
-  - art. 13 (3) and art. 22 d): the quality of the works is checked by authorised site supervisors engaged by the investor.
-  Source: legeaz.net (verified_secondary). Later amendments (Law 204/2020 among them) not checked yet; official text on legislatie.just.ro.
+Read on legislatie.just.ro, the official legislation portal, on 12 Nov 2026 (verified_official). The review date picks the law.
+- Until 24 August 2026: Law 10/1995 on quality in construction, republished in Monitorul Oficial 765 of 30 September 2016. The two paragraphs below read the same in every consolidated form on the portal from 2016 to the last one, in force from 13 March 2026:
+  - art. 11 (3): "se interzice utilizarea de produse pentru construcții fără certificarea și declararea, în condițiile legii, a performanței, respectiv a conformității acestora";
+  - art. 25 f): the contractor uses only "produselor și a procedeelor prevăzute în proiect, certificate", or products with technical approvals (agremente tehnice).
+- From 25 August 2026: the Code of spatial planning, urbanism and construction of 5 August 2026 (Law 169/2026, Monitorul Oficial 661 of 10 August 2026). Its art. 576 (3) c) repeals art. 1-9, 11-40 and 42-44 of Law 10/1995. The same two requirements are now:
+  - art. 378 (3): no construction product without certification and a declaration of its performance or conformity; art. 560 (2) repeats it for construction products;
+  - art. 452 (3) g): the general contractor uses only products in the design, certified or with a technical approval.
+- Also in the Code, read but not used by a check yet: art. 561 (5), a technical approval is required only when the product carries no CE marking and declaration of performance; art. 563, the documents that come with a product.
+- Not looked up yet: where art. 13 (3) and art. 22 d) of Law 10/1995 went (the site supervisors engaged by the investor check the quality of the works); whether Government Decision 668/2017 on construction products still applies under the Code.
+- Drinking water (check H1): Order of the Minister of Health 275/2012, the procedure for placing on the market products, materials and equipment used in contact with drinking water, consolidated form of 16 November 2023 (Order 3730/2023). Art. 2 b): a sanitary approval (aviz sanitar) or a notification from the INSP commission; art. 19 (1): the public health directorates check "existenței și valabilității avizului sanitar/notificării". Art. 1 covers fixed public or private drinking water supply installations; I9-2022 lists Order 275/2012 among the acts that apply to water installations in buildings. Which pumps need it (Luca, 12 Nov 2026): booster sets, hot water recirculation pumps and the pump between the hot water store and its heat exchanger; not heating or cooling circulation pumps (`RO-OMS275-DW`, verified_official).
+- Hot water temperature (check V3): Normativ I 9-2022 on sanitary installations (Order MDLPA 2960/2022, Monitorul Oficial 1167 bis of 6 Dec 2022), art. 23.7: every month the hot water installation is kept at 60 °C for 24 hours against legionella, "se asigură menţinerea unei temperaturi de 60 °C, în întreaga instalaţie, timp de 24 de ore"; art. 11 sets 55-60 °C in the distribution pipes. Read in the Official Gazette copy in Luca's normative folder (`RO-I9-23-7`). Also in I9-2022, not used by a check yet: art. 6.56, booster sets have, as a rule, a standby pump equal to the largest pump of the group.
 - Practice from the register: on six MAFs the site supervisor reminds that at delivery the declaration of performance, the quality certificate and the guarantee must come with the product. Three of those MAFs were still approved (A).
 
 ## Spain
 - CTE Part I (RD 314/2006), art. 7.2: reception control of products: supply documents (origin, supply sheet, labels, manufacturer guarantee, conformity documents including CE marking), quality marks and technical evaluations, tests; carried out by the director de la ejecución de la obra. A draft amendment of November 2025 may remove 7.2.2 (quality marks), according to a research note; to check.
 - RITE (RD 1027/2007), art. 20, "Recepción en obra de equipos y materiales" (thermal installations): the qualified installer, or the installation director where one is required, checks that the equipment received matches the project, has the required documents, meets the properties required in the project and passed the tests required. The documents include a copy of the manufacturer's guarantee certificate and the conformity documents or administrative authorisations, including CE marking and the energy label where relevant. Source: papelea.com (verified_secondary); the first paragraphs were not readable, check on BOE. Sanitary pumps (water supply, drainage) fall outside RITE.
+- Drinking water (check H1): Real Decreto 3/2023, art. 44: materials in contact with drinking water, in installations from the intake to the user's tap, must not worsen its quality. Until the EU conformity procedures apply (31 Dec 2026), the manufacturer issues a declaración responsable that comes with the product (disposición transitoria única, 1) (`ES-RD3-DTU-DW`). BOE consolidated text, updated 20 Dec 2025.
+- Hot water temperature (check V3): Real Decreto 487/2022 on legionella, annex III, part A, point 7: stores at 60 °C (double tank 70 °C), above 50 °C at every terminal and in the return, and the installation lets the water reach 70 °C for thermal disinfection (`ES-RD487-DHW-70`). Art. 3.2 leaves out buildings used only as dwellings, which the check cannot see. CTE DB-HS 4, 2.1.3: 50-65 °C at the points of use.
+
+## Other countries, for comparison (no location chain yet)
+Read on the official legislation sites on 12 Nov 2026.
+- Germany: Trinkwasserverordnung 2023, § 14 (materials in contact with drinking water must not harm health, colour, smell or taste, or let microorganisms grow), § 15 (the Umweltbundesamt sets the assessment criteria), § 16 (conformity is presumed with a certificate from a certifier accredited for drinking water products). gesetze-im-internet.de.
+- United Kingdom (England and Wales): Water Supply (Water Fittings) Regulations 1999, reg. 4 (a fitting conforms to a British Standard, an equivalent national specification or a specification approved by the regulator) and Schedule 2, para. 2 (no material likely to contaminate water in a fitting that carries water for domestic use). legislation.gov.uk. In practice this is the WRAS approval, not read here.
+- France: the attestation de conformité sanitaire (ACS); not read on Légifrance yet.
+- All EU countries from 31 Dec 2026: Delegated Regulations (EU) 2024/370 and 2024/371, above.
