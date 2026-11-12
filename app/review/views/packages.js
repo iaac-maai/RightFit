@@ -26,7 +26,7 @@ function drawTables() {
   const waiting = shown.filter((p) => !p.letter);
   $('#tables').innerHTML = `${ready.length ? `<h2 class="section-h">Ready to review<small>${ready.length}</small></h2><table class="pk">${head('Draft answer')}<tbody>${ready.map(readRow).join('')}</tbody></table>` : ''}
     ${waiting.length ? `<details class="waiting" ${filter.text || filter.discipline ? 'open' : ''}><summary class="section-h">Not read yet<small>${waiting.length}</small></summary><table class="pk">${head('State')}<tbody>${waiting.map(waitRow).join('')}</tbody></table></details>` : ''}
-    ${shown.length ? '' : '<p class="empty">No package matches.</p>'}`;
+    ${shown.length ? '' : all.length ? '<p class="empty">No package matches.</p>' : '<p class="empty">No packages in this project yet. <a href="#/add">Add a package</a>, then save it in the project, and add the project\'s BOQs below.</p>'}`;
 }
 
 // The project's bills of quantities. RightFit finds each product's line in them and checks what the line asks.

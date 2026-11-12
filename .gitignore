@@ -221,6 +221,7 @@ __marimo__/
 
 # Local only, never pushed
 data/raw/
+data/projects/
 agent/
 .DS_Store
 

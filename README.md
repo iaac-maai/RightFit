@@ -33,7 +33,9 @@ python app/review_server.py      # the application: http://127.0.0.1:8520
 python app/mcp_server.py         # the checks as MCP tools; an agent starts it from .mcp.json
 ```
 
-The app works from `data/maf/extracted/`, which is in Git. The original PDFs and forms stay on our laptops in `data/raw/`.
+The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`.
+
+The AI parts (a rule typed in words, what a BOQ line asks) use the Claude command line (`claude`) installed and signed in on the laptop.
 
 ## Where things are
 

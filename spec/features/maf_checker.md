@@ -130,8 +130,18 @@ One application over the checks, `app/review_server.py` with `app/review/`, whic
 - comparison: found by both, found only by the tool (real or not), missed by the tool;
 - Luca's time to review each package by hand, against his time to check the tool's draft.
 
+### Projects
+The reviewer works on one project at a time and picks it in the rail; a new project needs a name and a country. Each project is a folder under data/projects/ (git-ignored, because it holds the client's documents; `--projects` points the application at another folder, such as a shared Google Drive folder):
+
+    <project>/project.json   name, country (RO or ES), created; optional paths for packages, originals and boq
+    <project>/packages/      the read packages (<package>.json) and, per package, a folder with its original files
+    <project>/boq/           every BOQ of the project, read together, and the cache of what their lines ask
+
+A package uploaded on "Add a package" can be saved into the project; it then shows as not read yet until the reader has been through it. A project's paths can point elsewhere: the project of P01 and P02 uses data/maf/extracted, data/raw and data/raw/boq, where they already are. With no project, the application shows those examples. Shortcut: the consultant's rules stay one set for every project; one set per project comes when a second project needs different ones.
+
 ## 11. Data and privacy
-- data/raw/ holds the originals and is git-ignored;
+- data/raw/ holds the originals and is git-ignored; so does data/projects/;
+- a project's name is shown only on this laptop and never written into Git;
 - the anonymised register of the earlier project stays outside Git, as docs/data_map.md says for the approval forms; docs/maf_register_findings.md keeps only counts and short anonymised examples, and the row ids (R01 to R80) refer to Luca's local copy;
 - no client, project, company or personal names anywhere in Git; manufacturer names and model codes are fine;
 - no prices.

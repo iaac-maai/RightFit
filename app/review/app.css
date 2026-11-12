@@ -396,3 +396,14 @@ td a { font-weight: 600; }
 .boq-files { list-style: none; padding: 0; margin: 8px 0 12px; }
 .boq-files li { padding: 6px 0; border-bottom: 1px solid var(--line-soft); }
 #boq { margin-top: 26px; max-width: 900px; }
+
+/* the project in use, in the rail, and the dialog for a new one */
+.project-pick { display: grid; gap: 4px; padding: 0 10px 16px; }
+.project-pick .lab { color: var(--rail-soft); }
+.project-pick select { width: 100%; padding: 7px 8px; border-radius: 4px; border: 1px solid var(--green-2); background: var(--green-2); color: #fff; font-weight: 600; }
+#new-project { border: 1px solid var(--line); border-radius: 6px; padding: 22px 24px; width: min(440px, calc(100vw - 32px)); }
+#new-project::backdrop { background: rgba(14, 59, 46, .35); }
+#new-project h2 { font-size: 18px; margin-bottom: 12px; }
+#new-project label { display: grid; gap: 4px; margin-top: 10px; font-size: 13px; color: var(--label); }
+#new-project input, #new-project select { padding: 9px 10px; border: 1px solid var(--rule); border-radius: 4px; font-size: 15px; color: var(--ink); }
+#new-project .btns { margin-top: 16px; }

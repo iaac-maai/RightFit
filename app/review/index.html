@@ -23,6 +23,7 @@
 
 <nav class="rail" aria-label="Main">
   <a class="brand" href="#/packages">RightFit</a>
+  <label class="project-pick"><span class="lab">Project</span><select id="project" aria-label="Project"><option>Loading…</option></select></label>
   <div class="rail-links">
     <a href="#/packages" data-nav="packages p">Packages</a>
     <a href="#/add" data-nav="add">Add a package</a>
@@ -35,6 +36,15 @@
 </nav>
 
 <main id="app"></main>
+<dialog id="new-project" aria-labelledby="np-title">
+  <form method="dialog" id="np-form">
+    <h2 id="np-title">New project</h2>
+    <label>Name, as you call it <input name="name" required maxlength="80" placeholder="e.g. the sports hall" autocomplete="off"></label>
+    <label>Country <select name="location"><option value="RO">Romania</option><option value="ES">Spain</option></select></label>
+    <p class="note">The project and its files stay on this laptop, in a folder of their own. Nothing goes to Git.</p>
+    <div class="btns"><button class="btn p" value="create">Create project</button><button class="btn" value="cancel" formnovalidate>Cancel</button></div>
+  </form>
+</dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -131,14 +131,59 @@ def rules_for_location(location):
 BOQ_DIR = RAW / "boq"
 _boq_lines = {}
 
+# Projects (spec section 6, "Projects"): one folder each, git-ignored; --projects can point at a shared Drive folder.
+PROJECTS = ROOT / "data/projects"
+EXAMPLES = {"id": "", "name": "Examples (P01, P02)", "location": "RO", "packages": ROOT / "data/maf/extracted",
+            "originals": RAW, "boq": BOQ_DIR}
 
-def boq_files():
-    return sorted(p for p in BOQ_DIR.glob("*.xls*") if not p.name.startswith("~$")) if BOQ_DIR.exists() else []
+
+FOLDERS = {"packages": "packages", "originals": "packages", "boq": "boq"}   # a package's files sit beside its reading
 
 
-def boq_links(pkg, read=True):
+def projects():
+    """Every project folder with a project.json; a path in it may point elsewhere, relative to the folder."""
+    out = []
+    for f in sorted(PROJECTS.glob("*/project.json")) if PROJECTS.exists() else []:
+        p = json.loads(f.read_text())
+        out.append({"id": f.parent.name, "name": p["name"], "location": p.get("location", "RO"),
+                    **{k: (f.parent / p.get(k, FOLDERS[k])).resolve() for k in FOLDERS}})
+    return out
+
+
+def current_project():
+    """The project the reviewer picked last; the examples when there is no project yet."""
+    every = projects()
+    mark = PROJECTS / ".current"
+    chosen = mark.read_text().strip() if mark.exists() else ""
+    return next((p for p in every if p["id"] == chosen), every[0] if every else EXAMPLES)
+
+
+def new_project(name, location, root=None):
+    """A project folder from a name typed in the app; the folder name is made from it, the name stays as typed."""
+    root = root or PROJECTS
+    name = " ".join(str(name).split())[:80]
+    if not name or location not in CHAINS:
+        raise ValueError("a project needs a name and a country (RO or ES)")
+    base = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") or "project"
+    slug, n = base, 2
+    while (root / slug).exists():
+        slug, n = f"{base}-{n}", n + 1
+    for sub in ("packages", "boq"):
+        (root / slug / sub).mkdir(parents=True)
+    (root / slug / "project.json").write_text(json.dumps({"name": name, "location": location,
+                                                            "created": date.today().isoformat()}, indent=2) + "\n")
+    return slug
+
+
+def boq_files(folder=None):
+    folder = folder or BOQ_DIR
+    return sorted(p for p in folder.glob("*.xls*") if not p.name.startswith("~$")) if folder.exists() else []
+
+
+def boq_links(pkg, read=True, folder=None):
     """For each item, the BOQ line it answers and what that line asks (AI, cached); None when there is no BOQ."""
-    files = boq_files()
+    folder = folder or BOQ_DIR
+    files = boq_files(folder)
     if not files:
         return None
     lines = []
@@ -152,9 +197,9 @@ def boq_links(pkg, read=True):
     found = {i["id"]: find_line(lines, pkg["form"].get("boq_ref"), i) for i in pkg["items"]}
     readings = sorted({k for i in pkg["items"] for k in i["values"]})
     try:
-        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, BOQ_DIR / "asks.json", read)
+        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, folder / "asks.json", read)
     except (RuntimeError, OSError, ValueError):   # no AI now: the lines show as not read yet
-        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, BOQ_DIR / "asks.json", False)
+        asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, folder / "asks.json", False)
     return {k: {**ln, "requirements": (asks.get(ln["text"]) or {}).get("requirements"), "status": "extracted"}
             for k, ln in found.items() if ln}
 
@@ -351,12 +396,13 @@ def find_marks(source, page, quotes):
              for r in one_band_per_line(locate(p, q))] for q in quotes]
 
 
-def package_list(data, raw=RAW):
-    """Every package the application knows: those RightFit has read, then those on this laptop still to be read."""
+def package_list(data, raw=RAW, boq=None, location="RO"):
+    """Every package the application knows: those RightFit has read, then those on this laptop still to be read.
+    boq is the project's BOQ folder, so the counts match the review page (only BOQ lines already read)."""
     out = []
     for path in sorted(data.glob("P*.json")):
         pkg = json.loads(path.read_text())
-        v = review(pkg)
+        v = review(pkg, location, boq=boq_links(pkg, read=False, folder=boq) if boq else None)
         out.append({"id": path.stem, "form_no": pkg["form"]["form_no"], "revision": pkg["form"]["revision"],
                     "discipline": DISCIPLINES.get(pkg["form"]["form_no"].split()[0], ""), "items": [i["name"] for i in pkg["items"]],
                     "files": len(pkg["documents"]) + 1, "pages": sum(d["pages"] for d in pkg["documents"]),
@@ -371,7 +417,25 @@ def package_list(data, raw=RAW):
                     out.append({"id": row["package"], "form_no": row["code"], "revision": int(row["revision"]),
                                 "discipline": row["discipline"][0].upper() + row["discipline"][1:], "items": [row["product"]],
                                 "files": int(row["files"]), "pages": int(row["pdf_pages"]), "letter": None})
+    listed = {p["id"] for p in out}
+    for folder in sorted(raw.glob("P*")) if raw.exists() else []:   # a package saved into the project, not read yet
+        files = [f for f in folder.iterdir() if f.is_file() and not f.name.startswith(".")] if folder.is_dir() else []
+        if re.fullmatch(r"P\d+", folder.name) and folder.name not in listed and files:
+            out.append({"id": folder.name, "form_no": folder.name, "revision": 0, "discipline": "", "letter": None,
+                        "items": [f"{len(files)} files, not read yet"], "files": len(files), "pages": None})
     return out
+
+
+def save_package(entries, originals, packages):
+    """The files of an upload, kept in a new package folder of the project (P01, P02 ...). Returns its name."""
+    taken = [int(p.stem[1:]) for p in packages.glob("P*.json") if p.stem[1:].isdigit()]
+    taken += [int(p.name[1:]) for p in originals.glob("P*") if p.name[1:].isdigit()]
+    name = f"P{max(taken, default=0) + 1:02d}"
+    folder = originals / name
+    folder.mkdir(parents=True)
+    for file_name, data in entries:
+        (folder / Path(file_name).name).write_bytes(data)
+    return name
 
 
 def save(path, pkg):
@@ -383,7 +447,11 @@ def day(text):
 
 
 class Handler(SimpleHTTPRequestHandler):
-    data = ROOT / "data/maf/extracted"
+    data = None   # --data: one folder of packages instead of the projects (tests and previews)
+
+    def project(self):
+        p = current_project()
+        return {**EXAMPLES, "packages": self.data} if self.data else p
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PAGE), **kwargs)
@@ -410,7 +478,7 @@ class Handler(SimpleHTTPRequestHandler):
     def send_original(self, name, no):
         """Serve an attachment's original PDF so the reviewer can check the page; only files listed in the package."""
         source = self.packages().get(name)
-        path = original(name, json.loads(source.read_text()), no) if source else None
+        path = original(name, json.loads(source.read_text()), no, self.project()["originals"]) if source else None
         if path is None:
             body = "The original of this attachment is not on this laptop.".encode()
             self.send_response(404)
@@ -437,7 +505,7 @@ class Handler(SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def packages(self):
-        return {p.stem: p for p in sorted(self.data.glob("*.json"))}
+        return {p.stem: p for p in sorted(self.project()["packages"].glob("*.json"))}
 
     def do_GET(self):
         doc = re.fullmatch(r"/doc/([A-Za-z0-9_-]+)/(\d+)", self.path.split("?")[0])
@@ -446,7 +514,7 @@ class Handler(SimpleHTTPRequestHandler):
         shown = re.fullmatch(r"/page/([A-Za-z0-9_-]+)/(\d+)/(\d+)\.png", self.path.split("?")[0])
         if shown:   # one page of an attachment; only files listed in the package, as for /doc/
             source = self.packages().get(shown.group(1))
-            path = original(shown.group(1), json.loads(source.read_text()), int(shown.group(2))) if source else None
+            path = original(shown.group(1), json.loads(source.read_text()), int(shown.group(2)), self.project()["originals"]) if source else None
             return self.send_png(page_png(path, int(shown.group(3))) if path else None)
         shown = re.fullmatch(r"/upload/([0-9a-f]{16})/(\d+)\.png", self.path.split("?")[0])
         if shown:   # one page of an upload that is still in memory
@@ -466,13 +534,18 @@ class Handler(SimpleHTTPRequestHandler):
         if url.path == "/api/consultant-rules":
             return self.send_json(consultant_screen())
         if url.path == "/api/boq":
-            return self.send_json([{"file": f.name, "lines": len(read_boq(f))} for f in boq_files()])
+            return self.send_json([{"file": f.name, "lines": len(read_boq(f))} for f in boq_files(self.project()["boq"])])
+        if url.path == "/api/projects":
+            here = self.project()
+            return self.send_json({"current": here["id"], "name": here["name"],
+                                   "projects": [{"id": p["id"], "name": p["name"], "location": p["location"]} for p in projects()]})
         if url.path == "/api/rules":
             location = parse_qs(url.query).get("location", ["RO"])[0]
             return self.send_json(rules_for_location(location if location in CHAINS else "RO"))
         if url.path != "/api/packages":
             return super().do_GET()
-        self.send_json(package_list(self.data))
+        p = self.project()
+        self.send_json(package_list(p["packages"], p["originals"], p["boq"], p["location"]))
 
     def do_POST(self):
         try:
@@ -487,12 +560,13 @@ class Handler(SimpleHTTPRequestHandler):
                 name = Path(unquote(self.headers.get("X-File-Name", ""))).name
                 if not re.fullmatch(r"[\w .()&+,-]{1,120}\.xlsx?", name, re.I) or name.startswith("~$"):
                     return self.send_json({"error": "A BOQ is an Excel file (.xlsx or .xls)."}, 400)
-                BOQ_DIR.mkdir(parents=True, exist_ok=True)
-                (BOQ_DIR / name).write_bytes(raw)
+                folder = self.project()["boq"]
+                folder.mkdir(parents=True, exist_ok=True)
+                (folder / name).write_bytes(raw)
                 try:
-                    lines = read_boq(BOQ_DIR / name)
+                    lines = read_boq(folder / name)
                 except Exception:
-                    (BOQ_DIR / name).unlink()
+                    (folder / name).unlink()
                     return self.send_json({"error": "This file could not be read as a BOQ."}, 400)
                 return self.send_json({"file": name, "lines": len(lines)})
             body = json.loads(raw or b"{}")
@@ -504,6 +578,23 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.send_json({"error": "The server was restarted and no longer has these files. "
                                                     "Add the package again."}, 410)
                 return self.send_json(pump_demo.analyse(body["tokens"]))
+            if self.path == "/api/projects":   # a new project, which becomes the one in use
+                slug = new_project(body.get("name", ""), body.get("location", "RO"))
+                (PROJECTS / ".current").write_text(slug)
+                return self.send_json({"current": slug})
+            if self.path == "/api/projects/select":
+                if body["id"] not in {p["id"] for p in projects()}:
+                    return self.send_json({"error": "unknown project"}, 404)
+                (PROJECTS / ".current").write_text(body["id"])
+                return self.send_json({"current": body["id"]})
+            if self.path == "/api/projects/save-package":   # the files of an upload, kept in the project
+                if not body["tokens"] or not all(tk in pump_demo.UPLOADS for tk in body["tokens"]):
+                    return self.send_json({"error": "The server was restarted and no longer has these files. "
+                                                    "Add the package again."}, 410)
+                p = self.project()
+                name = save_package([(pump_demo.UPLOADS[tk]["name"], pump_demo.UPLOADS[tk]["data"]) for tk in body["tokens"]],
+                                    p["originals"], p["packages"])
+                return self.send_json({"package": name, "project": p["name"]})
             if self.path == "/api/consultant-rules/draft":   # a rule typed in words: the AI proposes, nothing is saved
                 rows = load(CONSULTANT.name)
                 info = consultant_screen()
@@ -533,12 +624,13 @@ class Handler(SimpleHTTPRequestHandler):
                 return self.send_json({"error": "unknown package"}, 404)
             pkg = json.loads(path.read_text())
             if self.path == "/api/marks":   # where the quoted lines sit on one page of an attachment
-                source = original(body["package"], pkg, int(body["no"]))
+                source = original(body["package"], pkg, int(body["no"]), self.project()["originals"])
                 return self.send_json({"marks": find_marks(source, int(body["page"]), body["quotes"]) if source else []})
             if self.path == "/api/load-local":   # the same files as an upload, taken from the originals on this laptop
-                files = [(d["file"], original(body["package"], pkg, n)) for n, d in enumerate(pkg["documents"], 1)]
-                form = (RAW / body["package"] / pkg["form"]["source"]).resolve()
-                if form.is_relative_to((RAW / body["package"]).resolve()) and form.is_file():
+                files = [(d["file"], original(body["package"], pkg, n, self.project()["originals"])) for n, d in enumerate(pkg["documents"], 1)]
+                raw = self.project()["originals"]
+                form = (raw / body["package"] / pkg["form"]["source"]).resolve()
+                if form.is_relative_to((raw / body["package"]).resolve()) and form.is_file():
                     files.append((form.name, form))
                 return self.send_json([{"name": n, "pages": pump_demo.page_count(f.read_bytes()),
                                         "token": pump_demo.keep(n, f.read_bytes())} for n, f in files if f])
@@ -550,8 +642,9 @@ class Handler(SimpleHTTPRequestHandler):
                 save(path, pkg)
             elif self.path != "/api/review":
                 return self.send_json({"error": "unknown address"}, 404)
-            self.send_json(review(pkg, body.get("location") or "RO", day(body.get("review")),
-                                  day(body.get("delivery")), body.get("dismissed"), boq_links(pkg)))
+            here = self.project()
+            self.send_json(review(pkg, body.get("location") or here["location"], day(body.get("review")),
+                                  day(body.get("delivery")), body.get("dismissed"), boq_links(pkg, folder=here["boq"])))
         except (KeyError, ValueError, StopIteration, TypeError, IndexError) as e:
             self.send_json({"error": f"{type(e).__name__}: {e}"}, 400)
         except Exception as e:   # an upload no library can read still gets an answer the page can show
@@ -562,9 +655,11 @@ class Handler(SimpleHTTPRequestHandler):
 def main():
     ap = argparse.ArgumentParser(description="RightFit review page")
     ap.add_argument("--port", type=int, default=8520)
-    ap.add_argument("--data", type=Path, default=Handler.data, help="folder with the package files")
+    ap.add_argument("--data", type=Path, help="one folder of package files instead of the projects (tests, previews)")
+    ap.add_argument("--projects", type=Path, help="the folder that holds the projects, for example a shared Drive folder")
     args = ap.parse_args()
-    Handler.data = args.data
+    global PROJECTS
+    Handler.data, PROJECTS = args.data, args.projects or PROJECTS
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(f"RightFit review page: http://127.0.0.1:{args.port}", flush=True)
     server.serve_forever()

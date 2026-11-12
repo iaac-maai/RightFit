@@ -150,3 +150,28 @@ def test_a_consultant_rule_from_the_rules_screen_is_checked_before_it_is_written
         except ValueError:
             continue
         raise AssertionError(f"accepted {bad}")
+
+
+def test_projects_are_folders_and_keep_what_is_saved_into_them(tmp_path, monkeypatch):
+    import json
+    import app.review_server as s
+    monkeypatch.setattr(s, "PROJECTS", tmp_path)
+    assert s.current_project()["id"] == ""   # no project yet: the examples
+    slug = s.new_project("  Sports   hall A ", "RO")
+    assert slug == "sports-hall-a" and s.new_project("Sports hall A", "ES") == "sports-hall-a-2"
+    for bad in (("", "RO"), ("Hall", "FR")):
+        try:
+            s.new_project(*bad)
+        except ValueError:
+            continue
+        raise AssertionError(bad)
+    (tmp_path / ".current").write_text("sports-hall-a-2")
+    here = s.current_project()
+    assert (here["name"], here["location"], here["boq"]) == ("Sports hall A", "ES", (tmp_path / "sports-hall-a-2" / "boq").resolve())
+    name = s.save_package([("form.xls", b"x"), ("../sheet.pdf", b"y")], here["originals"], here["packages"])
+    assert name == "P01" and sorted(p.name for p in (here["originals"] / "P01").iterdir()) == ["form.xls", "sheet.pdf"]
+    assert [p["id"] for p in s.package_list(here["packages"], here["originals"])] == ["P01"]
+    # a project can point at folders elsewhere, like the one of P01 and P02
+    (tmp_path / "old").mkdir()
+    (tmp_path / "old" / "project.json").write_text(json.dumps({"name": "Old", "packages": "../elsewhere"}))
+    assert next(p for p in s.projects() if p["id"] == "old")["packages"] == (tmp_path / "elsewhere").resolve()

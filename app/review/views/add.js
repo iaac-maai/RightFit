@@ -1,6 +1,6 @@
 // Add a package: the server (app/pump_demo.py) reads the uploaded files page by page and runs the pump checks on what
 // they say. The package is every file added so far: files added later are read on their own, then all of it is checked again.
-import { $, api, esc, icon, plural, shortName } from '../lib.js';
+import { $, api, esc, icon, plural, shortName, toast } from '../lib.js';
 
 const LOCAL = 'P01';   // the pump package kept on this laptop
 const state = { entries: [], analysis: null, busy: false, waiting: [], refused: [] };
@@ -13,7 +13,8 @@ const kindOf = (p) => (p.category === 'booster_set' ? 'booster set'
   : (p.pump_type || '').startsWith('submersible_') ? p.pump_type.split('_')[1] : p.category.replace('_', ' '));
 
 function pkgBar(n) {   // the package so far, the button that adds to it, and the files the server refused this time
-  return `<div class="pkg"><b>${n} ${plural(n, 'file')} in this package</b><button class="btn" type="button" data-pick>Add documents</button></div>`
+  return `<div class="pkg"><b>${n} ${plural(n, 'file')} in this package</b><button class="btn" type="button" data-pick>Add documents</button>`
+    + '<button class="btn p" type="button" data-save>Save in this project</button></div>'
     + state.refused.map((r) => `<p class="error" role="alert">${esc(r.name)} was not added. ${esc(r.message)}</p>`).join('');
 }
 
@@ -173,6 +174,18 @@ function selectPump(i) {
     <a class="open" href="/upload/${token}#page=${page}" target="_blank" rel="noopener">${icon('open')}Open the PDF</a></div>`;
 }
 
+async function saveToProject(button) {   // the files stay in the project's folder, to be read later
+  button.disabled = true;
+  try {
+    const r = await api('/api/projects/save-package', { tokens: state.entries.map((e) => e.token) });
+    toast(`Saved in ${r.project} as ${r.package}. It shows on Packages as not read yet.`);
+    button.textContent = `Saved as ${r.package}`;
+  } catch (e) {
+    button.disabled = false;
+    failed(e);
+  }
+}
+
 function build() {
   el = document.createElement('div');
   el.className = 'screen';
@@ -187,6 +200,7 @@ function build() {
     if (tr) selectPump(Number(tr.dataset.i));
     if (ev.target.closest('[data-pick]')) $('#files', el).click();
     if (ev.target.closest('#local')) useLocal();
+    if (ev.target.closest('[data-save]')) saveToProject(ev.target.closest('[data-save]'));
   });
   main.addEventListener('keydown', (ev) => {
     const tr = ev.target.closest('.pumps tbody tr');
