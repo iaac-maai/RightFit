@@ -25,7 +25,7 @@ Luca is an MEP engineer, not a programmer. He confirms what the AI read and judg
 RightFit checks an MAF for MEP equipment before the reviewer signs it. It does three things:
 
 - reads the attachments;
-- checks them against EU and national rules and against a checklist built from past reviewers' comments;
+- checks them against EU and national rules, the project's bill of quantities (BOQ), a checklist built from past reviewers' comments and the consultant's own rules;
 - drafts the answer, with a page reference for every finding.
 
 Success means the reviewer finds the real gaps without reading every PDF line by line, and sends a correct answer. Examples of real gaps:
@@ -45,24 +45,25 @@ The evidence for the problem comes from Luca's last project. Of 80 MEP approval 
 
 ## Operating Context
 
-- **The package.** A package is the MAF form plus its attachments: data sheets, declarations of conformity, certificates and selection reports, in Romanian and English. The originals stay on the laptop in `data/raw/`. What the AI read is in `data/maf/extracted/`.
-- **The review.** The reviewer reads the draft answer and its reasons, then works in this order:
+- A package is the MAF form plus its attachments: data sheets, declarations of conformity, certificates and selection reports, in Romanian and English. The originals stay on the laptop in `data/raw/`. What the AI read is in `data/maf/extracted/`.
+- A project keeps its packages and its BOQs together in one folder, and the reviewer works on one project at a time.
+- The reviewer reads the draft answer and its reasons, then works in this order:
   1. goes through the problems found;
   2. decides on each AI suggestion;
   3. confirms what the AI read;
   4. copies or downloads the answer to send.
-- **Exports:**
+- Exports:
   - the answer text;
   - the confirmed values, for the certification consultant and the O&M file;
   - the findings marked "not a problem", with their reasons.
-- **Location.** The checks run for Romania (RO) on the real packages. Spain (ES) is the provisional context of the constitution. EU product rules apply to both.
+- The checks run for Romania (RO) on the real packages. Spain (ES) is the provisional context of the constitution. EU product rules apply to both.
 
 ## Capabilities and Constraints
 
-- **Packages.** Two real packages:
+- Two real packages:
   - P01, Grundfos pumps;
   - P02, a FläktGroup air handling unit with Hisense outdoor units and a DX kit, at revision 4.
-- **Checks:**
+- The checks:
   - D1–D4, the documents;
   - V1–V3, the duty point, the pressure rating and the liquid temperature;
   - E1, ecodesign;
@@ -73,22 +74,22 @@ The evidence for the problem comes from Luca's last project. Of 80 MEP approval 
   - R, the delivery reminder.
 
   They produce pass, flag, unclear or info, and a draft status A, B or C with its reasons.
-- **AI.** A second AI reviewer proposes findings with page evidence, and the reviewer accepts or rejects each one. The AI also matches documents to products.
-- **Reviewer actions:**
+- A second AI reviewer proposes findings with page evidence, and the reviewer accepts or rejects each one. The AI also matches documents to products, turns a rule typed in words into a row, and lists what a BOQ line asks for.
+- The reviewer can:
   - mark a finding "not a problem", with a reason;
   - decide on AI suggestions;
   - confirm readings, which records who checked them.
-- **MCP.** Four read-only tools let an agent list the packages, review one, list the rules and classify a package's pages. Confirming a reading stays on the page.
-- **Constraints:**
+- Four read-only MCP tools let an agent list the packages, review one, list the rules and classify a package's pages. Confirming a reading stays on the page.
+- Constraints:
   - the interface is in English;
   - no data is invented;
   - every value carries a value, unit, source, page, a quote of at most 15 words, and a status;
   - checks pass only on confirmed values;
   - the tool never certifies;
   - no client, project, company or personal names and no prices go into Git. Manufacturer names and model codes are fine.
-- **Undecided or later:**
+- Undecided or later:
   - adding a package of any family. Today the page reads an added pump package on the spot; the other families are read offline;
-  - reading the 49 packages of the second batch, which the Packages screen lists as not read yet.
+  - reading the 48 packages of the second batch, which the Packages screen lists as not read yet (a 49th is there with its files incomplete).
 
 ## Brand Commitments
 
@@ -102,14 +103,16 @@ The product is called RightFit. It has no logo or visual identity yet. The voice
 | Luca's reference answers | `data/maf/reference/` |
 | Manufacturer documents found online | `data/maf/library.json` |
 | Counts from the register of 80 MAFs | `docs/maf_register_findings.md` |
-| Results of the first own model, the page classifier | `eval/page_classifier/results_2026-10-29.md` |
+| Results of our own model, the page classifier | `eval/page_classifier/results_2026-10-29.md`, `results_2026-11-11.md` |
+| How a product's BOQ line is found | `eval/boq_matching/results_2026-11-13.md` |
+| The chatbot test, written before any run | `eval/chatbot_baseline/protocol.md` |
 
 Absent, and not to be invented:
 
 - measured time savings;
 - user quotes;
 - customers;
-- verified values, beyond the single one Luca confirmed in P02.
+- verified readings, beyond the one value in P02 and the two P01 declarations Luca confirmed.
 
 ## Product Principles
 

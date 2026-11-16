@@ -1,13 +1,13 @@
-# AGENTS.md — RightFit
+# AGENTS.md for RightFit
 
 Instructions for any AI agent and any human contributor working in this repository. Read this file before making changes.
 
 ## Read first
 
-1. `spec/constitution/mission.md` — problem, scope, principles
-2. `spec/constitution/roadmap.md` — milestones, phases, features
-3. `spec/constitution/tech_stack.md` — tools, architecture, data rule, repository structure
-4. `spec/features/maf_checker.md` — the MAF checker, the feature we build first
+1. `spec/constitution/mission.md`: problem, scope, principles
+2. `spec/constitution/roadmap.md`: milestones, phases, features
+3. `spec/constitution/tech_stack.md`: tools, architecture, data rule, repository structure
+4. `spec/features/maf_checker.md`: the MAF checker, the feature we build first
 
 If this file and the constitution disagree, the constitution wins.
 
@@ -27,6 +27,10 @@ RightFit checks material approval forms (MAFs) for MEP equipment before the revi
 | 5 Nov 2026 | Midterm submission |
 | 6 Nov 2026 | Midterm presentation |
 | 12 Nov 2026 | Full SDD constitution, first feature with tests, first MCP connection attempt |
+| 26 Nov 2026 | Full plan and build harness, MCP connectors to the mapped sources, next features |
+| 3 Dec 2026 | Features and tests, comparison against the non-AI method |
+| 10 Dec 2026 | Proof of concept; limits and ethics check |
+| 14 Dec 2026 | Interface, testing in realistic conditions, narrative draft |
 | 17 Dec 2026 | Final presentation |
 
 ## Team and ownership
@@ -53,7 +57,7 @@ The packages are Romanian, so the checks run for Romania (RO); Spain (ES) stays 
 6. **Predictions are not warnings.** Predictive output is labelled as a prediction and never shown as a check.
 7. **Test data is locked.** Reference answers in `data/maf/reference/` are written before the tool's output is seen and never used for tuning.
 8. **Humans decide.** The tool never certifies. Every result states what was and was not checked.
-9. **No confidential material, copyrighted files or secrets in Git.**
+9. **No confidential material, copyrighted files or secrets in Git.** The repository is public.
 10. **Decisions and scope changes are recorded in `docs/decisions.md`.**
 
 The full principles are in `spec/constitution/mission.md` §5.
@@ -68,12 +72,12 @@ The full principles are in `spec/constitution/mission.md` §5.
 6. If an engineering question is unclear, stop and flag it for Luca instead of assuming.
 7. Record shared decisions in repository files, not only in chat.
 
-The planned repository structure is in `spec/constitution/tech_stack.md` §6.
+The repository structure is in `spec/constitution/tech_stack.md` §5.
 
 ## Open decisions
 
 Open decisions are the items tagged **[O]** in `spec/constitution/`. This file keeps no separate list.
 
-## Current status (11 Nov 2026)
+## Current status (16 Nov 2026)
 
-Two packages read into `data/maf/extracted/`; all values still `extracted`, except one that Luca confirmed. Checks, draft status and draft comments built, with tests. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. One application, `app/review_server.py` with `app/review/`, holds the packages, the review, confirming readings, the answer, adding a pump package, booster sizing, the standby test and the rules. The same checks are MCP tools an agent can call (`app/mcp_server.py`). The app and every file are in English.
+Two packages read into `data/maf/extracted/`. Of what the AI read, Luca has confirmed 1 of 116 values and 2 of 15 documents; the rest is still `extracted`. Checks, draft status and draft comments built, with 107 tests. All 28 legal rules in `data/maf/rules.csv` were read on the official text, and each rule's dates pick the law in force on the review date. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. One application, `app/review_server.py` with `app/review/`, works on one project at a time and holds the packages, the review, confirming readings, the answer, the BOQ files, the rules (the law's and the consultant's own), adding a pump package, booster sizing and the standby test. The same checks are MCP tools an agent can call (`app/mcp_server.py`). The app and every file are in English.

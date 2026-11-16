@@ -1,22 +1,22 @@
-# Tech Stack — RightFit
+# RightFit tech stack
 
-Full version for 12 Nov 2026, built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
+Full version for 12 Nov 2026, brought up to date on 16 Nov 2026. It is built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. Tools
 
-We work in Python, with Git and GitHub (`iaac-maai/RightFit`, private), VS Code and Markdown, as agreed for the hood version. For the MAF checker we have installed and used:
+We work in Python, with Git and GitHub (`iaac-maai/RightFit`, a public repository), VS Code and Markdown, as agreed for the hood version. For the MAF checker we have installed and used:
 
 | Tool | What we use it for |
 |---|---|
-| xlrd | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`) |
+| xlrd and openpyxl | Reading the MAF form, which comes as an old .xls file (`ingest/maf_form.py`), and the project's BOQ, .xls or .xlsx (`ingest/boq.py`) |
 | pytest | Tests for every check (`tests/`) |
 | The Claude command line (`claude -p`, Haiku, no tools) | The AI the application asks: a rule typed in words, what a BOQ line asks (`app/ai.py`) |
 | Python's standard library (`http.server`), with plain HTML, CSS and JavaScript | The application (`app/review_server.py`, `app/review/`), which runs only on the laptop |
 | pypdf and PyMuPDF (`pymupdf`) | The text of each PDF page, page images, marking quoted lines on the page, and pump curves from a data sheet's vector drawing |
 | Tesseract with `pytesseract` | OCR of scanned pages when a pump package is added |
-| scikit-learn | Our own page classifier (`model/`), trained from scratch and compared with a keyword search |
+| scikit-learn | Our own page classifier (`model/`), trained from scratch and compared with a keyword search; also the text similarity that picks a product's BOQ line among the positions the form names |
 | An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
-| The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): four read-only tools an agent can call to list the packages, review one, list the rules with their status and classify a package's pages; `.mcp.json` tells the agent how to start it |
+| The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): four read-only tools an agent can call to list the packages, review one, list the rules with their status and classify a package's pages; `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client |
 
 The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
 
@@ -27,29 +27,34 @@ The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baselin
 | The two MAF packages (form and attachments) | Everything the checks read | Held; originals in `data/raw/`, outside Git |
 | 48 more packages from the same project (285 PDFs, 1,296 pages) | Training and locked testing of our own models; the evaluation on unseen packages | Held since 6 Nov, in `data/raw/`, outside Git; listed in the app, not read yet |
 | The register of 80 MAFs from Luca's last project | Evidence for the problem, and the source of the checklist | Held; anonymised, outside Git; counts in `docs/maf_register_findings.md` |
-| EU texts on EUR-Lex (machinery, low voltage, construction products, ecodesign of ventilation units) | Rules for documents and ecodesign | Partly read; several rows still "to confirm" |
-| Romanian law (Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026) and Spanish CTE and RITE | National rules and delivery reminders | The Romanian articles read on legislatie.just.ro on 12 Nov; the Spanish ones on secondary sites, [O] the BOE |
+| EU texts (machinery, low voltage, construction products, ecodesign of ventilation units, drinking water) | Rules for documents and ecodesign | Every rule read on the official text by 16 Nov, through the Publications Office, because EUR-Lex no longer answers scripts |
+| Romanian law (Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026) and Spanish CTE and RITE | National rules and delivery reminders | The Romanian articles read on legislatie.just.ro on 12 and 16 Nov; the Spanish ones on the BOE open data service on 16 Nov |
 | Manufacturer data sheets and declarations | Values per product | Only those inside the packages |
+| The project's BOQ (Excel) | What each product's line asks for (check Q) | Held for the project of P01 and P02; outside Git, because it holds prices, which are never read |
+| The consultant's own rules | Check P | In Git (`data/maf/consultant_rules.csv`), five example rules |
 
 The full list is in `docs/data_map.md`.
 
 ## 3. How the pieces fit
 
 ```text
-MAF form (.xls) + attachments (PDF)
-        |
-        v
-ingest/      the form is read in Python, roles only;     -> data/maf/extracted/<package>.json
-             the attachments are read by the AI agent       every value: source, page, quote, status
+MAF form (.xls) + attachments (PDF)                      the project's BOQ (.xlsx or .xls)
+        |                                                        |
+        v                                                        v
+ingest/      the form is read in Python, roles only;     the lines are read in Python, never the prices;
+             the attachments are read by the AI agent    an AI lists what a product's line asks for
+             -> data/maf/extracted/<package>.json: every value with source, page, quote, status
         |
         v  (a person verifies the values in the app)
-checks/maf/  plain Python, no AI, rules from data/maf/   -> pass / flag / unclear / info per check
+checks/maf/  plain Python, no AI; rules from data/maf/:  -> pass / flag / unclear / info per check
+             the law by date, the reviewers' checklist,
+             the consultant's own rules, the BOQ line
         |
         v
 explain/     comments filled from templates              -> one sentence per issue
         |
         v
-app/         the application                             -> draft status, overrides, exports
+app/         the application, one project at a time      -> draft status, overrides, exports
              the same checks as MCP tools                -> any agent that speaks MCP (read only)
 
 model/       our page classifier                         -> what kind of document each page is; a hint, labelled as AI
@@ -78,21 +83,24 @@ We settled the format question from the hood version: one JSON file per package 
 
 ```text
 RightFit/
-|-- AGENTS.md, README.md, requirements.txt, pytest.ini
+|-- AGENTS.md, README.md, PRODUCT.md, DESIGN.md, requirements.txt, pytest.ini
+|-- .mcp.json, .codex/     how an agent starts the MCP server
+|-- .impeccable/           design records of the application
 |-- spec/
 |   |-- constitution/      mission, roadmap, tech stack
 |   `-- features/          maf_checker.md
 |-- docs/                  problem tree, data map, decisions, register findings, rules
 |-- data/
-|   |-- raw/               original packages and register (git-ignored)
-|   `-- maf/               rules, checklist, inventory, extracted/, reference/
-|-- ingest/                form reader
+|   |-- raw/               original packages, BOQ and register (git-ignored)
+|   |-- projects/          one folder per project: packages, originals, BOQs (git-ignored)
+|   `-- maf/               rules, checklist, consultant's rules, inventory, extracted/, reference/
+|-- ingest/                form reader, BOQ reader, the instructions given to the AI (prompts/)
 |-- checks/maf/            the checks and the draft status
 |-- checks/pumps/          pump rules, booster sizing and the standby test
 |-- explain/               comment templates
 |-- model/                 our page classifier
 |-- eval/                  labels, sources and results of every comparison with a baseline
-|-- app/                   the application (review/) and the MCP server
+|-- app/                   the application (review/), the MCP server, the AI helper
 `-- tests/                 tests
 ```
 
@@ -101,7 +109,7 @@ We create a folder only when work in it starts.
 ## 6. Open questions [O]
 
 - The Python version and environment manager. We have tested with Python 3.14 so far.
-- Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not.
+- Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not. What already goes to an online model is in `mission.md` §9.
 - Where the application runs for the final demo, on a laptop or hosted.
 - Which agent the team uses with the MCP server.
 

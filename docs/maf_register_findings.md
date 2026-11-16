@@ -29,6 +29,6 @@ The checklist in data/maf/checklist.csv comes from these comments, so testing it
 
 ## Open with Luca
 - confirm the causes above;
-- why P02 (form IV 004) needed four revisions, and what the reviewers said on revisions 0 to 3;
-- the status P01 (form IS 015, revision 0) received, and the comments;
 - which roles sit behind consultant 1 and consultant 2.
+
+Answered in data/maf/reference/: P02 (form IV 004) went through four revisions because the client wanted FläktGroup, a brand reason and not a technical one; P01 (form IS 015, revision 0) was approved (A).

@@ -36,7 +36,7 @@ Romanian standard form, one per package, old .xls (read with xlrd in ingest/). S
 | id | form | items | attachments |
 |---|---|---|---|
 | P01 | IS 015 rev 0 | water booster set Hydro Multi-E 2 CME 15-2 (1 duty + 1 standby, 15 m³/h at 50 mCA); stormwater pumps DPK.15.80.30.5.0D (P1/P2, 38 m³/h at 15 mCA); drainage pumps Unilift AP12.50.11.3 (3 l/s at 10 mCA) and AP12.40.06.3 (1 l/s at 10 mCA) | 4 data sheets, 2 declarations |
-| P02 | IV 004 rev 4 | AHUs FläktGroup CAIRplus 9000 m³/h and 7000 m³/h with DX coil; 2 outdoor units Hisense AVW-54HKFHH2; AHU kit HZX-6BEJ | AHU data sheet, outdoor unit data sheet, 2 Hisense declarations, AHU kit sheet, TÜV certificate, Eurovent certificate, 2 DX simulation reports (+6 °C, -15 °C) |
+| P02 | IV 004 rev 4 | one AHU FläktGroup CAIRplus (supply 9000 m³/h, return 7000 m³/h) with DX coil; 2 outdoor units Hisense AVW-54HKFHH2; AHU kit HZX-6BEJ | AHU data sheet, outdoor unit data sheet, 2 Hisense declarations, AHU kit sheet, TÜV certificate, Eurovent certificate, 2 DX simulation reports (+6 °C, -15 °C) |
 
 Originals in data/raw/P01 and data/raw/P02: git-ignored, never committed. Families: pump, ahu, outdoor_unit, dx_kit. From the second batch, with document rules only so far (12 Nov 2026): fire_damper, radiator, elastomeric_insulation, fire_detection_panel, visual_alarm_device, voice_alarm_control, voice_alarm_loudspeaker, fire_alarm_power_supply, cable.
 
@@ -73,7 +73,7 @@ Results: pass, flag, unclear, info. A check passes only on verified values; extr
 | H1 | Drinking water approval | a booster set or a hot water pump (dhw_circulation, dhw_charging) has a document approving it for contact with drinking water that names it; heating and cooling circulation pumps are not asked (Luca, 12 Nov 2026); flag if none; no rule for the location: unclear | RO-OMS275-DW, ES-RD3-DTU-DW (until 30 Dec 2026), EU-DW-DOC (from 31 Dec 2026) |
 | C | Checklist | every item of data/maf/checklist.csv for the family, with its source rows as the reason | data/maf/checklist.csv |
 | P | Consultant's rules | every active rule in data/maf/consultant_rules.csv for the item's family (and application, when the rule names one); see below | data/maf/consultant_rules.csv |
-| Q | BOQ line | for each item, the line of the project's BOQ it answers, and each thing that line asks for, checked against the readings; see below | the BOQ in data/raw/boq/ |
+| Q | BOQ line | for each item, the line of the project's BOQ it answers, and each thing that line asks for, checked against the readings; see below | the project's BOQ files |
 | R | Location reminders | the location's delivery documents (RO: declaration, quality certificate, guarantee; ES: CTE 7.2 and RITE 20) as info | RO-PRACTICE-DELIVERY, ES-CTE-7-2, ES-RITE-20 |
 
 ### Consultant's rules (check P)
@@ -89,10 +89,10 @@ One row per rule in data/maf/consultant_rules.csv: rule_id (CR-01, CR-02...), fa
 Effect when a rule is not met: B (a comment), C (revise and resubmit, blocking) or info. The consultant adds a rule and switches it on or off on the Rules screen; the rules apply to every package. Shortcut: one set of rules for every project and consultant; per project sets come when a second project needs different ones. The consultant can also type a rule in words ("pumps only from Grundfos"): an AI turns it into a row, shown as a sentence labelled AI, and nothing is saved until the consultant saves it. The AI is Claude, through the Claude command line on the laptop (no tools, structured answer); without it the consultant fills the form by hand.
 
 ### The BOQ (check Q)
-The project's bill of quantities, an Excel file (.xlsx or .xls), sits in data/raw/boq/ (git-ignored: it holds prices). The reader (ingest/boq.py, no AI) finds the header row of each sheet (number, description, unit, quantity; producer and standards when the sheet has them) and keeps every line with a description; prices are never read.
+The project's bill of quantities, one or more Excel files (.xlsx or .xls), sits in the project's boq folder, which is git-ignored because a BOQ holds prices (for the project of P01 and P02 that folder is data/raw/boq/). The reader (ingest/boq.py, no AI) finds the header row of each sheet (number, description, unit, quantity; producer and standards when the sheet has them) and keeps every line with a description; prices are never read.
 
 - which line: the position the form names (`E02.ICS01.01`, `T03 pozitia 2 si 4`); when it names several, the one whose text is closest to the item (TF-IDF on character n-grams, cosine); with no position, the line in the form's sheet with the item's duty (Q=..., H=...), else the closest text, which the result marks as matched by text only; no BOQ sheet for the form's code: no Q result, and CL-04 says so. Chosen in a study on 24 products (eval/boq_matching/results_2026-11-13.md): the old duty rule found 4, positions then text found 24;
-- what the line asks: an AI reads the line once and lists what it asks for, each as a consultant-style rule (included, brand, value, reminder) with the exact words it comes from; a reference model or "or equivalent" is a reminder, not a brand rule; the list is cached in data/raw/boq/ and labelled AI;
+- what the line asks: an AI reads the line once and lists what it asks for, each as a consultant-style rule (included, brand, value, reminder) with the exact words it comes from; a reference model or "or equivalent" is a reminder, not a brand rule; the list is cached next to the BOQ files and labelled AI;
 - the motor power in a BOQ is the designer's estimate, not a limit (Luca, 12 Nov 2026): shown as information;
 - the check is deterministic: each thing asked is checked like a consultant's rule, from the readings; the BOQ line is AI output, so a result stays unclear until the reviewer confirms it ("would be" otherwise).
 
@@ -120,15 +120,8 @@ One application over the checks, `app/review_server.py` with `app/review/`, whic
 - Answer: the draft with one comment per issue, what was checked and what could not be checked; only here can the country and the dates be changed;
 - exports: the answer, the confirmed values (item, value, unit, source, page) for the certification consultant and the O&M file, and the findings marked "not a problem" with their reasons;
 - Packages also lists the BOQ files and takes a new one;
-- Rules: the consultant's own rules first, in words or by hand, then the rules of the law;
-- Add a package, Booster sizing and Standby test: the pump workflow of the midterm, as screens of the same application;
-- Rules: every rule for a location, with its source and status.
-
-## 10. Tests and evaluation
-- pytest unit tests for every check, with hand written cases approved by Luca;
-- a reference answer per package, written by Luca before he sees the tool's output, kept in data/maf/reference/ and never used for tuning;
-- comparison: found by both, found only by the tool (real or not), missed by the tool;
-- Luca's time to review each package by hand, against his time to check the tool's draft.
+- Rules: the consultant's own rules first, in words or by hand, then every rule of the law for the location, with its source, its status and the dates it applies between;
+- Add a package, Booster sizing and Standby test: the pump workflow of the midterm, as screens of the same application.
 
 ### Projects
 The reviewer works on one project at a time and picks it in the rail; a new project needs a name and a country. Each project is a folder under data/projects/ (git-ignored, because it holds the client's documents; `--projects` points the application at another folder, such as a shared Google Drive folder):
@@ -139,6 +132,12 @@ The reviewer works on one project at a time and picks it in the rail; a new proj
 
 A package uploaded on "Add a package" can be saved into the project; it then shows as not read yet until the reader has been through it. A project's paths can point elsewhere: the project of P01 and P02 uses data/maf/extracted, data/raw and data/raw/boq, where they already are. With no project, the application shows those examples. Shortcut: the consultant's rules stay one set for every project; one set per project comes when a second project needs different ones.
 
+## 10. Tests and evaluation
+- pytest unit tests for every check, with hand written cases approved by Luca;
+- a reference answer per package, written by Luca before he sees the tool's output, kept in data/maf/reference/ and never used for tuning;
+- comparison: found by both, found only by the tool (real or not), missed by the tool;
+- Luca's time to review each package by hand, against his time to check the tool's draft.
+
 ## 11. Data and privacy
 - data/raw/ holds the originals and is git-ignored; so does data/projects/;
 - a project's name is shown only on this laptop and never written into Git;
@@ -148,8 +147,12 @@ A package uploaded on "Add a package" can be saved into the project; it then sho
 
 ## 12. Open questions
 - the draft status rules (Luca);
-- the duty point tolerance: none (Luca, 28 Oct 2026, ENG-DUTY-TOL);
+- whether an ecodesign limit that is not met should be C instead of B, since such a unit may not be sold in the EU (Luca);
+- whether the 0.76 that P02's data sheet prints under EN 13053 is the efficiency Regulation (EU) 1253/2014 means (Luca);
+- whether the weight a BOQ line gives is a limit or the designer's estimate; the motor power is an estimate (Luca, 12 Nov 2026);
 - which roles sit behind the four reviewer columns of the register (Luca);
-- the CTE and RITE articles checked against the BOE (the Romanian articles were read on legislatie.just.ro on 12 Nov 2026);
 - which LEED, BREEAM or VERDE values join each family's checklist (Sahil or Jeff);
-- V3 and H1 (asked for by a practising MEP consultant on 12 Nov 2026): Luca answered which pumps need a drinking water approval; P01's pumps (booster and drainage) see no high temperatures, so V3 stays info for them; control panels are a consultant's preference (check P), not a requirement.
+- the second batch: the electrical declaration of fire detection equipment, cable trays and conduits, fire resistant cables, pressure equipment and door hardware have no rule yet (docs/maf_rules.md);
+- from 20 Jan 2027 a machinery declaration may be only a link in the instructions (Regulation (EU) 2023/1230 art. 10(8)); D1 does not look for one yet.
+
+Answered since the first version: no tolerance on the duty point (Luca, 28 Oct 2026, ENG-DUTY-TOL); which pumps need a drinking water approval, and control panels as a consultant's preference, not a requirement (Luca, 12 Nov 2026); P01's pumps see no high temperatures, so V3 stays info for them; every legal rule, the CTE and RITE articles included, read on the official text (16 Nov 2026).

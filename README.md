@@ -61,13 +61,13 @@ The AI parts (a rule typed in words, what a BOQ line asks) use the Claude comman
 
 ## For agents
 
-`app/mcp_server.py` gives any agent that speaks MCP four read-only tools: list the packages, review one, list the rules with their status, and classify a package's pages. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it.
+`app/mcp_server.py` gives any agent that speaks MCP four read-only tools: list the packages, review one, list the rules with their status, and classify a package's pages. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
 
 ## Where we are (16 Nov 2026)
 
 - Two packages are read: P01, a set of Grundfos pumps, and P02, an air handling unit with its outdoor units, already at revision 4. Of what the AI read, 1 of 116 values and 2 of 15 documents are confirmed so far, so most results are still what a check would say.
 - 48 more packages from the same project are on our laptops. The app lists them; none is read yet.
-- 19 of the 32 rules in `data/maf/rules.csv` were read in the official text. Each rule shows its status, and nothing is presented as compliance on a rule that wasn't.
+- All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
@@ -94,4 +94,4 @@ The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it 
 
 ## A few rules
 
-Nothing confidential goes into Git: no client, project, company or personal names, no prices, no original PDFs. Manufacturer names and model codes are fine. Every technical value needs a source, and when we can't find one the value stays `unclear`. Decisions go in `docs/decisions.md` so they don't get lost in chat.
+The repository is public, so nothing confidential goes into Git: no client, project, company or personal names, no prices, no original PDFs. Manufacturer names and model codes are fine. Every technical value needs a source, and when we can't find one the value stays `unclear`. Decisions go in `docs/decisions.md` so they don't get lost in chat.

@@ -1,6 +1,6 @@
-# Problem Segmentation Tree — RightFit
+# RightFit problem segmentation tree
 
-IAAC deliverable, 29 Oct 2026. MAF version, which the team agreed to on 5 Nov 2026; the hood version stays in the Git history. Open questions are marked [O].
+IAAC deliverable, 29 Oct 2026, brought up to date on 16 Nov 2026. MAF version, which the team agreed to on 5 Nov 2026; the hood version stays in the Git history. Open questions are marked [O].
 
 We split the work by who does each step. "Human" means one of us or a reviewer decides. "AI" means a model reads or interprets, and a person checks what it read. "Rule" is a fixed check in plain Python. "Data" is collecting, storing and moving files.
 
@@ -22,7 +22,8 @@ L0  MEP approval forms go back and forth. Each reviewer reads the same
  |         |-- 6. Draft the answer
  |         `-- 7. Decide and evaluate
  |
- `-- L1  Other families (fire dampers and valves, pipes, meters): later
+ `-- L1  Other families: nine have document rules since 12 Nov;
+         reading their packages, and valves, pipes and meters: later
 ```
 
 The check codes in the last column (D1, V1, C...) are the ones in `spec/features/maf_checker.md`.
@@ -45,7 +46,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | 2.2 | Say what each document is and which products it covers, and how (exact model, range table, range), never from the file name | AI + Human | AI reader, Luca checks | Read and matched, not verified |
 | 2.3 | Read the values each family needs, with page and a short quote | AI + Human | AI reader, Luca checks | Read, not verified |
 | 2.4 | Mark a value that isn't there as `unclear`, with where we looked | Rule | AI reader | Done |
-| 2.5 | Verify each value in the app | Human | Luca | Not started |
+| 2.5 | Verify each value in the app | Human | Luca | Started: 1 of 116 values and 2 of 15 documents |
 
 ### 3. Set the context
 
@@ -53,8 +54,9 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 |---|---|---|---|---|
 | 3.1 | Choose the location (RO or ES), which picks the rules | Human | Reviewer | Done in the app |
 | 3.2 | Review date and delivery date (form date plus lead time, unless given) | Human | Reviewer | Done in the app |
-| 3.3 | Project requirements from the specification or BOQ | Human | Reviewer | [O] none for P01 and P02 |
-| 3.4 | Write each rule with clause, source and status | AI + Human | AI first pass, Luca verifies | Partly; several rules "to confirm" |
+| 3.3 | Project requirements: the BOQ, the pressure and the water temperatures | Rule + AI + Human | `ingest/boq.py` reads the BOQ, an AI lists what a line asks, the reviewer types the rest | The BOQ is read for P01 and P02; the written specification is not |
+| 3.5 | The consultant's own rules, by hand or typed in words | Human + AI | Consultant; an AI turns the words into a row | Done in the app, five example rules |
+| 3.4 | Write each rule with clause, source and status | AI + Human | AI first pass, Luca verifies | 32 rules; the 28 legal ones read on the official text by 16 Nov |
 
 ### 4. Check the documents
 
@@ -75,6 +77,10 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | 5.4 | The reviewers' checklist for the family | Rule | C | Done |
 | 5.5 | What the location asks for at delivery, as a reminder | Rule | R | Done |
 | 5.6 | Issues no rule covers, proposed with page evidence and decided by the reviewer | AI + Human | Second AI reviewer | First run on P01 and P02 |
+| 5.7 | The pump's liquid temperature range against the project's, or against the law for hot water | Rule | V3 | Done |
+| 5.8 | An approval for contact with drinking water, for booster sets and hot water pumps | Rule | H1 | Done |
+| 5.9 | The consultant's own rules | Rule | P | Done |
+| 5.10 | What the product's BOQ line asks for | Rule, on what an AI read in the line | Q | Done |
 
 ### 6. Draft the answer
 
@@ -97,8 +103,8 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 
 ## 3. Where the AI is
 
-The AI reads the attachments (2.2, 2.3), makes a first pass at the rules (3.4) and, as a second reviewer, proposes issues no rule covers (5.6). A person checks all of it. Everything in groups 4 to 6 is fixed rules and templates, and no model can change their result. People choose the location and dates, set the requirements, verify values, override, and sign.
+The AI reads the attachments (2.2, 2.3), makes a first pass at the rules (3.4), lists what a BOQ line asks (3.3), turns a rule typed in words into a row (3.5) and, as a second reviewer, proposes issues no rule covers (5.6). Our own page classifier says what kind of document each page is. A person checks all of it. Everything in groups 4 to 6 is fixed rules and templates, and no model can change their result. People choose the location and dates, set the requirements, verify values, override, and sign.
 
 ## 4. What runs today
 
-Both packages go through every check, for Romania and for Spain. Because nobody has verified a value yet, every pass and flag still shows as `unclear` together with the result it would give. The next step is 2.5, then 7.2 again on verified values.
+Both packages go through every check, for Romania and for Spain. Because almost nothing has been verified yet (1 of 116 values), nearly every pass and flag still shows as `unclear` together with the result it would give. The next step is 2.5, then 7.2 again on verified values.

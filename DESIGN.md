@@ -285,7 +285,7 @@ Keep, Not a problem and the other decisions on an open problem sit in one segmen
 - **Focus:** every focusable element takes a 2px carbon-violet outline offset by 2px; on the rail the outline is white.
 
 ### Navigation
-- **Rail:** 196px of bottle green, the product name in white 20px bold, links in band-colored text with 8px by 10px padding and 4px corners. Hover fills with the lighter green; the current link fills with the form ground and turns green and semi-bold. A small-capital group label separates the tools. Below 1100px it becomes a top bar.
+- **Rail:** 196px of bottle green, the product name in white 20px bold, links in band-colored text with 8px by 10px padding and 4px corners. Hover fills with the lighter green; the current link fills with the form ground and turns green and semi-bold. Under the product name sits the project picker, a labelled select in the lighter green whose last entry opens the New project dialog. A small-capital group label separates the tools. Below 1100px it becomes a top bar.
 - **Tabs:** numbered steps with 600 weight; the current tab gets a white fill and a 3px green underline.
 
 ### The Re-ink (signature)

@@ -1,6 +1,6 @@
-# Mission — RightFit
+# RightFit mission
 
-Full version for 12 Nov 2026, built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
+Full version for 12 Nov 2026, brought up to date on 16 Nov 2026. It is built on the MAF direction the team agreed on 5 Nov 2026. Open questions are marked [O].
 
 ## 1. Problem
 
@@ -33,7 +33,7 @@ AI reads, rules decide, a person signs.
 
 ## 4. Scope
 
-The prototype covers MEP equipment at the MAF stage of Design & Pre-Construction, after the design is done and before anything is ordered. We start with pumps and air handling units (with their outdoor units and DX kits), because those are the two complete packages we hold.
+The prototype covers MEP equipment at the MAF stage of Design & Pre-Construction, after the design is done and before anything is ordered. We start with pumps and air handling units (with their outdoor units and DX kits), because those are the two complete packages we hold. Each package is checked against the law in force on the review date, the project's bill of quantities, the reviewers' checklist and the consultant's own rules. Since 12 Nov nine families of the second batch (fire dampers, radiators, pipe insulation, fire detection and voice alarm equipment, cables) also have rules for the documents they need; none of their packages is read yet.
 
 It runs for Romania, where the packages come from, and for Spain, the provisional testing context of the course. EU product rules are the same for both. Luca checks which national rules apply; until a rule is verified on the official text, nothing in RightFit is presented as regulatory compliance, and every rule shows its status next to the result.
 
@@ -41,7 +41,7 @@ Out of scope: choosing products, visual search, finishes, checking whether equip
 
 [O] Doors. Luca would like them in, but they are on hold since 29 Oct until we know how.
 
-[O] The next families. Fire dampers and valves would bring in the construction products regulation; pipes and meters are frequent in the register.
+[O] The next families to read. The construction products regulation came in on 12 Nov with the nine families above. Valves, tanks and heat exchangers wait for a decision on the pressure equipment rules; pipes and meters are frequent in the register.
 
 [O] Which LEED, BREEAM or VERDE values belong in each family's checklist (Sahil or Jeff).
 
@@ -74,7 +74,7 @@ The checklist comes from the register's comments, so we never evaluate it on the
 - A value the manufacturer doesn't publish stays missing.
 - Scanned PDFs without a text layer are read from the page image and need a closer look.
 - Some returns no check can catch: coordination with the architecture, a design that isn't approved yet, a reviewer asking for a sample.
-- A rule is only as current as its last check, so each one keeps its source and the date it was checked.
+- A rule is only as current as its last check, so each one keeps its source and the date it was checked. On 12 Nov we found that Romania's Law 10/1995, behind two of our rules, had been repealed in August. A scheduled check of the sources is planned and not built.
 - Two packages make a demonstration, not an evaluation. 48 more packages from the same project are on the laptop and not read yet. [O] Packages from other projects.
 
 ## 8. Why AI, and why not a general chatbot
@@ -90,12 +90,16 @@ Every AI part is measured against the plain way of doing the same job, and the r
 | Our page classifier, trained from scratch | Keyword search | First version, on real package pages: 25 % right against 27 %. On manuals with declarations inside: 87 % against 45 %. It didn't beat the keywords on real packages. The second version also trains on real packages: on 184 locked pages of the second batch it gets 62 % right against 35 %, and finds 69 % of the data sheet pages against 9 % |
 | AI matching of documents to products | Text matching | The same answer on all 51 pairs. So far the AI only adds how a document covers a product |
 | AI reading of packages into values | A person reading them | Not measured yet: 1 of 116 values has been confirmed |
-| The whole review | Luca by hand, and general chatbots | By hand: about 10 minutes for P01 (figures only) and 3 hours for P02. Chatbots: the protocol is written (`eval/chatbot_baseline/protocol.md`), no run yet |
+| A rule typed in words, or a BOQ line, turned into items to check | A person filling in the form by hand | Not measured. The reviewer sees each item, labelled AI, before it counts |
+| The whole review | Luca by hand, and general chatbots | By hand: about 10 minutes for P01 (figures only) and 3 hours for P02. Chatbots: the protocol and a frozen test set of 21 unseen packages are written (`eval/chatbot_baseline/`), no run yet |
+
+One comparison has no AI on either side. To find a product's line in the BOQ, our first rule looked for the pump's duty and found 4 of 24 lines. The position the form names, then plain text similarity, found all 24 (`eval/boq_matching/`). The method was designed on those 24 cases, so this is not a test yet.
 
 At the midterm on 6 Nov the jury's main comment was that RightFit has to differ clearly from any general AI chatbot. A chatbot can read a PDF and give an opinion. RightFit differs in how the result is built:
 
 - the same package gets the same result on every run, and the protocol above measures how much a chatbot's runs differ;
 - every result names its rule, the rule's source and whether anyone has read the official text;
+- each rule has the dates it applies between, so a review dated after 25 Aug 2026 cites Romania's new construction Code and not the law it replaced;
 - nothing passes until a person has confirmed the reading behind it, and the confirmation records who and when;
 - each finding opens next to the real page, with the quoted line marked where the page has a text layer;
 - the checklist comes from what reviewers wrote on 80 real forms, which a chatbot has not seen;
@@ -107,7 +111,7 @@ If the chatbots find as much as RightFit at the same quality, we will say so and
 
 The person who signs the form carries the responsibility, and RightFit doesn't take any of it away. It drafts, says what it checked and what it couldn't, and never certifies.
 
-The packages, the forms and the register belong to the project's parties. The originals stay on our laptops, outside Git, and the repository keeps only values, short quotes and counts. Anything we get from other practitioners needs the permission of the company that owns it. [O] Whether real packages may be sent to an online model: the manufacturer documents are public, the forms and the project headers on some pages are not.
+The packages, the forms and the register belong to the project's parties. The originals stay on our laptops, outside Git, and the repository keeps only values, short quotes and counts. Anything we get from other practitioners needs the permission of the company that owns it. Some of this already passes through an online AI model. The two packages read so far were read by an AI agent on Luca's laptop, which sends the pages to its provider. The application also asks an online model two small things: to turn a rule the consultant types into a row, and to list what a BOQ line asks for, from the line's description alone. Prices are never read. [O] Whether the remaining packages may be sent to an online model or need one that runs on the laptop: the manufacturer documents are public, the forms and the project headers on some pages are not.
 
 All 50 packages come from one project, and the checklist comes from a register Luca kept. He is also the one who judges the results, so a comment that was common there may be rare elsewhere. We reduce this by writing the reference answers before seeing the tool's output and by hiding the source when findings are judged. [O] A second reviewer, and packages from other projects.
 
