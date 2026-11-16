@@ -68,25 +68,90 @@ def sheets_for(lines, boq_ref):
     return [ln for ln in lines if code and ln["sheet"].replace(" ", "").upper().startswith(code.group(0).upper())]
 
 
-# Words a BOQ line uses for a family, to pick among the positions a form names (P02: "T03 pozitia 2 si 4").
-# shortcut: only the families of P01 and P02; add words as new families get BOQ lines.
-FAMILY_WORDS = {"pump": r"pomp", "ahu": r"centrala de tratare|air handling",
-                "outdoor_unit": r"unitate exterioar|outdoor unit"}
-
-
-def find_line(lines, boq_ref, item):
-    """The BOQ line an item answers, in the sheets named by the form's BOQ code: the line with the item's duty, or,
-    when the form names positions, the position whose words fit the item's family."""
-    positions = {p for p in re.findall(r"\d+", re.sub(r"^\s*[A-Za-z]+\d+", "", boq_ref or ""))}
-    if positions and item["family"] in FAMILY_WORDS:
-        named = [ln for ln in sheets_for(lines, boq_ref) if str(ln["nr"]).split(".")[0] in positions
-                 and re.search(FAMILY_WORDS[item["family"]], ln["text"], re.I)]
-        if len(named) == 1:
-            return named[0]
-    flow, head = (item["values"].get(k) or {} for k in ("duty_flow", "duty_head"))
-    if flow.get("value") is None or head.get("value") is None or flow.get("unit") not in ("m3/h", "l/s"):
+def _num(x):
+    try:
+        return int(float(str(x).strip()))
+    except ValueError:
         return None
-    want = (flow["value"] * (3.6 if flow["unit"] == "l/s" else 1.0), head["value"])
+
+
+def positions(lines, boq_ref):
+    """The lines at the positions a form names: `E02.ICS01.01` (sheet, section, number) or `T03 pozitia 2 si 4`,
+    `IS01 ... pozitiile 08-11` (sheet code, then numbers or ranges)."""
+    ref = boq_ref or ""
+    named = [(s, sec, int(n)) for s, sec, n in re.findall(r"\b([A-Z]{1,2}\d{2})\.([A-Z]{2,4}\d{2})\.(\d{1,3})\b", ref)]
+    if not named:
+        code = re.match(r"\s*([A-Za-z]{1,2}\d{2})", ref)
+        if not code:
+            return []
+        rest = ref[code.end():]
+        nums = [n for a, b in re.findall(r"(\d+)\s*-\s*(\d+)", rest) for n in range(int(a), int(b) + 1)]
+        nums += [int(n) for n in re.findall(r"\b(\d{1,3})\b", re.sub(r"\d+\s*-\s*\d+", " ", rest))]
+        named = [(code.group(1).upper(), None, n) for n in nums]
+    out = []
+    for sheet, sec, n in named:
+        for ln in lines:
+            if not ln["sheet"].replace(" ", "").upper().startswith(sheet.upper()):
+                continue
+            head, _, tail = str(ln["nr"] or "").strip().partition(".")
+            if (sec is None and _num(ln["nr"]) == n) or (sec is not None and head == sec and _num(tail) == n):
+                out.append(ln)
+    return out
+
+
+_vectors = {}
+
+
+def most_similar(lines, query, pool):
+    """The line of pool whose text is closest to the query (TF-IDF on character n-grams, cosine), with the score.
+    eval/boq_matching/results_2026-11-13.md: alone it confuses close products, after the form's positions it is right."""
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    key = hash(tuple(ln["text"] for ln in lines))
+    if key not in _vectors:
+        vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(3, 5)).fit([ln["text"] for ln in lines])
+        _vectors[key] = vec
+    vec = _vectors[key]
+    scores = cosine_similarity(vec.transform([query]), vec.transform([ln["text"] for ln in pool])).ravel()
+    best = int(scores.argmax())
+    return pool[best], round(float(scores[best]), 2)
+
+
+def _code(text):
+    return re.sub(r"[^A-Z0-9]", "", str(text).upper())
+
+
+def form_words(item, form):
+    """The form's own words for an item: the row of the form's product list whose model holds the item's model.
+    They are in the BOQ's language; the item's name may have been translated when the package was read."""
+    rows = (form or {}).get("items_raw") or []
+    models = [_code(m) for m in re.split(r"[/;,]", str(item.get("model") or "")) if len(_code(m)) >= 4]
+    row = next((r for r in rows if any(m in _code(r.get("model")) for m in models)), None)
+    return " ".join(str(row.get(k) or "") for k in ("name", "brand", "model")) if row else None
+
+
+def find_line(lines, boq_ref, item, form=None):
+    """The BOQ line an item answers, and how it was found: the position the form names; several positions, then the
+    one whose text is closest to the item; the item's duty in the form's sheet; else the closest text in that sheet.
+    Text alone is the weakest way, so its line says so (`how` is "text")."""
+    found = positions(lines, boq_ref)
+    used_for = item["values"].get("used_for") or {}
+    query = form_words(item, form) or " ".join(str(x) for x in (
+        item.get("name"), item.get("brand"), item.get("model"), used_for.get("value"), used_for.get("quote")) if x)
+    if len(found) == 1:
+        return {**found[0], "how": "position"}
+    if found and query:
+        ln, score = most_similar(lines, query, found)
+        return {**ln, "how": "position and text", "score": score}
     pool = sheets_for(lines, boq_ref) or lines
-    close = lambda a, b: abs(a - b) <= 0.01 * max(abs(b), 1e-9)  # noqa: E731
-    return next((ln for ln in pool if any(close(q, want[0]) and close(h, want[1]) for q, h in duties(ln["text"]))), None)
+    flow, head = (item["values"].get(k) or {} for k in ("duty_flow", "duty_head"))
+    if flow.get("value") is not None and head.get("value") is not None and flow.get("unit") in ("m3/h", "l/s"):
+        want = (flow["value"] * (3.6 if flow["unit"] == "l/s" else 1.0), head["value"])
+        close = lambda a, b: abs(a - b) <= 0.01 * max(abs(b), 1e-9)  # noqa: E731
+        hit = next((ln for ln in pool if any(close(q, want[0]) and close(h, want[1]) for q, h in duties(ln["text"]))), None)
+        if hit:
+            return {**hit, "how": "duty"}
+    if not query:
+        return None
+    ln, score = most_similar(lines, query, pool)
+    return {**ln, "how": "text", "score": score}

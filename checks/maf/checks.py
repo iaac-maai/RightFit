@@ -594,6 +594,8 @@ def q_boq_lines(pkg, ctx):
                               item=item["id"], code="Q.none", params={"item": item["model"]}))
             continue
         where = f"BOQ {link['sheet']}, row {link['row']}"
+        if link.get("how") == "text":   # no position on the form and no duty: the weakest match, so it says so
+            where += " (matched by text only; check it is the right line)"
         if link.get("requirements") is None:
             out.append(result("Q", "unclear", f"{where}: what the line asks has not been read yet", item=item["id"],
                               code="Q.unread", params={"item": item["model"], "where": where}))
@@ -601,6 +603,8 @@ def q_boq_lines(pkg, ctx):
         for ask in link["requirements"]:
             # What the AI read in the BOQ line is an input like any reading: unconfirmed until the reviewer looks.
             line = {"value": ask["quote"], "status": link.get("status", "extracted"), "source": link["file"], "page": where}
+            if ask["kind"] == "included" and not all(f.endswith(("_included", "_switch")) for f in ask["field"].split("|")):
+                ask = {**ask, "kind": "reminder"}   # "included" only makes sense on a yes/no reading
             verdict, reason, inputs = KINDS[ask["kind"]](item, pkg, ask)
             if verdict == "missing":
                 verdict = "flag"

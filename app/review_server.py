@@ -194,7 +194,7 @@ def boq_links(pkg, read=True, folder=None):
         lines += _boq_lines[stamp]
     if not sheets_for(lines, pkg["form"].get("boq_ref")):   # the BOQ of another project, or the form gives no code
         return None
-    found = {i["id"]: find_line(lines, pkg["form"].get("boq_ref"), i) for i in pkg["items"]}
+    found = {i["id"]: find_line(lines, pkg["form"].get("boq_ref"), i, pkg["form"]) for i in pkg["items"]}
     readings = sorted({k for i in pkg["items"] for k in i["values"]})
     try:
         asks = ai.boq_requirements([ln["text"] for ln in found.values() if ln], readings, folder / "asks.json", read)

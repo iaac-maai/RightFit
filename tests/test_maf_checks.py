@@ -416,3 +416,11 @@ def test_q_shows_the_boq_motor_power_as_an_estimate():
     link = {"file": "b.xlsx", "sheet": "IS06", "row": 31, "requirements": [ask], "status": "verified"}
     r = only(c.q_boq_lines({**pkg([pump], []), "boq": {"Q2": link}}, ctx()))
     assert r["result"] == "info" and "estimate" in r["reason"]
+
+
+def test_q_checks_included_only_on_yes_no_readings():
+    ahu = item("Q3", "ahu", "Z096", hrs_type=v("rotary heat exchanger"))
+    ask = {"text": "plate heat recovery is included", "kind": "included", "field": "hrs_type", "operator": "", "value": "",
+           "unit": "", "quote": "recuperator de caldura in placi"}
+    link = {"file": "b.xlsx", "sheet": "T03", "row": 17, "requirements": [ask], "status": "verified"}
+    assert only(c.q_boq_lines({**pkg([ahu], []), "boq": {"Q3": link}}, ctx()))["result"] == "info"
