@@ -5,9 +5,9 @@ The check engine is the same in every country. What changes with the project's l
 ## Layers
 A project collects its rules from layers, from the most general to the most specific:
 1. EU: product rules (declarations of conformity, construction products, ecodesign). Same for every EU country.
-2. Country: national rules (Romania: Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026, and the site supervisor's practice; Spain: CTE, RITE).
+2. Country: national rules (Romania: Law 10/1995 until 24 Aug 2026, then the construction Code, Law 169/2026; Order 275/2012 and I9-2022 for water; the site supervisor's practice. Spain: CTE and RITE; RD 487/2022 and RD 3/2023 for water).
 3. Region and city, where they exist (Catalonia, Barcelona). None is needed for the MAF checks in v0.1.
-4. Project: the specification and the BOQ, the most specific layer.
+4. Project, the most specific layer: the BOQ (check Q), the consultant's own rules (check P) and the pressure and water temperatures the reviewer types in. The written specification is not read yet.
 
 Ids follow ISO 3166: EU, RO, ES, ES-CT (Catalonia), ES-CT-BCN (Barcelona). Practice and engineer inputs use ANY, or the country when the practice is national (RO-PRACTICE-DELIVERY).
 
@@ -16,7 +16,7 @@ rule_id, jurisdiction, topic, check, code, clause, requirement, param, operator,
 - topic groups the rules that answer the same question, whatever the country: doc.eu_declaration_of_conformity, doc.reception_control, ahu.hrs_efficiency;
 - applies_to: the product families (pump, ahu, outdoor_unit, dx_kit, fire_damper and the others named in data/maf/family_documents.csv) or all;
 - valid_from and valid_to: the window in which that version applies; the project date picks the version (the Machinery Directive until 19 Jan 2027, the Machinery Regulation from 20 Jan 2027; in Romania Law 10/1995 until 24 Aug 2026, the construction Code from 25 Aug 2026);
-- status: verified, verified_secondary, to_confirm, practice (from past reviewers), engineer_input.
+- status: verified_official (read on the official text), verified_secondary (read in a copy), to_confirm, practice (from past reviewers), engineer_input.
 
 ## How the engine resolves the rules for a project
 1. Build the location chain: RO gives EU, RO, ANY; ES-CT-BCN gives EU, ES, ES-CT, ES-CT-BCN, ANY.
@@ -27,12 +27,12 @@ rule_id, jurisdiction, topic, check, code, clause, requirement, param, operator,
 
 ## Adding a country
 1. The topics are the same for every country, because the checks are the same. That gives the list of questions to answer.
-2. For each topic, find the national rule. The AI does the first pass: it reads the official texts and proposes a row with clause and quote. An engineer who works under that code verifies it before its status becomes verified. This is where the human in the loop sits.
+2. For each topic, find the national rule. The AI does the first pass: it reads the official texts and proposes a row with clause and quote. An engineer who works under that code checks it against the official text before its status becomes verified_official. This is where the human in the loop sits.
 3. Topics with no national rule stay empty and their checks show Unclear.
 4. A few packages from that country with known answers test the pack before anyone uses it.
 
 ## Keeping the rules current
-Each row keeps its source and the date it was last checked. A scheduled check watches the official sources (EUR-Lex, BOE, codigotecnico.org, Monitorul Oficial and legislatie.just.ro). When a source changes, the affected rows go back to to_confirm until someone verifies them again.
+Each row keeps its source and the date it was last checked. On 16 Nov 2026 every legal rule was read again by hand on its official source, and each source says when it last changed: the Publications Office gives the latest consolidated version of an EU act, the BOE open data service gives the date a consolidated text was last updated, and legislatie.just.ro lists the consolidated forms of a Romanian act. The plan is to run the same three questions on a schedule (roadmap, MAF-10; not built). When a source changes, the affected rows go back to to_confirm until someone reads them again.
 
 ## In the MAF checker
 Locations RO (the packages are Romanian) and ES (the provisional testing context of the constitution; ES-CT-BCN behaves as ES for the MAF checks). The same package runs under both, and the page shows which rules change.

@@ -323,7 +323,7 @@ def test_reminders_change_with_the_location():
 def test_run_all_attaches_the_rule_status():
     results = c.run_all(pkg([PUMP], [SHEET, DECL]), ctx())
     d1 = next(r for r in results if r["check"] == "D1" and "EU-LVD-DOC" in r["rules"])
-    assert d1["rule_status"]["EU-LVD-DOC"] == "to_confirm"
+    assert d1["rule_status"]["EU-LVD-DOC"] == tables()[0]["EU-LVD-DOC"]["status"]   # whatever the rules table says today
 
 
 # ---------------------------------------------------------------- MAF-11: manufacturer documents library
