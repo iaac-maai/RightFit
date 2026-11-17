@@ -34,7 +34,7 @@ What is new: the Revit model is a source. A value read from the model (the room 
 |---|---|
 | `candidates.json` | the submitted set and its alternatives: maker, model, size (L × W × H mm), weight, number of pumps, motor power each, power one pump needs at the duty, standby verdict, suction and discharge DN, drinking water approval, each with its source and status |
 | `project.json` | the service space the consultant asks for, and anything the model doesn't hold yet: the circuit when the model has none, the room for a test build |
-| `families/` | the makers' own Revit families (.rfa), one per candidate, from the makers' BIM pages |
+| `families/` | the makers' models, one per candidate: a Revit family (.rfa) from the makers' BIM pages, or a 3D DWG where the maker offers no family (Grundfos); `families.json` maps names, types, up axis and notes, and Prepare Models saves each family's shape (`.shape.json`) so previews never load the family |
 
 A template with the fields and no values is in `revit/templates/`.
 

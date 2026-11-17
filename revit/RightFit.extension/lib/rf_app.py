@@ -124,22 +124,28 @@ def preview(doc, uidoc, g, s, shape_note=None):
     painter = rf_draw.Painter(doc, sit.frame, [v3])
     is_current = s is g["current"] or (s.get("id") is not None and s.get("id") == g["current_id"])
     s = dict(s)
-    path, entry = rf_project.family_file(s)
-    inst = None
+    path, entry = (None, {}) if is_current else rf_project.family_file(s)
+    inst, what = None, None
     if is_current:
         s.update(sit.size)
         s["shape"] = u"the set in the model, measured on its geometry"
     elif path:
         inst, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump), v3,
-                                            u"RF preview " + s.get("model", u""), BuiltInCategory.OST_GenericModel)
+                                            u"RF preview " + s.get("model", u""), BuiltInCategory.OST_GenericModel,
+                                            as_shape=True)
         if inst is not None:
             if isinstance(inst, FamilyInstance):
                 inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(rf_draw.PREVIEW)
             s["shape"] = what + _size_note(s, b)
             s["L"], s["W"], s["H"] = b[2] - b[0], b[3] - b[1], b[5] - b[4]
     if not is_current and inst is None:
-        s["shape"] = u"a stand-in drawn from the catalogue sizes (add the maker's .rfa to the project's families " \
-                     u"folder to see the real set)"
+        if path:
+            s["shape"] = u"a stand-in drawn from the catalogue sizes; the maker's file could not be used: " + (what or u"")
+        elif entry.get("note"):
+            s["shape"] = u"a stand-in drawn from the catalogue sizes: " + entry["note"]
+        else:
+            s["shape"] = u"a stand-in drawn from the catalogue sizes (add the maker's .rfa to the project's families " \
+                         u"folder to see the real set)"
     res = fit(s, room, g["service"], sit.base_z)
     if not is_current:
         ids = List[ElementId]()
@@ -280,6 +286,7 @@ def swap(doc, uidoc, g, s):
     note = old.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
     note = note.AsString() if note is not None else None
     painter = rf_draw.Painter(doc, sit.frame, [rf_draw.view3d(doc)])
+    new, what = None, None
     if same_family_type is not None and not path:
         if not same_family_type.IsActive:
             same_family_type.Activate()
@@ -291,12 +298,14 @@ def swap(doc, uidoc, g, s):
     elif path:
         new, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump),
                                            rf_draw.view3d(doc), u"RFT pump - {} {}".format(s["maker"], s["model"]),
-                                           BuiltInCategory.OST_MechanicalEquipment)
-        how = u"placed " + what
-    else:
+                                           BuiltInCategory.OST_MechanicalEquipment,
+                                           as_shape=stand_in_ok)  # test room: the family's saved shape is enough
+        how = u"placed " + (what or u"")
+    if new is None:  # no maker file, or one that could not be used: a stand-in at the catalogue size
+        why = (u" (the maker's file could not be used: " + what + u")") if (path and what) else u""
         body, _ = rf_model.space_checks.body_and_zones(s, {}, sit.base_z)
         new, b = painter.stand_in_single(s, body, u"RFT pump - ", BuiltInCategory.OST_MechanicalEquipment), body
-        how = u"placed a stand-in (test room)"
+        how = u"placed a stand-in (test room)" + why
     new_s["L"], new_s["W"], new_s["H"] = b[2] - b[0], b[3] - b[1], b[5] - b[4]
     res = swap_checks(new_s, g["current"], room, g["service"], pipes, g["circuit"], sit.base_z, sit.size)
     if new is not old:
