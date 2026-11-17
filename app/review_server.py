@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT))
 from checks.maf.checks import DOC_LABELS, KINDS, context, run_all  # noqa: E402
 from checks.maf.rules import CHAINS, DATA, load, tables  # noqa: E402
 from checks.maf.status import LABELS, draft_status  # noqa: E402
-from explain.maf_comments import comment, title  # noqa: E402
+from checks.maf.comments import comment, title  # noqa: E402
 from app import ai, pump_demo  # noqa: E402
 from ingest.boq import find_line, read_boq, sheets_for  # noqa: E402
 

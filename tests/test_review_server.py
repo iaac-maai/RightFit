@@ -6,7 +6,7 @@ from pathlib import Path
 import pymupdf
 
 from app.review_server import confirm, decide, decide_findings, find_marks, original, package_list, page_png, review
-from explain.maf_comments import comment, title
+from checks.maf.comments import comment, title
 
 P02 = json.loads((Path(__file__).resolve().parents[1] / "data/maf/extracted/P02.json").read_text())
 

@@ -1,7 +1,7 @@
 """Draft status (spec section 7) and draft comments (spec section 8)."""
 from checks.maf.checks import result
 from checks.maf.status import draft_status
-from explain.maf_comments import comment
+from checks.maf.comments import comment
 from maf_cases import v
 
 

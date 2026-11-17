@@ -17,7 +17,7 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, a public repositor
 | scikit-learn | Our own page classifier (`model/`), trained from scratch and compared with a keyword search; also the text similarity that picks a product's BOQ line among the positions the form names |
 | An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
 | Revit 2026 with pyRevit (free, open source) | The fit check in the project's Revit model (`revit/`): pyRevit runs our Python inside Revit, on the Windows computer that has Revit; the checks it calls are `checks/space/`, also run by the tests |
-| The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): five read-only tools an agent can call to list the packages, review one, list the rules with their status, classify a package's pages and ask the official sources whether the act behind each legal rule changed; `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client |
+| The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): six read-only tools an agent can call to list the packages, review one, list the rules with their status, classify a package's pages, compare a package with the previous revision of its form and ask the official sources whether the act behind each legal rule changed; `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client |
 
 The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
 
@@ -52,13 +52,13 @@ checks/maf/  plain Python, no AI; rules from data/maf/:  -> pass / flag / unclea
              the consultant's own rules, the BOQ line
         |
         v
-explain/     comments filled from templates              -> one sentence per issue
+checks/maf/comments.py  comments filled from templates   -> one sentence per issue
         |
         v
 app/         the application, one project at a time      -> draft status, overrides, exports
              the same checks as MCP tools                -> any agent that speaks MCP (read only)
 
-model/       our page classifier                         -> what kind of document each page is; a hint, labelled as AI
+model/       our page and family classifiers             -> what kind of document each page is; a hint, labelled as AI
 ```
 
 Nothing in `checks/` may import or call an AI model.
@@ -86,7 +86,6 @@ We settled the format question from the hood version: one JSON file per package 
 RightFit/
 |-- AGENTS.md, README.md, PRODUCT.md, DESIGN.md, requirements.txt, pytest.ini
 |-- .mcp.json, .codex/     how an agent starts the MCP server
-|-- .impeccable/           design records of the application
 |-- spec/
 |   |-- constitution/      mission, roadmap, tech stack
 |   `-- features/          maf_checker.md
@@ -97,18 +96,17 @@ RightFit/
 |   |-- maf/               rules, checklist, consultant's rules, inventory, extracted/, reference/
 |   `-- space/             the fit check's rules
 |-- ingest/                form reader, BOQ reader, rule watch, revision comparison, the instructions given to the AI (prompts/)
-|-- checks/maf/            the checks and the draft status
+|-- checks/maf/            the checks, the draft status and the comment templates
 |-- checks/pumps/          pump rules, booster sizing and the standby test
 |-- checks/space/          the fit check: the set in its room, and what a swap changes
 |-- revit/                 the Revit add-in (pyRevit) and the templates of its project files
-|-- explain/               comment templates
 |-- model/                 our page classifier and family classifier
 |-- eval/                  labels, sources and results of every comparison with a baseline
 |-- app/                   the application (review/), the MCP server, the AI helper
 `-- tests/                 tests
 ```
 
-We create a folder only when work in it starts.
+Each top folder has a short README that says what is in it. We create a folder only when work in it starts.
 
 ## 6. Open questions [O]
 

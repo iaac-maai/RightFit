@@ -146,26 +146,50 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
 
-## Where things are
+## How the repository is organised
 
-| To see | Open |
+The code follows the way a package travels: the files are read, the rules check them, and the application shows the result. Each folder has a short README of its own.
+
+```mermaid
+flowchart LR
+    raw[("data/raw<br/>the original forms and PDFs,<br/>on the laptops only")] --> ingest["ingest/<br/>reads the files"]
+    ingest --> data[("data/<br/>the rules tables and<br/>what the AI read")]
+    data --> checks["checks/<br/>the rules, in plain Python"]
+    checks --> app["app/<br/>the application and<br/>the tools for agents"]
+    model["model/<br/>our own models"] --> app
+    checks --> revit["revit/<br/>the add-in in Revit"]
+    tests["tests/"] -.-> checks
+    eval["eval/<br/>every comparison"] -.-> model
+    classDef ai fill:#ece9fb,stroke:#6250d6,color:#1b1446
+    classDef rule fill:#e3efe8,stroke:#1e5a3c,color:#0f2e1f
+    class model ai
+    class checks rule
+```
+
+| Folder | What is in it |
 |---|---|
-| the application | [`app/`](app/): the server `review_server.py` and the screens in `review/` |
-| the checks and the draft answer | [`checks/maf/`](checks/maf/) |
-| the fit check in Revit | [`revit/`](revit/) and [`checks/space/`](checks/space/) |
-| reading the forms and the BOQs | [`ingest/`](ingest/) |
-| our models | [`model/`](model/) |
-| every comparison with a baseline | [`eval/`](eval/) |
-| the feature in detail | [`spec/features/maf_checker.md`](spec/features/maf_checker.md) |
-| the problem, scope and principles | [`spec/constitution/mission.md`](spec/constitution/mission.md) |
-| milestones and who does what | [`spec/constitution/roadmap.md`](spec/constitution/roadmap.md) |
-| tools and architecture | [`spec/constitution/tech_stack.md`](spec/constitution/tech_stack.md) |
-| the rules and where they come from | [`docs/maf_rules.md`](docs/maf_rules.md), [`docs/jurisdictions.md`](docs/jurisdictions.md) |
-| the data we have and need | [`docs/data_map.md`](docs/data_map.md) |
-| what the old register tells us | [`docs/maf_register_findings.md`](docs/maf_register_findings.md) |
-| the look of the application | [`DESIGN.md`](DESIGN.md) |
-| how to work in this repository | [`AGENTS.md`](AGENTS.md) |
-| decisions so far | [`docs/decisions.md`](docs/decisions.md) |
+| [`app/`](app/) | the application the reviewer opens in the browser, and the same checks as tools for AI agents |
+| [`checks/`](checks/) | every check, in plain Python with no AI |
+| [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
+| [`data/`](data/) | the rules tables, and what the AI read from P01 and P02 |
+| [`model/`](model/) | our own models |
+| [`eval/`](eval/) | every comparison with the plain way |
+| [`tests/`](tests/) | the tests: run `pytest` |
+| [`revit/`](revit/) | Jeff's fit check in Revit |
+| [`spec/`](spec/) | the plan: mission, roadmap, tools and each feature |
+| [`docs/`](docs/) | decisions, the data map, the rules and the other notes |
+
+The files in the root:
+
+| File | What it is for |
+|---|---|
+| [`AGENTS.md`](AGENTS.md) | how anyone, a person or an agent, works in this repository |
+| `CLAUDE.md` | one line that points Claude Code to `AGENTS.md` |
+| `.mcp.json` | tells an agent how to start the MCP server, `app/mcp_server.py` |
+| `.codex/config.toml` | the same, for Codex, a second agent client |
+| [`DESIGN.md`](DESIGN.md), [`PRODUCT.md`](PRODUCT.md) | the look of the application, and who it is for |
+| `requirements.txt`, `pytest.ini` | the Python packages to install, and where the tests are |
+| `.gitignore` | what never goes into Git: the originals, the projects, the BOQs and local tool files |
 
 ## A few rules
 

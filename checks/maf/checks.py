@@ -6,7 +6,7 @@ Each check returns result dicts:
   result    pass, flag, unclear or info (what the reviewer sees)
   would_be  the verdict on the values as they are, before anyone verified them
   reason    plain-language reason; rules: the rule or checklist ids behind it
-  code, params   used by explain/ to write the draft comment
+  code, params   used by comments.py to write the draft comment
   blocking  True when a flag here makes the draft status C
 """
 import re

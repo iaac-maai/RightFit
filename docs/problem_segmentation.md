@@ -87,7 +87,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | ID | Task | Type | Who | Status |
 |---|---|---|---|---|
 | 6.1 | Propose A, B or C with the reasons | Rule | `checks/maf/status.py` | Done; [O] Luca confirms the rules |
-| 6.2 | One comment per issue, from templates | Rule | `explain/` | Done |
+| 6.2 | One comment per issue, from templates | Rule | `checks/maf/comments.py` | Done |
 | 6.3 | Say what was checked and what wasn't | Rule | App | Done |
 | 6.4 | Override a result, with a note | Human | Reviewer | Done in the app |
 | 6.5 | Sign, and choose the status (including Neaprobat or a sample request) | Human | Reviewer | Outside the tool |

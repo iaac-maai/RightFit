@@ -131,7 +131,7 @@ A missing declaration stays B until the reviewer approves it by hand (Luca, 29 O
 
 In the earlier register, missing declarations led to a reminder for the delivery, not to a C (three such MAFs were approved). That is why a missing declaration is a flag (B), not a C.
 
-## 8. Draft comments (explain/)
+## 8. Draft comments (checks/maf/comments.py)
 One sentence per flag or unclear, from a template per check, in English, in the tone of the reviewers' past comments. A language model may only rephrase them, never add values. Example for D2: "The declaration of conformity attached for {covers} matches no product in the MAF; please attach the declarations for {items}."
 
 ## 9. Interface (app/)

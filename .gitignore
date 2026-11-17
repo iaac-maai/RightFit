@@ -238,3 +238,6 @@ brag-output*/
 
 # A data file written halfway: the app writes a .tmp first and then puts it in place (app/review_server.py, save)
 *.tmp
+
+# The design tool's own records: kept on the laptop, not in the repository
+.impeccable/
