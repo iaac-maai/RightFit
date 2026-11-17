@@ -81,7 +81,7 @@ A feature is done when it has a spec, passing tests and a review against the spe
 | Person | Leads | Checks |
 |---|---|---|
 | Sahil | Integration, AI reading, documentation, evaluation | That the work matches the constitution |
-| Jeff | [O] To agree with Jeff. The spec leaves two things open that fit his side: sustainability values for the checklist (LEED, BREEAM, VERDE) and the items the architect has to see (CL-10) | The design side of the checklist |
+| Jeff | The fit check in Revit (MAF-28 to MAF-30), merged on 17 Nov. Still to agree with Jeff [O]: the spec leaves two things open that fit his side: sustainability values for the checklist (LEED, BREEAM, VERDE) and the items the architect has to see (CL-10) | The design side of the checklist |
 | Luca | Rules and checklist, reference answers, verifying the values the AI read | Engineering correctness |
 
 All three of us share the research, testing and presentation.

@@ -38,7 +38,7 @@ RightFit checks material approval forms (MAFs) for MEP equipment before the revi
 | Person | Owns |
 |---|---|
 | Sahil | Integration, documentation, AI implementation, validation |
-| Jeff | Design requirements; his part in the MAF version is still to agree with him [O] |
+| Jeff | Design requirements; the fit check in Revit (`revit/`, `checks/space/`), merged on 17 Nov 2026 |
 | Luca | Rules and checklist, reference answers, verification of extracted values, engineering verification |
 
 Engineering rules in `checks/` must be approved by Luca.
@@ -78,6 +78,6 @@ The repository structure is in `spec/constitution/tech_stack.md` §5.
 
 Open decisions are the items tagged **[O]** in `spec/constitution/`. This file keeps no separate list.
 
-## Current status (16 Nov 2026)
+## Current status (17 Nov 2026)
 
-Two packages read into `data/maf/extracted/`. Of what the AI read, Luca has confirmed 1 of 116 values and 2 of 15 documents; the rest is still `extracted`. Checks, draft status and draft comments built, with 107 tests. All 28 legal rules in `data/maf/rules.csv` were read on the official text, and each rule's dates pick the law in force on the review date. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. One application, `app/review_server.py` with `app/review/`, works on one project at a time and holds the packages, the review, confirming readings, the answer, the BOQ files, the rules (the law's and the consultant's own), what changed since the previous revision of a form, adding a pump package, booster sizing and the standby test. The same checks are MCP tools an agent can call (`app/mcp_server.py`). The app and every file are in English.
+Two packages read into `data/maf/extracted/`. Of what the AI read, Luca has confirmed 1 of 116 values and 2 of 15 documents; the rest is still `extracted`. Checks, draft status and draft comments built, with 157 tests. All 28 legal rules in `data/maf/rules.csv` were read on the official text, and each rule's dates pick the law in force on the review date. Luca's reference answers are in `data/maf/reference/`; the comparison so far runs on unverified values. One application, `app/review_server.py` with `app/review/`, works on one project at a time and holds the packages, the review, confirming readings, the answer, the BOQ files, the rules (the law's and the consultant's own), what changed since the previous revision of a form, adding a pump package, booster sizing and the standby test. The same checks are MCP tools an agent can call (`app/mcp_server.py`). The fit check in Revit (`revit/`, `checks/space/`) checks a pump set in its room in the project's Revit model and previews and swaps its alternatives; its rules in `data/space/rules.csv` wait for Luca. The app and every file are in English.

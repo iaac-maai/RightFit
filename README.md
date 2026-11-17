@@ -58,7 +58,7 @@ python app/mcp_server.py         # the checks as MCP tools; an agent starts it f
 python -m ingest.rule_watch      # has the act behind each legal rule changed since it was read?
 ```
 
-The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`.
+The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`. Each person starts it with their own name, `python app/review_server.py --reviewer "Jeff"`, which is kept next to every confirmation and decision (Luca when no name is given). The app answers only its own page, so another site open in the same browser can neither read the packages nor confirm or decide anything.
 
 The AI parts (a rule typed in words, what a BOQ line asks) use the Claude command line (`claude`) installed and signed in on the laptop.
 
@@ -66,11 +66,41 @@ The AI parts (a rule typed in words, what a BOQ line asks) use the Claude comman
 
 `app/mcp_server.py` gives any agent that speaks MCP six read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, compare a package with the previous revision of its form, and ask the official sources whether the act behind each legal rule changed since it was read. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
 
-## Where we are (16 Nov 2026)
+## The fit check in Revit
+
+Jeff's part, merged on 17 Nov 2026: `revit/` and `checks/space/`, with its spec in `spec/features/revit_fit_check.md`. The MAF review checks what a product is; the fit check shows where it goes. It runs inside the project's own Revit model through pyRevit, a free add-in that runs Python in Revit, on the Windows computer that has Revit.
+
+The architect clicks the pump set in the model. RightFit finds the room it stands in, also in a linked model, and reads the room's outline and height, its doors, everything else standing in it, the pipes that end at the pump and the pump's circuit. It checks the set where it stands and lists how each alternative from the data sheets would do in the same place:
+
+| Check | Question | Rule and its status |
+|---|---|---|
+| S1 | Does the set stand inside the room and under its ceiling? | I9-2022 art. 19.2, to confirm |
+| S2 | Does it hit anything drawn in the model, the door swings included? | I9-2022 art. 19.2, to confirm |
+| S3 | Is the service space around it free? | the consultant's own figures for the project; there is no legal one |
+| S4 | Does it go through a door of the room, standing, on its narrow side? | I9-2022 art. 17.11, to confirm |
+| S5 | Can one pump alone carry the duty, as the standby test found? | I9-2022 art. 6.56, confirmed by Luca |
+| S6 | Is there an approval for contact with drinking water? | Order MS 275/2012, read on the official text |
+
+Next Option shows each alternative in the pump's place as a preview: the maker's Revit family or 3D DWG when the project has it, otherwise a stand-in drawn from the catalogue sizes. Swap puts the chosen alternative into the model once the architect confirms it. It keeps the mark and comments, writes RightFit's verdict into the element and shows what the swap changes: pipe ends that no longer meet the set (K1), more motor power on the circuit, which goes back to the electrical engineer (K2), and the change in weight, which goes to the structural engineer (K3). Ctrl+Z undoes the whole swap.
+
+The checks are the same plain Python file the tests run, with no AI and no network. A value read from the model counts as the design's own; a value from a data sheet stays `extracted` until a person confirms it, and until then a verdict is what the check would say. Every result names its rule and the rule's status, and the report says that RightFit does not certify. The project's own data (the alternatives, the service space, the makers' files) stays in `data/projects/<project>/revit/`, outside Git.
+
+What the review of the code on 17 Nov 2026 found:
+
+- the door check takes the door's width parameter, not the clear opening, so a set within a few centimetres of the width passes and may still not get through;
+- the circuit check compares the motors' output power, not the power they draw, so a less efficient set with the same motors adds load without a flag;
+- every door is taken to open into the room and every obstacle as a box along the model's axes, so a diagonal pipe or a turned set can show a clash that is not there; these are false alarms, never missed clashes;
+- a set whose data sheet leaves a size empty stops the check with an error, and Test Room deletes any room named like the test room, so it must not be pressed in the project's model; both are to fix before it is used on the project's model.
+
+It has been tried in Revit 2026 on a test room, not yet on the project's model, and its rules wait for Luca.
+
+## Where we are (17 Nov 2026)
 
 - Two packages are read: P01, a set of Grundfos pumps, and P02, an air handling unit with its outdoor units, already at revision 4. Of what the AI read, 1 of 116 values and 2 of 15 documents are confirmed so far, so most results are still what a check would say.
 - 48 more packages from the same project are on our laptops. The app lists them; none is read yet.
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
+- Since 17 Nov the rule watch asks the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions are kept in the project folder, a resubmission shows what changed since the previous revision, and our second own model names a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows).
+- Jeff's fit check in Revit was merged on 17 Nov; see above.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
