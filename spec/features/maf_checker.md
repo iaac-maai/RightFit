@@ -115,7 +115,7 @@ One sentence per flag or unclear, from a template per check, in English, in the 
 One application over the checks, `app/review_server.py` with `app/review/`, which runs only on the laptop:
 - Packages: the packages already read, each with its draft answer and what is left, and the packages not read yet; a search and a discipline filter;
 - the review of one package, in three steps (Problems, Confirm readings, Answer), under a header with the form, the draft answer and its reasons, and how much is left;
-- Problems: one finding at a time, grouped by product, then the whole package, then the AI suggestions, with the real page open beside it and the quoted line marked; the reviewer keeps it in the answer, marks it "not a problem" with a reason, or goes to the next;
+- Problems: one finding at a time, grouped by product, then the whole package, then the AI suggestions, with the real page open beside it and the quoted line marked; the reviewer keeps it in the answer, marks it "not a problem" with a reason, or goes to the next; each decision is saved in the project folder with who took it and when, so it shows in any browser and to everyone who shares the folder;
 - Confirm readings: document by document and page by page, each reading marked on the page, with a tick that records who confirmed it (checked_by); a page without a text layer says so and lists what to look for on it;
 - Answer: the draft with one comment per issue, what was checked and what could not be checked; only here can the country and the dates be changed;
 - exports: the answer, the confirmed values (item, value, unit, source, page) for the certification consultant and the O&M file, and the findings marked "not a problem" with their reasons;
@@ -129,8 +129,9 @@ The reviewer works on one project at a time and picks it in the rail; a new proj
     <project>/project.json   name, country (RO or ES), created; optional paths for packages, originals and boq
     <project>/packages/      the read packages (<package>.json) and, per package, a folder with its original files
     <project>/boq/           every BOQ of the project, read together, and the cache of what their lines ask
+    <project>/decisions/     the reviewer's decisions on each package's findings (<package>.json): kept in the answer or not a problem, the reason, who and when
 
-A package uploaded on "Add a package" can be saved into the project; it then shows as not read yet until the reader has been through it. A project's paths can point elsewhere: the project of P01 and P02 uses data/maf/extracted, data/raw and data/raw/boq, where they already are. With no project, the application shows those examples. Shortcut: the consultant's rules stay one set for every project; one set per project comes when a second project needs different ones.
+A package uploaded on "Add a package" can be saved into the project; it then shows as not read yet until the reader has been through it. A project's paths can point elsewhere: the project of P01 and P02 uses data/maf/extracted, data/raw and data/raw/boq, where they already are. Its decisions still sit in its own folder, never in the package files, which are in the public repository. With no project, the application shows those examples, and the decisions on them sit in decisions/ in the projects folder itself. Each finding is named by its check, product, document, rules and code, and for check Q by what the BOQ line asks, so a decision on one never closes another. Shortcut: the consultant's rules stay one set for every project; one set per project comes when a second project needs different ones.
 
 ## 10. Tests and evaluation
 - pytest unit tests for every check, with hand written cases approved by Luca;

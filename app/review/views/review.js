@@ -1,7 +1,7 @@
 // One package in three steps: go through the problems, confirm what the AI read, send the answer. Every result, number
 // and comment comes from the server (app/review_server.py), which runs the deterministic checks. This screen only
 // shows them beside the documents and sends back what the reviewer decides.
-import { $, api, breakable, csv, dmy, download, esc, icon, linkify, pad, plural, store, toast } from '../lib.js';
+import { $, api, breakable, csv, dmy, download, esc, icon, linkify, pad, plural, toast } from '../lib.js';
 
 const STEPS = ['problems', 'readings', 'answer'];
 const MAKER = "the manufacturer's copy";
@@ -23,18 +23,29 @@ const RULE_STATUS = {
 const S = { root: null, active: false, pkg: null, view: null, error: null, step: 'problems', location: 'RO', review: null, delivery: null,
   sel: null, reasonFor: null, doc: null, page: 1, big: false, shown: '', readAt: null, groupOpen: new Map(), inked: new Set(), marksRun: 0 };
 
-// ------------------------------------------------------------------ what stays in this browser, per package
-const dismissed = () => store.read(`rightfit.dismissed.${S.pkg}`, {});
-const seen = () => new Set(store.read(`rightfit.seen.${S.pkg}`, []));
-function markSeen(id) {
-  const s = seen();
-  s.add(id);
-  store.write(`rightfit.seen.${S.pkg}`, [...s]);
+// ------------------------------------------------------------------ the reviewer's decisions, kept by the server in the project folder
+const seen = () => new Set(Object.keys(S.view.decisions).filter((k) => S.view.decisions[k].decision === 'kept'));
+// One decision on a finding: { decision: 'kept' }, { decision: 'dismissed', reason }, or null to open it again.
+const decideFinding = (key, decision) => refresh('/api/decisions', { decisions: { [key]: decision } });
+
+// Decisions this browser kept before they moved to the project folder (17 Nov 2026) go across once, then leave the
+// browser. A decision already in the project folder, perhaps a colleague's, is not overwritten.
+async function moveBrowserDecisions() {
+  const keys = [`rightfit.seen.${S.pkg}`, `rightfit.dismissed.${S.pkg}`];
+  let old;
+  try {
+    const [kept, off] = keys.map((k) => JSON.parse(localStorage.getItem(k)));
+    old = { ...Object.fromEntries((kept || []).map((k) => [k, { decision: 'kept' }])),
+      ...Object.fromEntries(Object.entries(off || {}).map(([k, reason]) => [k, { decision: 'dismissed', reason }])) };
+  } catch { return; }   // a private window, or nothing this browser can read
+  const moves = Object.fromEntries(Object.entries(old).filter(([k]) => !S.view.decisions[k]));
+  if (Object.keys(moves).length && !(await refresh('/api/decisions', { decisions: moves }))) { toast(S.error); return; }
+  keys.forEach((k) => localStorage.removeItem(k));
 }
 
 async function refresh(path = '/api/review', extra = {}) {
   try {
-    S.view = await api(path, { package: S.pkg, location: S.location, review: S.review, delivery: S.delivery, dismissed: dismissed(), ...extra });
+    S.view = await api(path, { package: S.pkg, location: S.location, review: S.review, delivery: S.delivery, ...extra });
     S.error = null;
     S.review = S.view.review;
     S.delivery = S.view.delivery;
@@ -125,6 +136,8 @@ export async function render(root, [pkg, step]) {
     await refresh();
     if (S.pkg !== pkg) return;
     if (!S.view) { drawError(); return; }
+    await moveBrowserDecisions();
+    if (S.pkg !== pkg) return;
     pickFirst();
   }
   S.step = wanted;
@@ -521,25 +534,24 @@ async function onClick(ev) {
     const open = el.getAttribute('aria-expanded') === 'true';
     S.groupOpen.set(el.dataset.id, !open);
     drawLeft();
-  } else if (a === 'keep') { markSeen(S.sel); advance(); }
-  else if (a === 'next') advance();
+  } else if (a === 'keep') {
+    const at = S.sel;
+    if (!(await decideFinding(at, { decision: 'kept' }))) { toast(S.error); return; }
+    if (S.sel === at) advance(); else { drawHead(); drawLeft(); }   // the reviewer has already moved on
+  } else if (a === 'next') advance();
   else if (a === 'ask-reason') { S.reasonFor = S.sel; drawLeft(); $('#reason')?.focus(); }
   else if (a === 'cancel-reason') { S.reasonFor = null; drawLeft(); }
   else if (a === 'dismiss') {
     const reason = $('#reason').value.trim() || 'no reason given';
-    store.write(`rightfit.dismissed.${S.pkg}`, { ...dismissed(), [S.sel]: reason });
     const at = S.sel;
+    if (!(await decideFinding(at, { decision: 'dismissed', reason }))) { toast(S.error); return; }   // the reason stays typed
     S.reasonFor = null;
-    if (await refresh()) {
-      toast('Marked as not a problem. It is out of the answer.');
-      drawSteps();
-      if (S.sel === at) advance(); else { drawHead(); drawLeft(); }   // the reviewer has already moved on
-    }
+    toast('Marked as not a problem. It is out of the answer.');
+    drawSteps();
+    if (S.sel === at) advance(); else { drawHead(); drawLeft(); }   // the reviewer has already moved on
   } else if (a === 'undismiss') {
-    const map = dismissed();
-    delete map[S.sel];
-    store.write(`rightfit.dismissed.${S.pkg}`, map);
-    if (await refresh()) { toast('Back in the answer.'); drawHead(); drawSteps(); drawLeft(); }
+    if (await decideFinding(S.sel, null)) { toast('Back in the answer.'); drawHead(); drawSteps(); drawLeft(); }
+    else toast(S.error);
   } else if (a === 'decide') {
     const { status, id } = el.dataset;
     if (await refresh('/api/decide', { id, status })) {

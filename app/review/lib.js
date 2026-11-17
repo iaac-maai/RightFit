@@ -24,18 +24,6 @@ export async function api(path, body, headers) {
   return data;
 }
 
-// What stays in this browser, like a draft. In a private window it lasts until the page closes.
-const memory = {};
-export const store = {
-  read(key, fallback) {
-    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return memory[key] ?? fallback; }
-  },
-  write(key, value) {
-    memory[key] = value;
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private window */ }
-  },
-};
-
 let toastTimer;
 export function toast(message) {
   const t = $('#toast');

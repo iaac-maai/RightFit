@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pymupdf
 
-from app.review_server import confirm, decide, find_marks, original, package_list, page_png, review
+from app.review_server import confirm, decide, decide_findings, find_marks, original, package_list, page_png, review
 from explain.maf_comments import comment, title
 
 P02 = json.loads((Path(__file__).resolve().parents[1] / "data/maf/extracted/P02.json").read_text())
@@ -47,7 +47,8 @@ def test_confirming_and_deciding_change_the_package():
 
 def test_unknown_decisions_and_targets_are_refused():
     pkg = fresh()
-    for bad in (lambda: decide(pkg, "P02-AI1", "maybe"), lambda: confirm(pkg, [{"kind": "price"}])):
+    for bad in (lambda: decide(pkg, "P02-AI1", "maybe"), lambda: confirm(pkg, [{"kind": "price"}]),
+                lambda: decide_findings({}, {"key": {"decision": "approved"}}), lambda: decide_findings({}, ["key"])):
         try:
             bad()
         except ValueError:
@@ -126,6 +127,13 @@ def test_findings_have_a_short_title_and_plain_words():
     assert all(x["title"] for x in review(fresh())["results"])
 
 
+def test_each_thing_a_boq_line_asks_has_its_own_key():
+    asks = [{"kind": "reminder", "field": "", "quote": t, "text": t} for t in ("weight not above 1916 kg", "dimensions not above 6430 mm")]
+    boq = {"P02-1": {"sheet": "T03", "row": 17, "file": "boq.xlsx", "requirements": asks}}
+    keys = [r["key"] for r in review(fresh(), boq=boq)["results"]]
+    assert len(keys) == len(set(keys))   # so "not a problem" on one never closes the others
+
+
 def test_a_dismissed_problem_keeps_its_title():
     p = next(r for r in review(fresh())["results"] if r["verdict"] == "flag" and r["title"] != r["check_name"])
     after = next(r for r in review(fresh(), dismissed={p["key"]: "ok"})["results"] if r["key"] == p["key"])
@@ -157,6 +165,7 @@ def test_projects_are_folders_and_keep_what_is_saved_into_them(tmp_path, monkeyp
     import app.review_server as s
     monkeypatch.setattr(s, "PROJECTS", tmp_path)
     assert s.current_project()["id"] == ""   # no project yet: the examples
+    assert s.current_project()["folder"] == tmp_path   # their decisions stay out of the tracked folder of P01 and P02
     slug = s.new_project("  Sports   hall A ", "RO")
     assert slug == "sports-hall-a" and s.new_project("Sports hall A", "ES") == "sports-hall-a-2"
     for bad in (("", "RO"), ("Hall", "FR")):
@@ -175,3 +184,35 @@ def test_projects_are_folders_and_keep_what_is_saved_into_them(tmp_path, monkeyp
     (tmp_path / "old").mkdir()
     (tmp_path / "old" / "project.json").write_text(json.dumps({"name": "Old", "packages": "../elsewhere"}))
     assert next(p for p in s.projects() if p["id"] == "old")["packages"] == (tmp_path / "elsewhere").resolve()
+
+
+def test_a_decision_on_a_finding_is_kept_in_the_project_folder_for_every_browser(tmp_path, monkeypatch):
+    import http.client
+    import threading
+    import app.review_server as s
+    monkeypatch.setattr(s, "PROJECTS", tmp_path)
+    slug = s.new_project("Hall", "RO")
+    package = tmp_path / slug / "packages" / "P02.json"
+    package.write_text(json.dumps(P02))
+    server = s.ThreadingHTTPServer(("127.0.0.1", 0), s.Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+
+    def post(path, body):   # one browser asking the server; nothing is kept on the browser's side
+        c = http.client.HTTPConnection("127.0.0.1", server.server_port)
+        c.request("POST", path, json.dumps(body), {"Content-Type": "application/json"})
+        return json.loads(c.getresponse().read())
+
+    try:
+        problem = next(r for r in post("/api/review", {"package": "P02"})["results"] if r["verdict"] == "flag")
+        key = problem["key"]
+        post("/api/decisions", {"package": "P02", "decisions": {key: {"decision": "dismissed", "reason": " agreed  on site "}}})
+        other = post("/api/review", {"package": "P02"})   # another browser, after a reload
+        saved = json.loads((tmp_path / slug / "decisions" / "P02.json").read_text())
+        reopened = post("/api/decisions", {"package": "P02", "decisions": {key: None}})
+    finally:
+        server.shutdown()
+        server.server_close()
+    assert next(r for r in other["results"] if r["key"] == key)["dismissed"] == "agreed on site"
+    assert (saved[key]["decision"], saved[key]["decided_by"]) == ("dismissed", "Luca") and other["decisions"] == saved
+    assert next(r for r in reopened["results"] if r["key"] == key)["dismissed"] is None and reopened["decisions"] == {}
+    assert json.loads(package.read_text()) == P02   # the package file is never written

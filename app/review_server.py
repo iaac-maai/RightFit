@@ -3,7 +3,8 @@
 Run from the repository root:  python app/review_server.py   then open http://127.0.0.1:8520
 
 The screens are in app/review/. They ask this server for the review of a package. The server runs the
-deterministic checks and saves the reviewer's confirmations and decisions into the package files.
+deterministic checks, saves the reviewer's confirmations and decisions on AI suggestions into the package files,
+and keeps the decisions on findings (kept in the answer, or not a problem) in the project folder.
 It only listens on this computer (127.0.0.1).
 """
 import argparse
@@ -11,6 +12,7 @@ import csv
 import json
 import re
 import sys
+import threading
 import traceback
 from datetime import date, timedelta
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -53,7 +55,8 @@ def value_name(key):
 
 def key_of(r):
     """A stable name for one check result: the reviewer's decision on it is saved under this name."""
-    return "|".join(str(x) for x in (r["check"], r["item"], r["doc"], ",".join(r["rules"]), r["code"]))
+    key = "|".join(str(x) for x in (r["check"], r["item"], r["doc"], ",".join(r["rules"]), r["code"]))
+    return f"{key}|{r['params']['text']}" if r["code"] == "Q.rule" else key   # one BOQ line asks several things
 
 
 def rule_info(rule_id, status, rules, checklist, consultant=None):
@@ -145,17 +148,18 @@ def projects():
     out = []
     for f in sorted(PROJECTS.glob("*/project.json")) if PROJECTS.exists() else []:
         p = json.loads(f.read_text())
-        out.append({"id": f.parent.name, "name": p["name"], "location": p.get("location", "RO"),
+        out.append({"id": f.parent.name, "name": p["name"], "location": p.get("location", "RO"), "folder": f.parent,
                     **{k: (f.parent / p.get(k, FOLDERS[k])).resolve() for k in FOLDERS}})
     return out
 
 
 def current_project():
-    """The project the reviewer picked last; the examples when there is no project yet."""
+    """The project the reviewer picked last; the examples when there is no project yet. The examples have no folder
+    of their own, so the reviewer's decisions on them are kept in the projects folder itself."""
     every = projects()
     mark = PROJECTS / ".current"
     chosen = mark.read_text().strip() if mark.exists() else ""
-    return next((p for p in every if p["id"] == chosen), every[0] if every else EXAMPLES)
+    return next((p for p in every if p["id"] == chosen), every[0] if every else {**EXAMPLES, "folder": PROJECTS})
 
 
 def new_project(name, location, root=None):
@@ -335,6 +339,36 @@ def decide(pkg, finding_id, status, note=None):
     finding["note"] = note or None
 
 
+FINDINGS = ("kept", "dismissed")   # a finding kept in the answer, or marked not a problem with a reason
+DECISIONS_LOCK = threading.Lock()   # one change to a decisions file at a time, so two quick clicks never undo each other
+
+
+def decisions_file(folder, name):
+    """The reviewer's decisions on one package's findings. They sit in the project folder, which is git-ignored, and
+    never in the package file: the package files of P01 and P02 are in the public repository."""
+    return folder / "decisions" / f"{name}.json"
+
+
+def read_decisions(path):
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
+def decide_findings(decisions, changes):
+    """Apply the reviewer's decisions, by result key: {"decision": "kept"}, {"decision": "dismissed", "reason": ...},
+    or None to open the finding again. Each decision keeps who took it and when."""
+    if not isinstance(changes, dict):
+        raise ValueError("decisions map a finding's key to the decision")
+    for key, change in changes.items():
+        if change is None:
+            decisions.pop(key, None)
+        elif isinstance(change, dict) and change.get("decision") in FINDINGS:
+            reason = " ".join(str(change.get("reason") or "").split())[:500] or None
+            decisions[key] = {"decision": change["decision"], "reason": reason, "decided_by": REVIEWER,
+                              "decided_on": date.today().isoformat()}
+        else:
+            raise ValueError(f"unknown decision {change!r}")
+
+
 def original(name, pkg, no, raw=RAW):
     """The original PDF of attachment number `no` (1, 2, ...) of package `name`, or None when it is not on this laptop."""
     docs = pkg["documents"]
@@ -451,7 +485,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def project(self):
         p = current_project()
-        return {**EXAMPLES, "packages": self.data} if self.data else p
+        return {**EXAMPLES, "packages": self.data, "folder": self.data} if self.data else p
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PAGE), **kwargs)
@@ -634,17 +668,27 @@ class Handler(SimpleHTTPRequestHandler):
                     files.append((form.name, form))
                 return self.send_json([{"name": n, "pages": pump_demo.page_count(f.read_bytes()),
                                         "token": pump_demo.keep(n, f.read_bytes())} for n, f in files if f])
+            here = self.project()
+            file = decisions_file(here["folder"], path.stem)
             if self.path == "/api/confirm":
                 confirm(pkg, body["targets"])
                 save(path, pkg)
             elif self.path == "/api/decide":
                 decide(pkg, body["id"], body["status"], body.get("note"))
                 save(path, pkg)
+            elif self.path == "/api/decisions":   # the reviewer's decisions on findings, kept in the project folder
+                with DECISIONS_LOCK:   # read just before writing: a colleague sharing the folder may have decided since
+                    decisions = read_decisions(file)
+                    decide_findings(decisions, body["decisions"])
+                    file.parent.mkdir(parents=True, exist_ok=True)
+                    save(file, decisions)
             elif self.path != "/api/review":
                 return self.send_json({"error": "unknown address"}, 404)
-            here = self.project()
-            self.send_json(review(pkg, body.get("location") or here["location"], day(body.get("review")),
-                                  day(body.get("delivery")), body.get("dismissed"), boq_links(pkg, folder=here["boq"])))
+            decisions = read_decisions(file)
+            view = review(pkg, body.get("location") or here["location"], day(body.get("review")), day(body.get("delivery")),
+                          {k: d["reason"] for k, d in decisions.items() if d["decision"] == "dismissed"},
+                          boq_links(pkg, folder=here["boq"]))
+            self.send_json({**view, "decisions": decisions})
         except (KeyError, ValueError, StopIteration, TypeError, IndexError) as e:
             self.send_json({"error": f"{type(e).__name__}: {e}"}, 400)
         except Exception as e:   # an upload no library can read still gets an answer the page can show
