@@ -20,11 +20,13 @@ The project's data stays out of Git, in `data/projects/<project>/revit/`:
 |---|---|---|
 | `candidates.json` | the submitted set and its alternatives, from their data sheets | `revit/templates/candidates.json` |
 | `project.json` | the consultant's service space; the circuit if the model has none; an optional test room | `revit/templates/project.json` |
-| `families/` | the makers' Revit families (.rfa), named `<id>.rfa` or listed in `families.json` | |
+| `families/` | the makers' models: a Revit family (`<id>.rfa`) or a 3D DWG (`<id>.dwg`), or any name listed in `families.json` | |
 
-The makers publish their families for free (an account is needed): Grundfos on MEPcontent and the Grundfos
-Product Center, Wilo in its BIM/CAD catalogue, DAB and Lowara on BIMobject. They stay on our laptops and are
-not added to Git.
+The makers publish their models for free: Grundfos on its Product Center (product page > CAD tab > DWG), Wilo in
+its CAD catalogue, DAB and Lowara on BIMobject. A 3D DWG is read in millimetres and stood upright by matching its
+sizes to the catalogue's L x W x H (`"units"` in `families.json` overrides the units). A DWG has no pipe or power
+connections, so it is used for previews and the test room but never replaces a real Revit family in a project
+model. The files stay on our laptops and are not added to Git.
 
 Then in Revit: RightFit > Settings > Project, and pick it.
 

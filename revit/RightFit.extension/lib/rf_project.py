@@ -57,7 +57,8 @@ def service():
 
 
 def family_file(s):
-    """The maker's .rfa for a set, and how to place it: families.json entry, else families/<id>.rfa."""
+    """The maker's model of a set (a Revit family .rfa or a 3D drawing .dwg) and how to place it:
+    the families.json entry, else families/<id>.rfa or families/<id>.dwg."""
     f = folder()
     if not f:
         return None, {}
@@ -68,8 +69,12 @@ def family_file(s):
             entry = json.load(fh).get(s["id"]) or {}
     except Exception:
         pass
-    path = os.path.join(fam_dir, entry.get("file") or (s["id"] + ".rfa"))
-    return (path if os.path.exists(path) else None), entry
+    names = [entry["file"]] if entry.get("file") else [s["id"] + ".rfa", s["id"] + ".dwg"]
+    for n in names:  # a Revit family, or the maker's 3D drawing
+        path = os.path.join(fam_dir, n)
+        if os.path.exists(path):
+            return path, entry
+    return None, entry
 
 
 def _norm(text):

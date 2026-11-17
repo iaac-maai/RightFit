@@ -15,6 +15,9 @@ from Autodesk.Revit.DB import (Arc, BoundingBoxXYZ, BuiltInCategory, BuiltInPara
                                FamilyInstance, FillPatternElement, FilteredElementCollector, GeometryCreationUtilities,
                                GeometryObject, Level, Line, OverrideGraphicSettings, Transform, View3D,
                                ViewFamily, ViewFamilyType, ViewOrientation3D, Wall, XYZ)
+from Autodesk.Revit.DB import (FailureProcessingResult, FailureSeverity, IFailuresPreprocessor)
+from Autodesk.Revit.DB import ImportInstance, SolidUtils
+from Autodesk.Revit.DB import DWGImportOptions, GeometryInstance, ImportPlacement, ImportUnit, Mesh, Options, Solid
 from Autodesk.Revit.DB.Structure import StructuralType
 from System import Int64
 from System.Collections.Generic import List
@@ -229,29 +232,145 @@ def load_symbol(doc, path, type_name=None):
     return sym
 
 
+def fit_element(doc, el, frame, s, base_z, extra_turn=0, current=None):
+    """Turn an element so its long side runs along the frame's x like the catalogue, put its middle on the
+    frame's origin and stand it at base_z. Returns its measured box in the frame (mm)."""
+    axis = Line.CreateBound(frame.origin, frame.origin + XYZ.BasisZ)
+    if current is None:
+        current = math.atan2(el.GetTransform().BasisX.Y, el.GetTransform().BasisX.X)
+    turn = frame.angle() - current + math.radians(extra_turn)
+    if abs(turn) > 1e-6:
+        ElementTransformUtils.RotateElement(doc, el.Id, axis, turn)
+        doc.Regenerate()
+    b = local_box(geometry_points(el), frame)
+    if ((b[2] - b[0]) < (b[3] - b[1])) != (s["L"] < s["W"]):  # long side the wrong way: a quarter turn
+        ElementTransformUtils.RotateElement(doc, el.Id, axis, math.pi / 2)
+        doc.Regenerate()
+        b = local_box(geometry_points(el), frame)
+    move = frame.vector([-(b[0] + b[2]) / 2 / 304.8, -(b[1] + b[3]) / 2 / 304.8, (base_z - b[4]) / 304.8])
+    ElementTransformUtils.MoveElement(doc, el.Id, move)
+    doc.Regenerate()
+    return local_box(geometry_points(el), frame)
+
+
 def place_family(doc, sym, frame, s, base_z, level, extra_turn=0):
-    """Place a family in the frame: turned so its long side runs along the frame's x like the catalogue,
-    its middle on the frame's origin, standing at base_z. Returns the instance and its measured box."""
+    """Place a family in the frame (see fit_element). Returns the instance and its measured box."""
     try:
         inst = doc.Create.NewFamilyInstance(frame.origin, sym, level, StructuralType.NonStructural)
     except Exception:
         inst = doc.Create.NewFamilyInstance(frame.origin, sym, StructuralType.NonStructural)
     doc.Regenerate()
-    axis = Line.CreateBound(frame.origin, frame.origin + XYZ.BasisZ)
-    current = math.atan2(inst.GetTransform().BasisX.Y, inst.GetTransform().BasisX.X)
-    turn = frame.angle() - current + math.radians(extra_turn)
-    if abs(turn) > 1e-6:
-        ElementTransformUtils.RotateElement(doc, inst.Id, axis, turn)
-        doc.Regenerate()
-    b = local_box(geometry_points(inst), frame)
-    if ((b[2] - b[0]) < (b[3] - b[1])) != (s["L"] < s["W"]):  # long side the wrong way: a quarter turn
-        ElementTransformUtils.RotateElement(doc, inst.Id, axis, math.pi / 2)
-        doc.Regenerate()
-        b = local_box(geometry_points(inst), frame)
-    move = frame.vector([-(b[0] + b[2]) / 2 / 304.8, -(b[1] + b[3]) / 2 / 304.8, (base_z - b[4]) / 304.8])
-    ElementTransformUtils.MoveElement(doc, inst.Id, move)
+    return inst, fit_element(doc, inst, frame, s, base_z, extra_turn)
+
+
+class _AcceptWarnings(IFailuresPreprocessor):
+    """Let Revit go on past warnings (such as 'cannot import some of the geometry'): the parts it could read
+    are kept, and the report compares the result with the catalogue size."""
+    def PreprocessFailures(self, accessor):
+        for f in list(accessor.GetFailureMessages()):
+            if f.GetSeverity() == FailureSeverity.Warning:
+                accessor.DeleteWarning(f)
+        return FailureProcessingResult.Continue
+
+
+def accept_warnings(transaction):
+    opts = transaction.GetFailureHandlingOptions()
+    opts.SetFailuresPreprocessor(_AcceptWarnings())
+    transaction.SetFailureHandlingOptions(opts)
+
+
+def _upright(points, s):
+    """Which of the drawing's axes is the set's length, width and height: the order that best matches the
+    catalogue's L x W x H (makers draw 'up' along different axes). Returns a transform that stands it up."""
+    from itertools import permutations
+    ext = [max(p[i] for p in points) - min(p[i] for p in points) for i in range(3)]
+    want = [s.get("L"), s.get("W"), s.get("H")]
+    if not points or not all(want):
+        return Transform.Identity, ext
+    best = min(permutations(range(3)), key=lambda o: sum(abs(ext[o[k]] - want[k]) / want[k] for k in range(3)))
+    axes = [XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ]
+    ex, ez = axes[best[0]], axes[best[2]]  # the drawing's length axis becomes x, its height axis becomes z
+    ey = ez.CrossProduct(ex)
+    t = Transform.Identity
+    t.BasisX = XYZ(ex.X, ey.X, ez.X)
+    t.BasisY = XYZ(ex.Y, ey.Y, ez.Y)
+    t.BasisZ = XYZ(ex.Z, ey.Z, ez.Z)
+    return t, ext
+
+
+def import_drawing(doc, path, view, name, category, s=None, units="mm"):
+    """Bring a maker's 3D DWG into the model as one DirectShape with the drawing's real solids, standing up,
+    then remove the imported DWG itself. Maker drawings are in millimetres even when the file says otherwise
+    (the Grundfos file says inches); families.json can set "units" for one that isn't."""
+    opt = DWGImportOptions()
+    opt.ThisViewOnly = False
+    opt.Placement = ImportPlacement.Origin
+    opt.Unit = {"mm": ImportUnit.Millimeter, "cm": ImportUnit.Centimeter, "m": ImportUnit.Meter,
+                "inch": ImportUnit.Inch, "auto": ImportUnit.Default}.get(units, ImportUnit.Millimeter)
+    before = set(eid(e.Id) for e in FilteredElementCollector(doc).OfClass(ImportInstance))
+    ref = clr.Reference[ElementId]()
+    doc.Import(path, opt, view, ref)
     doc.Regenerate()
-    return inst, local_box(geometry_points(inst), frame)
+    new = [e for e in FilteredElementCollector(doc).OfClass(ImportInstance) if eid(e.Id) not in before]
+    if not new:
+        raise Exception(u"Revit could not import " + os.path.basename(path))
+    imp = new[0]
+    pieces = []
+
+    def walk(geo):
+        for g in geo:
+            if isinstance(g, GeometryInstance):
+                walk(g.GetInstanceGeometry())
+            elif isinstance(g, Solid) and g.Volume > 0:
+                pieces.append(g)
+            elif isinstance(g, Mesh) and g.NumTriangles > 0:
+                pieces.append(g)
+    walk(imp.get_Geometry(Options()))
+    pts = []
+    for g in pieces:
+        if isinstance(g, Solid):
+            for e in g.Edges:
+                for q in e.Tessellate():
+                    pts.append([mm(q.X), mm(q.Y), mm(q.Z)])
+        else:
+            for q in g.Vertices:
+                pts.append([mm(q.X), mm(q.Y), mm(q.Z)])
+    turn, _ = _upright(pts, s or {})
+    ds = DirectShape.CreateElement(doc, ElementId(category))
+    good = List[GeometryObject]()
+    for g in pieces:
+        g2 = SolidUtils.CreateTransformed(g, turn) if isinstance(g, Solid) else g.get_Transformed(turn)
+        one = List[GeometryObject]()
+        one.Add(g2)
+        try:
+            if ds.IsValidShape(one):
+                good.Add(g2)
+        except Exception:
+            good.Add(g2)
+    ds.SetShape(good)
+    ds.SetName(name)
+    try:
+        imp.Pinned = False  # an import placed at the origin comes pinned
+        doc.Delete(imp.Id)  # the DirectShape now holds the geometry
+    except Exception:
+        pass
+    doc.Regenerate()
+    return ds
+
+
+def place_model(doc, path, entry, frame, s, base_z, level, view, name, category):
+    """Place the maker's model of set s: a Revit family (.rfa) or a 3D drawing (.dwg).
+    Returns (element, measured box, what it is in words)."""
+    turn = float(entry.get("rotate", 0))
+    if path.lower().endswith(".dwg"):
+        ds = import_drawing(doc, path, view, name, category, s, entry.get("units", "mm"))
+        return ds, fit_element(doc, ds, frame, s, base_z, turn, current=0.0), \
+            u"the maker's 3D drawing: " + os.path.basename(path)
+    sym = load_symbol(doc, path, entry.get("type"))
+    if sym is None:
+        return None, None, None
+    inst, b = place_family(doc, sym, frame, s, base_z, level, turn)
+    return inst, b, u"the maker's Revit family: " + os.path.basename(path)
 
 
 def lowest_level(doc):
