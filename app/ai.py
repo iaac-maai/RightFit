@@ -32,9 +32,12 @@ def ask(prompt_file, text, schema, context=""):
         raise RuntimeError("The AI is not set up on this laptop (no Claude command line); fill in the rule by hand.")
     system = (PROMPTS / prompt_file).read_text() + (f"\n\n{context}" if context else "")
     with tempfile.TemporaryDirectory() as cwd:   # an empty folder, so no project instructions are read
-        run = subprocess.run([claude, "-p", "--model", MODEL, "--output-format", "json", "--json-schema", json.dumps(schema),
-                              "--no-session-persistence", "--strict-mcp-config", "--disallowedTools", NO_TOOLS,
-                              "--system-prompt", system], input=text, capture_output=True, text=True, timeout=120, cwd=cwd)
+        try:
+            run = subprocess.run([claude, "-p", "--model", MODEL, "--output-format", "json", "--json-schema", json.dumps(schema),
+                                  "--no-session-persistence", "--strict-mcp-config", "--disallowedTools", NO_TOOLS,
+                                  "--system-prompt", system], input=text, capture_output=True, text=True, timeout=120, cwd=cwd)
+        except subprocess.TimeoutExpired:   # the callers handle RuntimeError, so the page still answers
+            raise RuntimeError("The AI did not answer within two minutes; try again or fill in the rule by hand.") from None
     try:
         answer = json.loads(run.stdout)
     except ValueError:

@@ -235,3 +235,6 @@ brag-output*/
 
 # The Revit add-in keeps its Python modules in lib/, which the Python rules above ignore
 !revit/RightFit.extension/lib/
+
+# A data file written halfway: the app writes a .tmp first and then puts it in place (app/review_server.py, save)
+*.tmp

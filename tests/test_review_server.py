@@ -216,3 +216,75 @@ def test_a_decision_on_a_finding_is_kept_in_the_project_folder_for_every_browser
     assert (saved[key]["decision"], saved[key]["decided_by"]) == ("dismissed", "Luca") and other["decisions"] == saved
     assert next(r for r in reopened["results"] if r["key"] == key)["dismissed"] is None and reopened["decisions"] == {}
     assert json.loads(package.read_text()) == P02   # the package file is never written
+
+
+def test_a_change_from_another_site_is_refused_and_the_app_s_own_page_goes_on(tmp_path, monkeypatch):
+    import http.client
+    import threading
+    import app.review_server as s
+    monkeypatch.setattr(s, "PROJECTS", tmp_path)
+    slug = s.new_project("Hall", "RO")
+    (tmp_path / slug / "packages" / "P02.json").write_text(json.dumps(P02))
+    server = s.ThreadingHTTPServer(("127.0.0.1", 0), s.Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    own = f"127.0.0.1:{server.server_port}"
+
+    def post(headers):   # sent as plain text, the way a page of another site can send it without asking first
+        c = http.client.HTTPConnection("127.0.0.1", server.server_port)
+        c.request("POST", "/api/review", json.dumps({"package": "P02"}), {"Content-Type": "text/plain", **headers})
+        return c.getresponse().status
+
+    def get(headers):   # a read: the list of packages
+        c = http.client.HTTPConnection("127.0.0.1", server.server_port)
+        c.request("GET", "/api/packages", headers=headers)
+        return c.getresponse().status
+
+    try:
+        reads = [get({}), get({"Host": "another-site.example"})]   # the app's own page, a web name pointed here
+        codes = [post({"Origin": "https://another-site.example"}),   # a page of another site
+                 post({"Origin": f"http://{own}"}),   # RightFit's own page
+                 post({}),   # a script on this laptop
+                 post({"Host": "another-site.example", "Origin": "http://another-site.example"})]   # a web name pointed here
+    finally:
+        server.shutdown()
+        server.server_close()
+    assert codes == [403, 200, 200, 403] and reads == [200, 403]
+
+
+def test_a_write_cut_halfway_leaves_the_old_file_as_it_was(tmp_path, monkeypatch):
+    import pytest
+    import app.review_server as s
+    path = tmp_path / "P02.json"
+    path.write_text('{"old": true}\n')
+    real = Path.write_text
+
+    def half(self, text, *args, **kwargs):   # the disk fills up halfway through
+        real(self, text[: len(text) // 2], *args, **kwargs)
+        raise OSError("No space left on device")
+    monkeypatch.setattr(Path, "write_text", half)
+    with pytest.raises(OSError):
+        s.save(path, {"new": True, "readings": list(range(50))})
+    monkeypatch.undo()
+    assert json.loads(path.read_text()) == {"old": True}
+
+
+def test_the_reviewer_named_at_start_is_kept_with_each_confirmation(monkeypatch):
+    import app.review_server as s
+    monkeypatch.setattr(s, "REVIEWER", "Jeff")
+    entry = {"value": 15, "unit": "m³/h", "status": "extracted"}
+    s.set_verified(entry, True)
+    assert (entry["status"], entry["checked_by"]) == ("verified", "Jeff")
+
+
+def test_an_ai_that_does_not_answer_in_time_gives_the_usual_error(monkeypatch):
+    import subprocess
+    import sys
+    import pytest
+    from app import ai
+    monkeypatch.setattr(ai.shutil, "which", lambda name: sys.executable)
+
+    def hangs(*args, **kwargs):
+        raise subprocess.TimeoutExpired(cmd="claude", timeout=120)
+    monkeypatch.setattr(ai.subprocess, "run", hangs)
+    with pytest.raises(RuntimeError):
+        ai.ask("rule_from_words.md", "pumps only from one maker", ai.RULE)

@@ -73,6 +73,14 @@ def test_d3_expired_renew_before_delivery_valid_and_no_date():
     assert by_doc["decl.pdf"]["result"] == "info"
 
 
+
+def test_d3_a_date_that_is_not_a_full_date_is_unclear_not_an_error():
+    docs = [doc("month.pdf", "product_certificate", [], valid_until="2026-06"),
+            doc("dotted.pdf", "product_certificate", [], valid_until="30.06.2026"),
+            doc("year.pdf", "product_certificate", [], valid_until=2026)]
+    by_doc = {r["doc"]: r for r in c.d3_in_date(pkg([], docs), ctx())}
+    assert by_doc["month.pdf"]["result"] == by_doc["dotted.pdf"]["result"] == by_doc["year.pdf"]["result"] == "unclear"
+
 def test_d4_label_types():
     assert c.expected_type("FT DPK15803050D") == "data_sheet"
     assert c.expected_type("FISA TEHNICA CTA") == "data_sheet"

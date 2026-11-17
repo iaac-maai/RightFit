@@ -193,7 +193,12 @@ def d3_in_date(pkg, ctx):
             if d["doc_type"] in DATED_TYPES:
                 out.append(result("D3", "info", f"{d['file']}: no expiry date printed", doc=d["file"], rules=["CL-02"]))
             continue
-        until = date.fromisoformat(d["valid_until"])
+        try:
+            until = date.fromisoformat(d["valid_until"])
+        except (ValueError, TypeError):   # left as printed ("2026-06", "30.06.2026", 2026): a person reads it
+            out.append(result("D3", "unclear", f"{d['file']}: the expiry date {d['valid_until']!r} is not a full date; "
+                              "read it on the document", doc=d["file"], rules=["CL-02"]))
+            continue
         params = {"file": d["file"], "doc_type": d["doc_type"], "date": until.strftime("%d.%m.%Y")}
         if until < review:
             out.append(result("D3", "flag", f"{d['file']} expired on {until}, before the review date {review}",

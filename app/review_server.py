@@ -10,6 +10,7 @@ It only listens on this computer (127.0.0.1).
 import argparse
 import csv
 import json
+import os
 import re
 import sys
 import threading
@@ -33,7 +34,8 @@ from ingest.boq import find_line, read_boq, sheets_for  # noqa: E402
 PAGE = Path(__file__).with_name("review")
 RAW = ROOT / "data/raw"   # the original PDFs, on the laptop only (git-ignored)
 # shortcut: one reviewer name for every confirmation; add a login when more reviewers use it.
-REVIEWER = "Luca"
+REVIEWER = "Luca"   # kept next to every confirmation and decision; --reviewer "Name" when someone else reviews
+LOCAL = {"127.0.0.1", "localhost"}   # the only hosts the app answers (local_request)
 CHECK_NAMES = {"D1": "Required documents", "D2": "Declaration matches the products", "D3": "Certificate in date",
                "D4": "Attachment is what the form says", "V1": "Duty point", "V2": "Pressure rating", "V3": "Liquid temperature",
                "E1": "Ecodesign", "H1": "Drinking water approval", "C": "Reviewers' checklist", "P": "Consultant's rules", "Q": "BOQ line", "R": "Delivery reminder"}
@@ -111,10 +113,12 @@ def new_consultant_rule(body, rows, today=None):
 
 
 def write_consultant_rules(rows):
-    with open(CONSULTANT, "w", newline="", encoding="utf-8") as f:   # CRLF, like the other tables
+    tmp = CONSULTANT.with_name(CONSULTANT.name + ".tmp")   # written whole, then put in place, as in save()
+    with open(tmp, "w", newline="", encoding="utf-8") as f:   # CRLF, like the other tables
         w = csv.DictWriter(f, fieldnames=CONSULTANT_FIELDS, lineterminator="\r\n")
         w.writeheader()
         w.writerows(rows)
+    os.replace(tmp, CONSULTANT)
 
 
 def consultant_screen():
@@ -340,7 +344,7 @@ def decide(pkg, finding_id, status, note=None):
 
 
 FINDINGS = ("kept", "dismissed")   # a finding kept in the answer, or marked not a problem with a reason
-DECISIONS_LOCK = threading.Lock()   # one change to a decisions file at a time, so two quick clicks never undo each other
+WRITE_LOCK = threading.Lock()   # one change to a package or decisions file at a time, so two quick clicks never undo each other
 
 
 def decisions_file(folder, name):
@@ -486,11 +490,23 @@ def save_package(entries, originals, packages):
 
 
 def save(path, pkg):
-    path.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + "\n")
+    """Write a JSON file whole or not at all: it goes to a temporary file first and then takes the old one's place,
+    so a full disk or a stop halfway leaves the old file as it was."""
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(pkg, ensure_ascii=False, indent=2) + "\n")
+    os.replace(tmp, path)
 
 
 def day(text):
     return date.fromisoformat(text) if text else None
+
+
+def local_request(headers):
+    """True when a request comes from RightFit's own page on this laptop. A page of another site sends its own Origin,
+    and a web name pointed at this laptop shows in Host, so both must be local; a script sends no Origin."""
+    host = headers.get("Host") or ""
+    origin = headers.get("Origin")
+    return urlparse(f"http://{host}").hostname in LOCAL and (origin is None or urlparse(origin).netloc == host)
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -555,6 +571,8 @@ class Handler(SimpleHTTPRequestHandler):
         return {p.stem: p for p in sorted(self.project()["packages"].glob("*.json"))}
 
     def do_GET(self):
+        if not local_request(self.headers):   # a web name pointed at this laptop may not read the packages either
+            return self.send_json({"error": "RightFit only answers its own page."}, 403)
         doc = re.fullmatch(r"/doc/([A-Za-z0-9_-]+)/(\d+)", self.path.split("?")[0])
         if doc:
             return self.send_original(doc.group(1), int(doc.group(2)))
@@ -596,6 +614,8 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         try:
+            if not local_request(self.headers):   # another site open in the same browser; the app's own page goes on
+                return self.send_json({"error": "RightFit only answers its own page."}, 403)
             size = int(self.headers.get("Content-Length", 0))
             if size > 60_000_000:
                 return self.send_json({"error": "The file is larger than 60 MB."}, 413)
@@ -652,14 +672,16 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.send_json({"error": str(e)}, 503)
                 return self.send_json({"rule": new_consultant_rule(proposal, rows)})
             if self.path == "/api/consultant-rules":   # a new rule from the Rules screen
-                rows = load(CONSULTANT.name)
-                write_consultant_rules(rows + [new_consultant_rule(body, rows)])
+                with WRITE_LOCK:   # read, change and write in one go, as for a package
+                    rows = load(CONSULTANT.name)
+                    write_consultant_rules(rows + [new_consultant_rule(body, rows)])
                 return self.send_json(consultant_screen())
             if self.path == "/api/consultant-rules/active":   # switch one rule on or off
-                rows = load(CONSULTANT.name)
-                row = next(r for r in rows if r["rule_id"] == body["rule_id"])
-                row["active"] = "yes" if body["active"] else "no"
-                write_consultant_rules(rows)
+                with WRITE_LOCK:
+                    rows = load(CONSULTANT.name)
+                    row = next(r for r in rows if r["rule_id"] == body["rule_id"])
+                    row["active"] = "yes" if body["active"] else "no"
+                    write_consultant_rules(rows)
                 return self.send_json(consultant_screen())
             if self.path == "/api/pumps/sets":
                 return self.send_json(pump_demo.booster_sets())
@@ -685,14 +707,16 @@ class Handler(SimpleHTTPRequestHandler):
                                         "token": pump_demo.keep(n, f.read_bytes())} for n, f in files if f])
             here = self.project()
             file = decisions_file(here["folder"], path.stem)
-            if self.path == "/api/confirm":
-                confirm(pkg, body["targets"])
-                save(path, pkg)
-            elif self.path == "/api/decide":
-                decide(pkg, body["id"], body["status"], body.get("note"))
-                save(path, pkg)
+            if self.path in ("/api/confirm", "/api/decide"):
+                with WRITE_LOCK:   # read, change and write in one go, so a second quick tick never undoes the first
+                    pkg = json.loads(path.read_text())
+                    if self.path == "/api/confirm":
+                        confirm(pkg, body["targets"])
+                    else:
+                        decide(pkg, body["id"], body["status"], body.get("note"))
+                    save(path, pkg)
             elif self.path == "/api/decisions":   # the reviewer's decisions on findings, kept in the project folder
-                with DECISIONS_LOCK:   # read just before writing: a colleague sharing the folder may have decided since
+                with WRITE_LOCK:   # read just before writing: a colleague sharing the folder may have decided since
                     decisions = read_decisions(file)
                     decide_findings(decisions, body["decisions"])
                     file.parent.mkdir(parents=True, exist_ok=True)
@@ -712,13 +736,14 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 def main():
+    global PROJECTS, REVIEWER
     ap = argparse.ArgumentParser(description="RightFit review page")
     ap.add_argument("--port", type=int, default=8520)
     ap.add_argument("--data", type=Path, help="one folder of package files instead of the projects (tests, previews)")
     ap.add_argument("--projects", type=Path, help="the folder that holds the projects, for example a shared Drive folder")
+    ap.add_argument("--reviewer", default=REVIEWER, help="the name kept next to every confirmation and decision")
     args = ap.parse_args()
-    global PROJECTS
-    Handler.data, PROJECTS = args.data, args.projects or PROJECTS
+    Handler.data, PROJECTS, REVIEWER = args.data, args.projects or PROJECTS, args.reviewer
     server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(f"RightFit review page: http://127.0.0.1:{args.port}", flush=True)
     server.serve_forever()
