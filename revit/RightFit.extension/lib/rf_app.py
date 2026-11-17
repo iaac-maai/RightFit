@@ -298,7 +298,8 @@ def swap(doc, uidoc, g, s):
     elif path:
         new, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump),
                                            rf_draw.view3d(doc), u"RFT pump - {} {}".format(s["maker"], s["model"]),
-                                           BuiltInCategory.OST_MechanicalEquipment)
+                                           BuiltInCategory.OST_MechanicalEquipment,
+                                           as_shape=stand_in_ok)  # test room: the family's saved shape is enough
         how = u"placed " + (what or u"")
     if new is None:  # no maker file, or one that could not be used: a stand-in at the catalogue size
         why = (u" (the maker's file could not be used: " + what + u")") if (path and what) else u""
