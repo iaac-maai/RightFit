@@ -1,7 +1,7 @@
 // One package in three steps: go through the problems, confirm what the AI read, send the answer. Every result, number
 // and comment comes from the server (app/review_server.py), which runs the deterministic checks. This screen only
 // shows them beside the documents and sends back what the reviewer decides.
-import { $, api, breakable, csv, dmy, download, esc, icon, linkify, pad, plural, toast } from '../lib.js';
+import { $, api, breakable, csv, dmy, download, esc, fmt, icon, linkify, pad, plural, toast } from '../lib.js';
 
 const STEPS = ['problems', 'readings', 'answer'];
 const MAKER = "the manufacturer's copy";
@@ -130,7 +130,7 @@ export async function render(root, [pkg, step]) {
   S.active = true;
   const wanted = STEPS.includes(step) ? step : 'problems';
   if (pkg !== S.pkg || !S.view) {
-    Object.assign(S, { pkg, view: null, review: null, delivery: null, location: 'RO', sel: null, reasonFor: null, doc: null, page: 1, readAt: null });
+    Object.assign(S, { pkg, view: null, review: null, delivery: null, location: 'RO', sel: null, reasonFor: null, doc: null, page: 1, readAt: null, revisions: null });
     S.groupOpen = new Map();
     root.innerHTML = '<p class="empty">Loading the package…</p>';
     await refresh();
@@ -139,6 +139,10 @@ export async function render(root, [pkg, step]) {
     await moveBrowserDecisions();
     if (S.pkg !== pkg) return;
     pickFirst();
+    // Comparing with the previous revision reads every file, so the page does not wait for it.
+    api('/api/revisions', { package: pkg }).then((r) => {
+      if (S.pkg === pkg) { S.revisions = r; if (S.active && $('#head')) drawHead(); }
+    }).catch(() => {});
   }
   S.step = wanted;
   if (S.step === 'readings') { if (!S.readAt) firstReadingPage(); showPlace(S.readAt); }
@@ -177,7 +181,24 @@ function drawHead() {
     <div class="fld"><span class="lab">Package</span><span class="typed">${n} ${plural(n, 'product')}, ${v.documents.length + 1} files, ${pages} pages</span></div>
     <div class="fld"><span class="lab">Draft answer</span><div class="ans"><i class="letter ${letter}">${letter}</i><b>${esc(v.status.label)}</b></div></div>
     <details class="whyb"><summary>Why ${letter}?</summary><div class="pop"><p>${STATUS_RULE[letter]}</p><ul>${whyList()}</ul></div></details>
+    ${since()}
     <div class="prog">${progress(c)}</div>`;
+}
+
+// What changed since the previous revision of the same form, file by file (no AI; see ingest/revisions.py).
+function since() {
+  const r = S.revisions;
+  if (!r?.previous) return '';
+  const line = (a) => {
+    if (a.status === 'removed') return `<li><b>removed</b> ${breakable(a.previous)}</li>`;
+    if (a.status === 'new') return `<li><b>new</b> ${breakable(a.file)}</li>`;
+    if (a.status === 'unchanged') return `<li><b>unchanged</b> ${breakable(a.file)}${a.renamed ? `: the same file as ${breakable(a.previous)}, renamed` : ''}</li>`;
+    const pages = a.pages ? `; ${a.same_pages} of ${a.pages} pages keep the same text` : '';
+    return `<li><b>changed</b> ${breakable(a.file)}: closest to ${breakable(a.previous)} (${a.how === 'look' ? 'by the look of its pages' : 'by its text'}, similarity ${fmt(a.similarity, 2)}${pages})</li>`;
+  };
+  return `<details class="whyb end"><summary>Since rev ${esc(r.revision)}</summary><div class="pop">
+    <p>Compared with ${esc(r.previous)}, revision ${esc(r.revision)} of the same form, file by file: the same file, or the closest by text, or by the look of the pages for a scan. No AI. Open both files before relying on a pair.</p>
+    <ul>${r.attachments.map(line).join('')}</ul></div></details>`;
 }
 
 function progress(c) {

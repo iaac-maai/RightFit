@@ -14,7 +14,7 @@ from ingest import rule_watch
 from model.page_classifier import CLASSES
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOLS = ["classify_pages", "list_packages", "list_rules", "review_package", "watch_rules"]
+TOOLS = ["classify_pages", "compare_revisions", "list_packages", "list_rules", "review_package", "watch_rules"]
 
 
 def call(tool, **args):
@@ -26,7 +26,7 @@ def call(tool, **args):
     return anyio.run(go)
 
 
-def test_the_agent_sees_five_tools_and_all_of_them_only_read():
+def test_the_agent_sees_six_tools_and_all_of_them_only_read():
     async def go():
         async with Client(server) as client:
             return (await client.list_tools()).tools
@@ -84,6 +84,17 @@ def test_watch_rules_answers_for_every_legal_rule_and_changes_none(monkeypatch):
     assert [r["rule_id"] for r in got] == [r["rule_id"] for r in load("rules.csv") if r["status"] not in rule_watch.NOT_LAW]
     assert {r["result"] for r in got} == {"not_checked"}   # with no answer, nothing is called unchanged
     assert table.read_bytes() == before
+
+
+@pytest.mark.skipif(not (RAW / "P02").is_dir() or not (RAW / "P10").is_dir(),
+                    reason="the packages stay on Luca's laptop")
+def test_compare_revisions_finds_revision_3_of_p02_and_lists_every_file():
+    error, text = call("compare_revisions", package="P02")
+    got = json.loads(text)
+    assert not error and (got["form"], got["revision"], got["previous_package"], got["previous_revision"]) == ("IV 004", 4, "P10", 3)
+    statuses = {a["status"] for a in got["attachments"]}
+    assert statuses <= {"unchanged", "changed", "new", "removed"} and "unchanged" in statuses
+    assert call("compare_revisions", package="../P02")[0]          # a name from the agent cannot leave data/raw
 
 
 @pytest.mark.skipif(not (RAW / "P01").is_dir() or not MODEL.exists(),

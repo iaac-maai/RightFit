@@ -110,6 +110,16 @@ Each legal rule comes back as one of three results:
 Rules from practice and engineer inputs are not asked about. The watch only reads: it never changes a rule or its status, and a person reads a changed act again and decides. It asks each act once, about 15 acts in half a minute, from `python3 -m ingest.rule_watch` or the MCP tool watch_rules. The BOE date moves with any update of its record, so a change there can turn out to be technical. Shortcut: a version dated before verified_on but published after it is only seen with the act's next version; reading the amending acts' dates would close that gap. Run on 17 Nov 2026: all 28 legal rules unchanged.
 
 
+### What changed since the previous revision (MAF-26)
+
+A resubmitted MAF comes back as a new revision of the same form: P02 is revision 4 of IV 004, and P10 its revision 3. `ingest/revisions.py` pairs each attachment of the new revision with the one of the previous revision that it continues, with no AI:
+
+- the same file, byte for byte, whatever its name: unchanged, and marked when it was renamed;
+- otherwise the closest attachment by its text (TF-IDF on groups of 3 to 5 characters, cosine similarity of at least 0.5) or, for a scan, by the look of its first three pages (32 by 32 grey thumbnails, correlation of at least 0.8): changed, with how many of its pages kept exactly the same text;
+- nothing close enough: new; an attachment of the previous revision that nothing continues: removed.
+
+Pairs are one to one, the closest first. The previous revision is the package next to it with the same form number and the highest lower revision; the form itself is not compared. The review page shows the list under "Since rev N" in its header, and the MCP tool `compare_revisions` gives it to an agent. A pair is a hint: the reviewer opens both files before relying on it. The method is the similarity search of the AI Methods hackathon (code every item once, then look for the nearest code), with codes that need no training. The thresholds were set on P10 to P02, the only pair of revisions outside the frozen chatbot test set; P12 to P13 and P14 to P15 are in it and were not opened. No real pair of scans backs the look threshold yet (`eval/revisions/`).
+
 ## 7. Draft status (written rules, not a model; Luca confirms or changes them)
 - Revise and resubmit (C): an item has no data sheet, or its data sheet does not show the submitted model, or a checklist item marked blocking is missing;
 - Approved as noted (B): no C condition, but at least one flag or unclear; one note per flag or unclear;

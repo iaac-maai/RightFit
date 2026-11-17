@@ -119,6 +119,25 @@ def watch_rules() -> dict:
     return {"checked_on": date.today().isoformat(), "rules": run()}
 
 
+@server.tool(annotations=READ_ONLY)
+def compare_revisions(package: str) -> dict:
+    """What changed in a package folder on this laptop since the previous revision of the same MAF (the folder
+    next to it with the same form number and the highest lower revision). Each attachment comes back unchanged
+    (the same file, renamed or not), changed (the closest earlier attachment by text, or by the look of its pages
+    for a scan, with the similarity and how many pages kept the same text), new, or removed. No AI: file digests
+    and text or image similarity. A pair is a hint: the reviewer opens both files before relying on it."""
+    from ingest.revisions import compare, form_of, previous_revision
+    folder = RAW / package
+    if not re.fullmatch(r"P\d+", package) or not folder.is_dir():
+        raise ToolError(f"No package folder {package!r} on this laptop.")
+    previous = previous_revision(folder)
+    if previous is None:
+        raise ToolError(f"No earlier revision of {package}'s form was found next to it.")
+    (form, revision), (_, earlier) = form_of(folder), form_of(previous)
+    return {"package": package, "form": form, "revision": revision, "previous_package": previous.name,
+            "previous_revision": earlier, "attachments": compare(previous, folder)}
+
+
 _model = None
 
 

@@ -23,6 +23,7 @@ A project holds its MAF packages and its BOQ. For each package RightFit:
 - checks the values: the duty point, the pressure rating, the liquid temperature and the ecodesign limits of air handling units;
 - checks the reviewers' checklist, the consultant's own rules and what the product's BOQ line asks for;
 - follows the law in force on the review date. In Romania that is Law 10/1995 until 24 Aug 2026 and the construction Code (Law 169/2026) from 25 Aug 2026;
+- on a resubmission, shows what changed since the previous revision of the form: the same files (renamed or not), the files that changed, and the new and removed ones;
 - drafts the answer, A (approved), B (approved as noted) or C (revise and resubmit), with one comment per issue.
 
 A check passes only on confirmed values. Until then it shows what the result would be.
@@ -62,7 +63,7 @@ The AI parts (a rule typed in words, what a BOQ line asks) use the Claude comman
 
 ## For agents
 
-`app/mcp_server.py` gives any agent that speaks MCP five read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, and ask the official sources whether the act behind each legal rule changed since it was read. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
+`app/mcp_server.py` gives any agent that speaks MCP six read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, compare a package with the previous revision of its form, and ask the official sources whether the act behind each legal rule changed since it was read. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
 
 ## Where we are (16 Nov 2026)
 

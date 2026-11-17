@@ -460,6 +460,19 @@ def package_list(data, raw=RAW, boq=None, location="RO"):
     return out
 
 
+def revisions(name, originals):
+    """What changed in a package's files since the previous revision of its form (ingest/revisions.py, no AI).
+    {"previous": None} when no earlier revision sits next to it, or its original files are not on this laptop."""
+    from ingest.revisions import compare, form_of, previous_revision
+    folder = Path(originals) / name
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", name) or not folder.is_dir():
+        return {"previous": None}
+    before = previous_revision(folder)
+    if before is None:
+        return {"previous": None}
+    return {"previous": before.name, "revision": form_of(before)[1], "attachments": compare(before, folder)}
+
+
 def save_package(entries, originals, packages):
     """The files of an upload, kept in a new package folder of the project (P01, P02 ...). Returns its name."""
     taken = [int(p.stem[1:]) for p in packages.glob("P*.json") if p.stem[1:].isdigit()]
@@ -657,6 +670,8 @@ class Handler(SimpleHTTPRequestHandler):
             if path is None:
                 return self.send_json({"error": "unknown package"}, 404)
             pkg = json.loads(path.read_text())
+            if self.path == "/api/revisions":   # what changed since the previous revision of the form (no AI)
+                return self.send_json(revisions(body["package"], self.project()["originals"]))
             if self.path == "/api/marks":   # where the quoted lines sit on one page of an attachment
                 source = original(body["package"], pkg, int(body["no"]), self.project()["originals"])
                 return self.send_json({"marks": find_marks(source, int(body["page"]), body["quotes"]) if source else []})

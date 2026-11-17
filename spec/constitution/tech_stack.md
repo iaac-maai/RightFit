@@ -94,7 +94,7 @@ RightFit/
 |   |-- raw/               original packages, BOQ and register (git-ignored)
 |   |-- projects/          one folder per project: packages, originals, BOQs (git-ignored)
 |   `-- maf/               rules, checklist, consultant's rules, inventory, extracted/, reference/
-|-- ingest/                form reader, BOQ reader, rule watch, the instructions given to the AI (prompts/)
+|-- ingest/                form reader, BOQ reader, rule watch, revision comparison, the instructions given to the AI (prompts/)
 |-- checks/maf/            the checks and the draft status
 |-- checks/pumps/          pump rules, booster sizing and the standby test
 |-- explain/               comment templates
