@@ -69,6 +69,7 @@ The hood features (image search, keyword baseline, re-ranking from a designer's 
 | MAF-24 | Projects: each one keeps its packages, their original files and its BOQs in a folder that can be shared | Plain Python | Done 12 Nov, tested |
 | MAF-25 | The law in force on the review date: each rule has the dates it applies between | Rules | Done 12 Nov for Romania (Law 10/1995, then the construction Code) and for the machinery rules |
 | MAF-26 | What changed since the previous revision of a form: each attachment unchanged, changed, new or removed | Plain Python: file digests, then text similarity (TF-IDF), or the look of the pages for a scan; the similarity search of the AI Methods hackathon, with no trained model | Built 17 Nov (`ingest/revisions.py`, the review page, a sixth MCP tool `compare_revisions`); shown on P10 to P02 only, as the other two pairs are in the frozen chatbot test set |
+| MAF-27 | Product family from the form's row, so check D1 knows which documents to ask for in unread packages | Our second own model (letter groups and logistic regression, trained from scratch) against the family's words | Built 17 Nov on 59 rows labelled by Luca; scored once on 37 locked rows: 28 right against 35 for the words, which win. The words can serve D1 once Luca approves them; the model needs more labelled rows, for example BOQ lines (`eval/family_classifier/`) |
 
 A feature is done when it has a spec, passing tests and a review against the spec.
 

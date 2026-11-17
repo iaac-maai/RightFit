@@ -98,7 +98,7 @@ RightFit/
 |-- checks/maf/            the checks and the draft status
 |-- checks/pumps/          pump rules, booster sizing and the standby test
 |-- explain/               comment templates
-|-- model/                 our page classifier
+|-- model/                 our page classifier and family classifier
 |-- eval/                  labels, sources and results of every comparison with a baseline
 |-- app/                   the application (review/), the MCP server, the AI helper
 `-- tests/                 tests

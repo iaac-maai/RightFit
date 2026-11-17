@@ -37,6 +37,7 @@ The checks are plain Python with no AI in them, so the same package always gives
 | Job | Done by | Compared with | Result so far |
 |---|---|---|---|
 | What kind of document each PDF page is | Our own classifier, trained from scratch | Keyword search | 62 % of pages right against 35 %, on 184 locked pages of real packages |
+| Which product family a form's row belongs to | Our second classifier, trained from scratch on 21 rows | The family's words (keyword rule) | 28 of 37 locked rows right, against 35 for the words: the words win until there are more labelled rows |
 | Which products each document covers | AI matching | Text matching | The same answer on all 51 pairs; the AI also says how a document covers a product |
 | Reading values from the documents | AI reader | A person | Not measured yet: 1 of 116 values confirmed so far |
 | Turning a rule typed in words, or a BOQ line, into items to check | AI, labelled as AI output | | Not measured; the reviewer sees each item before it counts |
