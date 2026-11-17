@@ -81,6 +81,7 @@ The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it 
 |---|---|
 | the application | [`app/`](app/): the server `review_server.py` and the screens in `review/` |
 | the checks and the draft answer | [`checks/maf/`](checks/maf/) |
+| the fit check in Revit | [`revit/`](revit/) and [`checks/space/`](checks/space/) |
 | reading the forms and the BOQs | [`ingest/`](ingest/) |
 | our models | [`model/`](model/) |
 | every comparison with a baseline | [`eval/`](eval/) |

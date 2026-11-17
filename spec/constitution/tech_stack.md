@@ -16,6 +16,7 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, a public repositor
 | Tesseract with `pytesseract` | OCR of scanned pages when a pump package is added |
 | scikit-learn | Our own page classifier (`model/`), trained from scratch and compared with a keyword search; also the text similarity that picks a product's BOQ line among the positions the form names |
 | An AI agent that reads PDFs | Reading the attachments, as text or as page images, into values with page and quote. A person verifies every value before a check can pass on it |
+| Revit 2026 with pyRevit (free, open source) | The fit check in the project's Revit model (`revit/`): pyRevit runs our Python inside Revit, on the Windows computer that has Revit; the checks it calls are `checks/space/`, also run by the tests |
 | The official MCP Python SDK (`mcp`) | The MCP server (`app/mcp_server.py`): five read-only tools an agent can call to list the packages, review one, list the rules with their status, classify a package's pages and ask the official sources whether the act behind each legal rule changed; `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client |
 
 The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
@@ -93,10 +94,13 @@ RightFit/
 |-- data/
 |   |-- raw/               original packages, BOQ and register (git-ignored)
 |   |-- projects/          one folder per project: packages, originals, BOQs (git-ignored)
-|   `-- maf/               rules, checklist, consultant's rules, inventory, extracted/, reference/
+|   |-- maf/               rules, checklist, consultant's rules, inventory, extracted/, reference/
+|   `-- space/             the fit check's rules
 |-- ingest/                form reader, BOQ reader, rule watch, revision comparison, the instructions given to the AI (prompts/)
 |-- checks/maf/            the checks and the draft status
 |-- checks/pumps/          pump rules, booster sizing and the standby test
+|-- checks/space/          the fit check: the set in its room, and what a swap changes
+|-- revit/                 the Revit add-in (pyRevit) and the templates of its project files
 |-- explain/               comment templates
 |-- model/                 our page classifier and family classifier
 |-- eval/                  labels, sources and results of every comparison with a baseline
