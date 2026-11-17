@@ -60,16 +60,17 @@ def family_file(s):
     """The maker's model of a set (a Revit family .rfa or a 3D drawing .dwg) and how to place it:
     the families.json entry, else families/<id>.rfa or families/<id>.dwg."""
     f = folder()
-    if not f:
+    sid = s.get("id")
+    if not f or not sid:  # a set that is not in the candidates list has no maker file
         return None, {}
     fam_dir = os.path.join(f, "families")
     entry = {}
     try:
         with io.open(os.path.join(fam_dir, "families.json"), encoding="utf-8") as fh:
-            entry = json.load(fh).get(s["id"]) or {}
+            entry = json.load(fh).get(sid) or {}
     except Exception:
         pass
-    names = [entry["file"]] if entry.get("file") else [s["id"] + ".rfa", s["id"] + ".dwg"]
+    names = [entry["file"]] if entry.get("file") else [sid + ".rfa", sid + ".dwg"]
     for n in names:  # a Revit family, or the maker's 3D drawing
         path = os.path.join(fam_dir, n)
         if os.path.exists(path):

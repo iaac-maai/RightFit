@@ -16,8 +16,10 @@ from Autodesk.Revit.DB import (Arc, BoundingBoxXYZ, BuiltInCategory, BuiltInPara
                                GeometryObject, Level, Line, OverrideGraphicSettings, Transform, View3D,
                                ViewFamily, ViewFamilyType, ViewOrientation3D, Wall, XYZ)
 from Autodesk.Revit.DB import (FailureProcessingResult, FailureSeverity, IFailuresPreprocessor)
-from Autodesk.Revit.DB import ImportInstance, SolidUtils
+from Autodesk.Revit.DB import FamilySymbol, ImportInstance, SolidUtils
 from Autodesk.Revit.DB import DWGImportOptions, GeometryInstance, ImportPlacement, ImportUnit, Mesh, Options, Solid
+from Autodesk.Revit.DB import (TessellatedFace, TessellatedShapeBuilder, TessellatedShapeBuilderFallback,
+                               TessellatedShapeBuilderTarget)
 from Autodesk.Revit.DB.Structure import StructuralType
 from System import Int64
 from System.Collections.Generic import List
@@ -206,27 +208,63 @@ def clear(doc, unhide=()):
 
 # ---------------------------------------------------------------- the maker's family
 
-def load_symbol(doc, path, type_name=None):
-    """Load a family file once (or find it already loaded) and return its type to place."""
+def _norm(text):
+    return u"".join(ch for ch in (text or u"").lower() if ch.isalnum())
+
+
+def load_symbol(doc, path, type_name=None, type_contains=None):
+    """Load a family file once (or find it already loaded) and return the type to place. A family with a type
+    catalogue (a .txt beside the .rfa) loads only the type asked for; a family that holds its types inside is
+    searched for type_name, or for a type whose name contains type_contains."""
     stem = os.path.splitext(os.path.basename(path))[0]
     fam = None
     for f in FilteredElementCollector(doc).OfClass(Family):
         if name_of(f) == stem:
             fam = f
             break
+    if fam is None and os.path.exists(os.path.splitext(path)[0] + ".txt"):
+        # a family with a type catalogue: load only the one type. Loading the whole family would load every
+        # type in the catalogue (slow, and Revit may ask which ones), so without a type name we stop here.
+        if not type_name:
+            return None
+        ref = clr.Reference[FamilySymbol]()
+        try:
+            if doc.LoadFamilySymbol(path, type_name, ref):
+                sym = ref.Value
+                if not sym.IsActive:
+                    sym.Activate()
+                    doc.Regenerate()
+                return sym
+        except Exception:
+            pass
+        for f in FilteredElementCollector(doc).OfClass(Family):  # loaded before, by another type
+            if name_of(f) == stem:
+                fam = f
+                break
+        if fam is None:
+            return None
     if fam is None:
         ref = clr.Reference[Family]()
         if doc.LoadFamily(path, ref):
             fam = ref.Value
     if fam is None:
+        for f in FilteredElementCollector(doc).OfClass(Family):
+            if name_of(f) == stem:
+                fam = f
+    if fam is None:
         return None
     syms = [doc.GetElement(i) for i in fam.GetFamilySymbolIds()]
     sym = None
     for s in syms:
-        if type_name and name_of(s) == type_name:
+        if type_name and _norm(name_of(s)) == _norm(type_name):
             sym = s
-    sym = sym or syms[0]
-    if not sym.IsActive:
+    if sym is None and type_contains:
+        for s in syms:
+            if _norm(type_contains) in _norm(name_of(s)):
+                sym = s
+                break
+    sym = sym or (syms[0] if syms else None)
+    if sym is not None and not sym.IsActive:
         sym.Activate()
         doc.Regenerate()
     return sym
@@ -279,7 +317,7 @@ def accept_warnings(transaction):
     transaction.SetFailureHandlingOptions(opts)
 
 
-def _upright(points, s):
+def _upright(points, s, up=None):
     """Which of the drawing's axes is the set's length, width and height: the order that best matches the
     catalogue's L x W x H (makers draw 'up' along different axes). Returns a transform that stands it up."""
     from itertools import permutations
@@ -287,7 +325,8 @@ def _upright(points, s):
     want = [s.get("L"), s.get("W"), s.get("H")]
     if not points or not all(want):
         return Transform.Identity, ext
-    best = min(permutations(range(3)), key=lambda o: sum(abs(ext[o[k]] - want[k]) / want[k] for k in range(3)))
+    orders = [o for o in permutations(range(3)) if up is None or o[2] == up]  # families.json can name "up"
+    best = min(orders, key=lambda o: sum(abs(ext[o[k]] - want[k]) / want[k] for k in range(3)))
     axes = [XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ]
     ex, ez = axes[best[0]], axes[best[2]]  # the drawing's length axis becomes x, its height axis becomes z
     ey = ez.CrossProduct(ex)
@@ -298,7 +337,52 @@ def _upright(points, s):
     return t, ext
 
 
-def import_drawing(doc, path, view, name, category, s=None, units="mm"):
+def _triangles(g):
+    """The triangles of a solid's faces or of a mesh, as lists of three points."""
+    tris = []
+    meshes = [g] if isinstance(g, Mesh) else []
+    if isinstance(g, Solid):
+        for f in g.Faces:
+            try:
+                m = f.Triangulate()
+            except Exception:
+                m = None
+            if m is not None:  # some faces in maker drawings cannot be triangulated
+                meshes.append(m)
+    for m in meshes:
+        for i in range(m.NumTriangles):
+            tr = m.get_Triangle(i)
+            tris.append([tr.get_Vertex(0), tr.get_Vertex(1), tr.get_Vertex(2)])
+    return tris
+
+
+def _rebuild(g):
+    """A shape Revit refuses as it is (common in maker drawings: open or self-touching surfaces) rebuilt
+    from its triangles; Revit keeps it as a solid when it closes, otherwise as a mesh."""
+    b = TessellatedShapeBuilder()
+    b.Target = TessellatedShapeBuilderTarget.AnyGeometry
+    b.Fallback = TessellatedShapeBuilderFallback.Mesh
+    b.OpenConnectedFaceSet(False)
+    n = 0
+    for a, c, d in _triangles(g):
+        if a.DistanceTo(c) < 1e-6 or c.DistanceTo(d) < 1e-6 or a.DistanceTo(d) < 1e-6:
+            continue  # a triangle with no area
+        pts = List[XYZ]()
+        for p in (a, c, d):
+            pts.Add(p)
+        try:
+            b.AddFace(TessellatedFace(pts, ElementId.InvalidElementId))
+            n += 1
+        except Exception:
+            pass
+    b.CloseConnectedFaceSet()
+    if not n:
+        return []
+    b.Build()
+    return list(b.GetBuildResult().GetGeometricalObjects())
+
+
+def import_drawing(doc, path, view, name, category, s=None, units="mm", up=None):
     """Bring a maker's 3D DWG into the model as one DirectShape with the drawing's real solids, standing up,
     then remove the imported DWG itself. Maker drawings are in millimetres even when the file says otherwise
     (the Grundfos file says inches); families.json can set "units" for one that isn't."""
@@ -321,7 +405,7 @@ def import_drawing(doc, path, view, name, category, s=None, units="mm"):
         for g in geo:
             if isinstance(g, GeometryInstance):
                 walk(g.GetInstanceGeometry())
-            elif isinstance(g, Solid) and g.Volume > 0:
+            elif isinstance(g, Solid) and g.Faces.Size > 0:  # closed solids and open shells
                 pieces.append(g)
             elif isinstance(g, Mesh) and g.NumTriangles > 0:
                 pieces.append(g)
@@ -335,25 +419,41 @@ def import_drawing(doc, path, view, name, category, s=None, units="mm"):
         else:
             for q in g.Vertices:
                 pts.append([mm(q.X), mm(q.Y), mm(q.Z)])
-    turn, _ = _upright(pts, s or {})
+    turn, _ = _upright(pts, s or {}, {"x": 0, "y": 1, "z": 2}.get((up or u"").lower()))
     ds = DirectShape.CreateElement(doc, ElementId(category))
     good = List[GeometryObject]()
+    why = []
     for g in pieces:
         g2 = SolidUtils.CreateTransformed(g, turn) if isinstance(g, Solid) else g.get_Transformed(turn)
         one = List[GeometryObject]()
         one.Add(g2)
         try:
-            if ds.IsValidShape(one):
-                good.Add(g2)
+            ok = ds.IsValidShape(one)
         except Exception:
+            ok = False
+        if ok:
             good.Add(g2)
-    ds.SetShape(good)
-    ds.SetName(name)
+        else:
+            try:
+                for r in _rebuild(g2):
+                    good.Add(r)
+            except Exception as err:
+                why.append(u"{}".format(err))
+    if good.Count:
+        ds.SetShape(good)
+        ds.SetName(name)
     try:
         imp.Pinned = False  # an import placed at the origin comes pinned
         doc.Delete(imp.Id)  # the DirectShape now holds the geometry
     except Exception:
         pass
+    if not good.Count:  # nothing Revit can hold as a shape: say so, and leave nothing behind
+        doc.Delete(ds.Id)
+        found = u", ".join(u"{} {}".format(type(g).__name__, (g.Faces.Size if isinstance(g, Solid) else g.NumTriangles))
+                           for g in pieces[:5])
+        raise Exception(u"Revit read no usable 3D shapes from {} ({} pieces found: {}; {} triangles; {})".format(
+            os.path.basename(path), len(pieces), found, sum(len(_triangles(g)) for g in pieces[:5]),
+            u"; ".join(why[:2])))
     doc.Regenerate()
     return ds
 
@@ -363,14 +463,18 @@ def place_model(doc, path, entry, frame, s, base_z, level, view, name, category)
     Returns (element, measured box, what it is in words)."""
     turn = float(entry.get("rotate", 0))
     if path.lower().endswith(".dwg"):
-        ds = import_drawing(doc, path, view, name, category, s, entry.get("units", "mm"))
+        try:
+            ds = import_drawing(doc, path, view, name, category, s, entry.get("units", "mm"), entry.get("up"))
+        except Exception as err:  # the drawing could not be used: the caller draws the stand-in instead
+            return None, None, u"{}".format(err)
         return ds, fit_element(doc, ds, frame, s, base_z, turn, current=0.0), \
-            u"the maker's 3D drawing: " + os.path.basename(path)
-    sym = load_symbol(doc, path, entry.get("type"))
+            u"the maker's 3D drawing: " + os.path.basename(path) + (u" — " + entry["note"] if entry.get("note") else u"")
+    sym = load_symbol(doc, path, entry.get("type"), entry.get("type_contains"))
     if sym is None:
-        return None, None, None
+        return None, None, u"no matching type in " + os.path.basename(path)
     inst, b = place_family(doc, sym, frame, s, base_z, level, turn)
-    return inst, b, u"the maker's Revit family: " + os.path.basename(path)
+    what = u"the maker's Revit family: {} ({})".format(os.path.basename(path), name_of(sym))
+    return inst, b, what + (u" — " + entry["note"] if entry.get("note") else u"")
 
 
 def lowest_level(doc):
