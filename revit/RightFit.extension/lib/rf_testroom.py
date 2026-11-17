@@ -173,17 +173,21 @@ def _build(doc, tr_room, t, lvl, notes):
             frame = rf_model.Frame(XYZ(ft(pump["centre"][0]), ft(pump["centre"][1]), 0), xdir, 0)
             base = pump.get("base_z", 0)
             path, entry = rf_project.family_file(s)
+            inst = None
             if path:
                 inst, _, what = rf_draw.place_model(doc, path, entry, frame, s, base, lvl, rf_draw.view3d(doc),
                                                     u"RFT pump - {} {}".format(s["maker"], s["model"]),
                                                     BuiltInCategory.OST_MechanicalEquipment)
-                if isinstance(inst, rf_draw.DirectShape):
+                if inst is None:
+                    notes.append(u"the maker's file could not be used (" + (what or u"") + u"), so a stand-in is drawn")
+                elif isinstance(inst, rf_draw.DirectShape):
                     inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump front:" + front)
                 else:
                     inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).Set(u"P-01")
                     inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump")
-                notes.append(u"the pump is " + what)
-            else:
+                if inst is not None:
+                    notes.append(u"the pump is " + what)
+            if inst is None:
                 body = [-s["L"] / 2, -s["W"] / 2, s["L"] / 2, s["W"] / 2, base, base + s["H"]]
                 ds = rf_draw.Painter(doc, frame, []).stand_in_single(s, body, u"RFT pump - ",
                                                                       BuiltInCategory.OST_MechanicalEquipment)
