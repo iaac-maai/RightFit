@@ -42,6 +42,7 @@ def build(doc, tr_room):
     X, Y, H = tr_room["x"], tr_room["y"], tr_room["height"]
     t2 = tr_room.get("wall", 200) / 2
     t = Transaction(doc, u"RightFit: build the test room")
+    rf_draw.accept_warnings(t)
     t.Start()
     try:
         _build(doc, tr_room, t, lvl, notes)
@@ -70,6 +71,17 @@ def _remove_old(doc, name):
         n = e.get_Parameter(BuiltInParameter.ROOM_NAME)
         if (p is not None and (p.AsString() or u"") == u"RFT room") or (n is not None and n.AsString() == name):
             old.append(e.Id)
+    from Autodesk.Revit.DB import ImportInstance
+    import os
+    fam = os.path.join(rf_project.folder() or u"", u"families")
+    ours = set(n.lower() for n in os.listdir(fam)) if os.path.isdir(fam) else set()
+    for e in FilteredElementCollector(doc).OfClass(ImportInstance):  # our maker drawings left by an earlier try
+        try:
+            if e.Category is not None and e.Category.Name.lower() in ours:
+                e.Pinned = False
+                old.append(e.Id)
+        except Exception:
+            pass
     for i in old:
         try:
             doc.Delete(i)
@@ -162,10 +174,15 @@ def _build(doc, tr_room, t, lvl, notes):
             base = pump.get("base_z", 0)
             path, entry = rf_project.family_file(s)
             if path:
-                sym = rf_draw.load_symbol(doc, path, entry.get("type"))
-                inst, _ = rf_draw.place_family(doc, sym, frame, s, base, lvl, float(entry.get("rotate", 0)))
-                inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).Set(u"P-01")
-                inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump")
+                inst, _, what = rf_draw.place_model(doc, path, entry, frame, s, base, lvl, rf_draw.view3d(doc),
+                                                    u"RFT pump - {} {}".format(s["maker"], s["model"]),
+                                                    BuiltInCategory.OST_MechanicalEquipment)
+                if isinstance(inst, rf_draw.DirectShape):
+                    inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump front:" + front)
+                else:
+                    inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).Set(u"P-01")
+                    inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump")
+                notes.append(u"the pump is " + what)
             else:
                 body = [-s["L"] / 2, -s["W"] / 2, s["L"] / 2, s["W"] / 2, base, base + s["H"]]
                 ds = rf_draw.Painter(doc, frame, []).stand_in_single(s, body, u"RFT pump - ",

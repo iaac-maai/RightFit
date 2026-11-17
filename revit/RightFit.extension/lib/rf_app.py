@@ -117,6 +117,7 @@ def preview(doc, uidoc, g, s, shape_note=None):
     sit, room = g["sit"], g["room"]
     st = rf_setup.state()
     t = Transaction(doc, u"RightFit: preview " + s.get("model", u""))
+    rf_draw.accept_warnings(t)
     t.Start()
     rf_draw.clear(doc, st.get("hidden", []))
     v3 = rf_draw.view3d(doc)
@@ -129,13 +130,13 @@ def preview(doc, uidoc, g, s, shape_note=None):
         s.update(sit.size)
         s["shape"] = u"the set in the model, measured on its geometry"
     elif path:
-        sym = rf_draw.load_symbol(doc, path, entry.get("type"))
-        if sym is not None:
-            inst, b = rf_draw.place_family(doc, sym, sit.frame, s, sit.base_z, _level(doc, sit.pump),
-                                           float(entry.get("rotate", 0)))
-            inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(rf_draw.PREVIEW)
+        inst, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump), v3,
+                                            u"RF preview " + s.get("model", u""), BuiltInCategory.OST_GenericModel)
+        if inst is not None:
+            if isinstance(inst, FamilyInstance):
+                inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(rf_draw.PREVIEW)
+            s["shape"] = what + _size_note(s, b)
             s["L"], s["W"], s["H"] = b[2] - b[0], b[3] - b[1], b[5] - b[4]
-            s["shape"] = u"the maker's Revit family: " + os.path.basename(path)
     if not is_current and inst is None:
         s["shape"] = u"a stand-in drawn from the catalogue sizes (add the maker's .rfa to the project's families " \
                      u"folder to see the real set)"
@@ -171,6 +172,19 @@ def _level(doc, pump):
     except Exception:
         pass
     return rf_draw.lowest_level(doc)
+
+
+def _size_note(s, b):
+    """Compare the maker's model with the catalogue size, so a wrong file or wrong units show up."""
+    got = [b[2] - b[0], b[3] - b[1], b[5] - b[4]]
+    want = [s.get("L"), s.get("W"), s.get("H")]
+    if not all(want):
+        return u""
+    off = max(abs(g - w) / w for g, w in zip(got, want))
+    if off > 0.25:
+        return u" — its size ({:.0f} x {:.0f} x {:.0f} mm) is far from the catalogue's ({:.0f} x {:.0f} x {:.0f} mm): " \
+               u"check the file".format(*(got + want))
+    return u" ({:.0f} x {:.0f} x {:.0f} mm; catalogue {:.0f} x {:.0f} x {:.0f})".format(*(got + want))
 
 
 def show_view(uidoc, v3):
@@ -245,6 +259,8 @@ def swap(doc, uidoc, g, s):
     path, entry = rf_project.family_file(s)
     same_family_type = _type_for(doc, old, s)
     stand_in_ok = isinstance(old, DirectShape)  # a RightFit test room's stand-in may become another stand-in
+    if path and path.lower().endswith(".dwg") and not stand_in_ok:
+        path = None  # a drawing has no pipe or power connections: it never replaces a real family
     if not (path or same_family_type or stand_in_ok):
         return None, (u"No Revit family for {} {}: add the maker's .rfa to the project's families folder. "
                       u"RightFit doesn't replace a real family with a stand-in.".format(s["maker"], s["model"]))
@@ -253,6 +269,7 @@ def swap(doc, uidoc, g, s):
     tg = TransactionGroup(doc, u"RightFit: swap to {} {}".format(s["maker"], s["model"]))
     tg.Start()
     t = Transaction(doc, u"RightFit: place the new set")
+    rf_draw.accept_warnings(t)
     t.Start()
     rf_draw.clear(doc, st.get("hidden", []))
     st["hidden"] = []
@@ -272,10 +289,10 @@ def swap(doc, uidoc, g, s):
         b = rf_model.local_box(rf_model.geometry_points(new), sit.frame)
         how = u"changed the type to " + rf_model.name_of(same_family_type)
     elif path:
-        sym = rf_draw.load_symbol(doc, path, entry.get("type"))
-        new, b = rf_draw.place_family(doc, sym, sit.frame, s, sit.base_z, _level(doc, sit.pump),
-                                      float(entry.get("rotate", 0)))
-        how = u"placed the maker's family " + os.path.basename(path)
+        new, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump),
+                                           rf_draw.view3d(doc), u"RFT pump - {} {}".format(s["maker"], s["model"]),
+                                           BuiltInCategory.OST_MechanicalEquipment)
+        how = u"placed " + what
     else:
         body, _ = rf_model.space_checks.body_and_zones(s, {}, sit.base_z)
         new, b = painter.stand_in_single(s, body, u"RFT pump - ", BuiltInCategory.OST_MechanicalEquipment), body
