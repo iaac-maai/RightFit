@@ -1,0 +1,24 @@
+{
+  "_about": "One entry per pump set: the submitted one and its alternatives. Copy this file to data/projects/<project>/revit/candidates.json (git-ignored) and fill it from the data sheets. Leave a value null when the data sheet doesn't give it; never fill it from typical values. Sizes in mm, weight in kg, power in kW.",
+  "sets": [
+    {
+      "id": "short-id-also-the-rfa-file-name",
+      "maker": "",
+      "model": "the model code exactly as on the data sheet",
+      "submitted": false,
+      "L": null,
+      "W": null,
+      "H": null,
+      "kg": null,
+      "pumps": null,
+      "p2_each": null,
+      "p2_needed": null,
+      "standby": "pass, fail or null (from the standby test, MAF-19)",
+      "dn_in": null,
+      "dn_out": null,
+      "dw_approval": "true, false or null: an approval for contact with drinking water is in the package",
+      "source": "file and page the values come from",
+      "status": "extracted until a person has checked the values against the source, then verified"
+    }
+  ]
+}

@@ -232,3 +232,6 @@ agent/
 .impeccable/hook.cache.json
 # Launch video output, local only
 brag-output*/
+
+# The Revit add-in keeps its Python modules in lib/, which the Python rules above ignore
+!revit/RightFit.extension/lib/

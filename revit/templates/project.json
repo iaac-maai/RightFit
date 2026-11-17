@@ -1,0 +1,29 @@
+{
+  "_about": "Per-project settings for the Revit add-in. Copy to data/projects/<project>/revit/project.json (git-ignored).",
+  "service": {
+    "_about": "The consultant's service space around a set, in mm. There is no legal figure (data/space/rules.csv, ANY-SPACE-SERVICE): these are the consultant's own.",
+    "tight": {"front": null, "sides": null, "back": null, "top": null},
+    "standard": {"front": null, "sides": null, "back": null, "top": null},
+    "comfortable": {"front": null, "sides": null, "back": null, "top": null}
+  },
+  "circuit": {
+    "_about": "Only when the model has no electrical circuit for the pump. Otherwise the model's circuit is used.",
+    "name": "",
+    "rating_a": null,
+    "source": "the drawing it comes from",
+    "status": "extracted or verified"
+  },
+  "test_room": {
+    "_about": "Optional: a room to build in an empty model with RightFit > Test Room. Origin at the room's south-west inner corner, x east, y north, mm.",
+    "name": "",
+    "source": "the drawings it comes from",
+    "x": null,
+    "y": null,
+    "height": null,
+    "wall": 200,
+    "door": {"wall": "east", "from": null, "to": null, "width": null, "height": null, "mark": "D1"},
+    "fixed": [{"name": "", "box": [null, null, null, null], "z": [0, null], "category": "PlumbingFixtures"}],
+    "pipes": [{"from": [null, null, null], "to": [null, null, null], "dn": null}],
+    "pump": {"set": "id of the set standing there (else the submitted one)", "centre": [null, null], "front": "+Y", "base_z": 0}
+  }
+}
