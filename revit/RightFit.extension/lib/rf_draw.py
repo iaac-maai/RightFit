@@ -6,6 +6,8 @@ Everything RightFit draws is named "RF ..." (DirectShapes) or carries the commen
 so Clear can remove it and the model reader can ignore it.
 """
 from __future__ import division
+import io
+import json
 import math
 import os
 
@@ -506,10 +508,81 @@ def family_as_shape(doc, inst, name, category):
     return ds
 
 
+# ---------------------------------------------------------------- saved shapes of maker families
+# Loading a maker's .rfa into the project left Revit 2026 busy for minutes after the command ended (seen in the
+# journal with the DAB and Wilo families). So the first time a family is shown, its shape is saved beside the
+# .rfa as "<file>.<type>.shape.json" (triangles in mm, in the pump's frame); later previews draw it from there
+# and never load the family again. "Prepare Models" (Setup panel) saves them all at once.
+
+def shape_path(path, entry):
+    key = _norm(entry.get("type") or entry.get("type_contains") or u"")
+    return os.path.splitext(path)[0] + (u"." + key if key else u"") + u".shape.json"
+
+
+def save_shape(ds, frame, type_name, out_path):
+    """Write the triangles of DirectShape ds, in the frame (mm, centred in plan, base at 0)."""
+    opt = Options()
+    tris = []
+    for g in ds.get_Geometry(opt):
+        if isinstance(g, (Solid, Mesh)):
+            for a, b, c in _triangles(g):
+                tris.append([frame.local(a), frame.local(b), frame.local(c)])
+    if not tris:
+        return False
+    xs = [p[0] for t3 in tris for p in t3]
+    ys = [p[1] for t3 in tris for p in t3]
+    zs = [p[2] for t3 in tris for p in t3]
+    cx, cy, z0 = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)
+    flat = [[round(p[0] - cx, 1), round(p[1] - cy, 1), round(p[2] - z0, 1)] for t3 in tris for p in t3]
+    with io.open(out_path, "w", encoding="utf-8") as fh:
+        fh.write(json.dumps({"type": type_name, "points": flat}, ensure_ascii=False))
+    return True
+
+
+def shape_from_file(doc, shape_file, frame, base_z, name, category):
+    """Draw a saved shape as a DirectShape in the frame. Returns (DirectShape, type name) or (None, None)."""
+    with io.open(shape_file, encoding="utf-8") as fh:
+        data = json.load(fh)
+    pts = data.get("points", [])
+    b = TessellatedShapeBuilder()
+    b.Target = TessellatedShapeBuilderTarget.AnyGeometry
+    b.Fallback = TessellatedShapeBuilderFallback.Mesh
+    b.OpenConnectedFaceSet(False)
+    n = 0
+    for i in range(0, len(pts) - 2, 3):
+        face = List[XYZ]()
+        for x, y, z in pts[i:i + 3]:
+            face.Add(frame.world(x, y, z + base_z))
+        if face[0].DistanceTo(face[1]) < 1e-6 or face[1].DistanceTo(face[2]) < 1e-6 or face[0].DistanceTo(face[2]) < 1e-6:
+            continue
+        try:
+            b.AddFace(TessellatedFace(face, ElementId.InvalidElementId))
+            n += 1
+        except Exception:
+            pass
+    b.CloseConnectedFaceSet()
+    if not n:
+        return None, None
+    b.Build()
+    ds = DirectShape.CreateElement(doc, ElementId(category))
+    ds.SetShape(b.GetBuildResult().GetGeometricalObjects())
+    ds.SetName(name)
+    doc.Regenerate()
+    return ds, data.get("type", u"")
+
+
 def place_model(doc, path, entry, frame, s, base_z, level, view, name, category, as_shape=False):
     """Place the maker's model of set s: a Revit family (.rfa) or a 3D drawing (.dwg).
+    as_shape (previews): draw a family as its shape only, from the saved shape when there is one.
     Returns (element, measured box, what it is in words)."""
     turn = float(entry.get("rotate", 0))
+    note = (u" — " + entry["note"]) if entry.get("note") else u""
+    saved = shape_path(path, entry)
+    if as_shape and path.lower().endswith(".rfa") and os.path.exists(saved):
+        ds, type_name = shape_from_file(doc, saved, frame, base_z, name, category)
+        if ds is not None:
+            return ds, local_box(geometry_points(ds), frame), \
+                u"the maker's Revit family: {} ({}), drawn from its saved shape".format(os.path.basename(path), type_name) + note
     if path.lower().endswith(".dwg"):
         try:
             ds = import_drawing(doc, path, view, name, category, s, entry.get("units", "mm"), entry.get("up"))
@@ -521,11 +594,15 @@ def place_model(doc, path, entry, frame, s, base_z, level, view, name, category,
     if sym is None:
         return None, None, u"no matching type in " + os.path.basename(path)
     inst, b = place_family(doc, sym, frame, s, base_z, level, turn)
-    if as_shape:  # a preview: keep only the family's shape (see family_as_shape)
+    if as_shape:  # a preview: keep only the family's shape (see family_as_shape), and save it for next time
         ds = family_as_shape(doc, inst, name, category)
         if ds is not None:
             inst = ds
             b = local_box(geometry_points(ds), frame)
+            try:
+                save_shape(ds, frame, name_of(sym), saved)
+            except Exception:
+                pass
     what = u"the maker's Revit family: {} ({})".format(os.path.basename(path), name_of(sym))
     return inst, b, what + (u" — " + entry["note"] if entry.get("note") else u"")
 
