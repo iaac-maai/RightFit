@@ -108,6 +108,17 @@ def list_rules(location: str = "RO") -> dict:
     return {"location": location, "rules": rules_for_location(location)}
 
 
+@server.tool(annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True))
+def watch_rules() -> dict:
+    """Ask the official source of every legal rule (the EU Publications Office, Spain's BOE, Romania's Portal
+    Legislativ) whether the act behind it changed since a person last read it (the rule's verified_on). Each rule
+    comes back unchanged, changed (with the date of the new version, or of the act's end that the rule does not
+    have) or not_checked (with the reason). A change means the act must be read again; the rule and its status stay
+    as they are until a person decides. Goes online and takes up to a minute."""
+    from ingest.rule_watch import run
+    return {"checked_on": date.today().isoformat(), "rules": run()}
+
+
 _model = None
 
 

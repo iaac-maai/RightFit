@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<response>
+  <status>
+    <code>200</code>
+    <text>ok</text>
+  </status>
+  <data>
+    <metadatos>
+      <fecha_actualizacion>20251218T200350Z</fecha_actualizacion>
+      <identificador>BOE-A-2003-14408</identificador>
+      <ambito codigo="1">Estatal</ambito>
+      <departamento codigo="4310">Ministerio de Sanidad y Consumo</departamento>
+      <rango codigo="1340">Real Decreto</rango>
+      <fecha_disposicion>20030704</fecha_disposicion>
+      <numero_oficial>865/2003</numero_oficial>
+      <titulo>Real Decreto 865/2003, de 4 de julio, por el que se establecen los criterios higiénico-sanitarios para la prevención y control de la legionelosis.</titulo>
+      <diario>Boletín Oficial del Estado</diario>
+      <fecha_publicacion>20030718</fecha_publicacion>
+      <diario_numero>171</diario_numero>
+      <fecha_vigencia>20030719</fecha_vigencia>
+      <estatus_derogacion>S</estatus_derogacion>
+      <fecha_derogacion>20230102</fecha_derogacion>
+      <estatus_anulacion>N</estatus_anulacion>
+      <vigencia_agotada>S</vigencia_agotada>
+      <estado_consolidacion codigo="3">Finalizado</estado_consolidacion>
+      <url_eli>https://www.boe.es/eli/es/rd/2003/07/04/865</url_eli>
+      <url_html_consolidada>https://www.boe.es/buscar/act.php?id=BOE-A-2003-14408</url_html_consolidada>
+    </metadatos>
+  </data>
+</response>

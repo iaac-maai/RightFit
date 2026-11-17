@@ -9,10 +9,12 @@ from mcp import Client, StdioServerParameters
 
 from app.mcp_server import MODEL, RAW, server
 from app.review_server import boq_links, review
+from checks.maf.rules import load
+from ingest import rule_watch
 from model.page_classifier import CLASSES
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOLS = ["classify_pages", "list_packages", "list_rules", "review_package"]
+TOOLS = ["classify_pages", "list_packages", "list_rules", "review_package", "watch_rules"]
 
 
 def call(tool, **args):
@@ -24,7 +26,7 @@ def call(tool, **args):
     return anyio.run(go)
 
 
-def test_the_agent_sees_four_tools_and_all_of_them_only_read():
+def test_the_agent_sees_five_tools_and_all_of_them_only_read():
     async def go():
         async with Client(server) as client:
             return (await client.list_tools()).tools
@@ -68,6 +70,20 @@ def test_rules_for_romania_leave_out_spain():
     assert not error and rules and {r["jurisdiction"] for r in rules} <= {"EU", "RO", "ANY"}
     # A repealed rule says until when it applied, so an agent does not cite it for a later review.
     assert next(r for r in rules if r["rule_id"] == "RO-L10-11-3")["valid_to"] == "2026-08-24"
+
+
+def test_watch_rules_answers_for_every_legal_rule_and_changes_none(monkeypatch):
+    def offline(act):
+        raise OSError("offline")
+    monkeypatch.setattr(rule_watch, "ask", offline)   # no network in tests
+    table = ROOT / "data/maf/rules.csv"
+    before = table.read_bytes()
+    error, text = call("watch_rules")
+    got = json.loads(text)["rules"]
+    assert not error
+    assert [r["rule_id"] for r in got] == [r["rule_id"] for r in load("rules.csv") if r["status"] not in rule_watch.NOT_LAW]
+    assert {r["result"] for r in got} == {"not_checked"}   # with no answer, nothing is called unchanged
+    assert table.read_bytes() == before
 
 
 @pytest.mark.skipif(not (RAW / "P01").is_dir() or not MODEL.exists(),

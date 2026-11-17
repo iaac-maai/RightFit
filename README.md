@@ -53,6 +53,7 @@ brew install tesseract           # OCR for scanned pages when a pump package is 
 pytest
 python app/review_server.py      # the application: http://127.0.0.1:8520
 python app/mcp_server.py         # the checks as MCP tools; an agent starts it from .mcp.json
+python -m ingest.rule_watch      # has the act behind each legal rule changed since it was read?
 ```
 
 The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`.
@@ -61,7 +62,7 @@ The AI parts (a rule typed in words, what a BOQ line asks) use the Claude comman
 
 ## For agents
 
-`app/mcp_server.py` gives any agent that speaks MCP four read-only tools: list the packages, review one, list the rules with their status, and classify a package's pages. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
+`app/mcp_server.py` gives any agent that speaks MCP five read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, and ask the official sources whether the act behind each legal rule changed since it was read. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
 
 ## Where we are (16 Nov 2026)
 

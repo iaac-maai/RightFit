@@ -96,6 +96,19 @@ The project's bill of quantities, one or more Excel files (.xlsx or .xls), sits 
 - the motor power in a BOQ is the designer's estimate, not a limit (Luca, 12 Nov 2026): shown as information;
 - the check is deterministic: each thing asked is checked like a consultant's rule, from the readings; the BOQ line is AI output, so a result stays unclear until the reviewer confirms it ("would be" otherwise).
 
+### The rule watch (MAF-10)
+`ingest/rule_watch.py` (no AI, standard library) asks the official source of every legal rule in data/maf/rules.csv whether the act behind it changed since the rule was read (verified_on). The act comes from the rule's source link:
+- EU: the Publications Office's notice of the act (Cellar): its consolidated versions, whether it is in force, and its end of validity. Its SPARQL endpoint refused requests from the laptop on 17 Nov 2026, and EUR-Lex does not answer scripts. The rows of harmonised standards are watched through Implementing Decision (EU) 2019/451, which cites, replaces and withdraws them;
+- ES: the BOE open data service: the date the consolidated text was last updated, and the repeal date if there is one. An ELI link is turned into the BOE id through the BOE's own page;
+- RO: the act's page on legislatie.just.ro, which lists the dates of its consolidated forms.
+
+Each legal rule comes back as one of three results:
+- changed: a version dated after verified_on, or an end of validity that the rule's valid_to does not have, with the date;
+- not_checked: the rule has no source link to an act, or the source did not answer or sent something else. A failed answer is never read as unchanged;
+- unchanged: anything else, with the date of the latest version.
+
+Rules from practice and engineer inputs are not asked about. The watch only reads: it never changes a rule or its status, and a person reads a changed act again and decides. It asks each act once, about 15 acts in half a minute, from `python3 -m ingest.rule_watch` or the MCP tool watch_rules. The BOE date moves with any update of its record, so a change there can turn out to be technical. Shortcut: a version dated before verified_on but published after it is only seen with the act's next version; reading the amending acts' dates would close that gap. Run on 17 Nov 2026: all 28 legal rules unchanged.
+
 
 ## 7. Draft status (written rules, not a model; Luca confirms or changes them)
 - Revise and resubmit (C): an item has no data sheet, or its data sheet does not show the submitted model, or a checklist item marked blocking is missing;
@@ -154,6 +167,7 @@ A package uploaded on "Add a package" can be saved into the project; it then sho
 - which roles sit behind the four reviewer columns of the register (Luca);
 - which LEED, BREEAM or VERDE values join each family's checklist (Sahil or Jeff);
 - the second batch: the electrical declaration of fire detection equipment, cable trays and conduits, fire resistant cables, pressure equipment and door hardware have no rule yet (docs/maf_rules.md);
-- from 20 Jan 2027 a machinery declaration may be only a link in the instructions (Regulation (EU) 2023/1230 art. 10(8)); D1 does not look for one yet.
+- from 20 Jan 2027 a machinery declaration may be only a link in the instructions (Regulation (EU) 2023/1230 art. 10(8)); D1 does not look for one yet;
+- how often the rule watch runs, and who reads its report (the team).
 
-Answered since the first version: no tolerance on the duty point (Luca, 28 Oct 2026, ENG-DUTY-TOL); which pumps need a drinking water approval, and control panels as a consultant's preference, not a requirement (Luca, 12 Nov 2026); P01's pumps see no high temperatures, so V3 stays info for them; every legal rule, the CTE and RITE articles included, read on the official text (16 Nov 2026).
+Answered since the first version: no tolerance on the duty point (Luca, 28 Oct 2026, ENG-DUTY-TOL); which pumps need a drinking water approval, and control panels as a consultant's preference, not a requirement (Luca, 12 Nov 2026); P01's pumps see no high temperatures, so V3 stays info for them; every legal rule, the CTE and RITE articles included, read on the official text (16 Nov 2026); RO-I9-23-7 links to the normativ's page on legislatie.just.ro, so the rule watch can check it (Luca, 17 Nov 2026).
