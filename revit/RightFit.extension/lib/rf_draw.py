@@ -20,6 +20,7 @@ from Autodesk.Revit.DB import FamilySymbol, ImportInstance, SolidUtils
 from Autodesk.Revit.DB import DWGImportOptions, GeometryInstance, ImportPlacement, ImportUnit, Mesh, Options, Solid
 from Autodesk.Revit.DB import (TessellatedFace, TessellatedShapeBuilder, TessellatedShapeBuilderFallback,
                                TessellatedShapeBuilderTarget)
+from Autodesk.Revit.DB import ViewDetailLevel
 from Autodesk.Revit.DB.Structure import StructuralType
 from System import Int64
 from System.Collections.Generic import List
@@ -458,7 +459,54 @@ def import_drawing(doc, path, view, name, category, s=None, units="mm", up=None)
     return ds
 
 
-def place_model(doc, path, entry, frame, s, base_z, level, view, name, category):
+def family_as_shape(doc, inst, name, category):
+    """Copy a placed family's solids into one DirectShape and delete the family instance. Used for previews:
+    a maker's MEP family (with pipe connectors and many detailed solids) left in the model made Revit 2026
+    stop responding on the next redraw or command, while DirectShapes draw quickly. Returns the DirectShape,
+    or None (and leaves the instance) when no shape could be copied."""
+    opt = Options()
+    opt.DetailLevel = ViewDetailLevel.Fine
+    pieces = []
+
+    def walk(geo):
+        if geo is None:
+            return
+        for g in geo:
+            if isinstance(g, GeometryInstance):
+                walk(g.GetInstanceGeometry())  # already in model coordinates
+            elif isinstance(g, Solid) and g.Faces.Size > 0:
+                pieces.append(g)
+            elif isinstance(g, Mesh) and g.NumTriangles > 0:
+                pieces.append(g)
+    walk(inst.get_Geometry(opt))
+    ds = DirectShape.CreateElement(doc, ElementId(category))
+    good = List[GeometryObject]()
+    for g in pieces:
+        one = List[GeometryObject]()
+        one.Add(g)
+        try:
+            ok = ds.IsValidShape(one)
+        except Exception:
+            ok = False
+        if ok:
+            good.Add(g)
+        else:
+            try:
+                for r in _rebuild(g):
+                    good.Add(r)
+            except Exception:
+                pass
+    if not good.Count:
+        doc.Delete(ds.Id)
+        return None
+    ds.SetShape(good)
+    ds.SetName(name)
+    doc.Delete(inst.Id)
+    doc.Regenerate()
+    return ds
+
+
+def place_model(doc, path, entry, frame, s, base_z, level, view, name, category, as_shape=False):
     """Place the maker's model of set s: a Revit family (.rfa) or a 3D drawing (.dwg).
     Returns (element, measured box, what it is in words)."""
     turn = float(entry.get("rotate", 0))
@@ -473,6 +521,11 @@ def place_model(doc, path, entry, frame, s, base_z, level, view, name, category)
     if sym is None:
         return None, None, u"no matching type in " + os.path.basename(path)
     inst, b = place_family(doc, sym, frame, s, base_z, level, turn)
+    if as_shape:  # a preview: keep only the family's shape (see family_as_shape)
+        ds = family_as_shape(doc, inst, name, category)
+        if ds is not None:
+            inst = ds
+            b = local_box(geometry_points(ds), frame)
     what = u"the maker's Revit family: {} ({})".format(os.path.basename(path), name_of(sym))
     return inst, b, what + (u" — " + entry["note"] if entry.get("note") else u"")
 

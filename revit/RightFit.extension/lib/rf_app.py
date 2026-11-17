@@ -131,7 +131,8 @@ def preview(doc, uidoc, g, s, shape_note=None):
         s["shape"] = u"the set in the model, measured on its geometry"
     elif path:
         inst, b, what = rf_draw.place_model(doc, path, entry, sit.frame, s, sit.base_z, _level(doc, sit.pump), v3,
-                                            u"RF preview " + s.get("model", u""), BuiltInCategory.OST_GenericModel)
+                                            u"RF preview " + s.get("model", u""), BuiltInCategory.OST_GenericModel,
+                                            as_shape=True)
         if inst is not None:
             if isinstance(inst, FamilyInstance):
                 inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(rf_draw.PREVIEW)
