@@ -6,7 +6,7 @@ AI reads, rules decide, a person signs.
 
 IAAC MaAI01 · Operable Futures · 2026–27 · Sahil Khan, Jeff El Khoury, Luca Obejdeanu
 
-![The review of a pump package: an open problem with the readings behind it on the left, and on the right the data sheet page they come from, with the quoted lines marked](docs/images/review.png)
+![RightFit at work: a material approval form and its PDFs come in, a violet line reads the data sheet and marks the product number, the duty point and the BMS module, the findings appear one by one with their page, a red B stamp lands, approved as noted, and a person signs](docs/images/hero.svg)
 
 ## The problem
 
@@ -28,7 +28,30 @@ A project holds its MAF packages and its BOQ. For each package RightFit:
 
 A check passes only on confirmed values. Until then it shows what the result would be.
 
-The reviewer works in three steps. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read. Last, the answer, ready to copy. The pump tools from the midterm, booster sizing and the standby test, are screens of the same application.
+```mermaid
+flowchart LR
+    A["MAF package<br/>form and PDFs"] --> B["AI reads<br/>each value with its file,<br/>page and a short quote"]
+    B --> C["The reviewer confirms<br/>what the AI read"]
+    C --> D["Rules check<br/>law · checklist · BOQ ·<br/>consultant's rules"]
+    D --> E["Draft answer<br/>A · B · C, one comment<br/>per issue, with its page"]
+    E --> F["The reviewer<br/>decides and signs"]
+    classDef ai fill:#ece9fb,stroke:#6250d6,color:#1b1446
+    classDef rule fill:#e3efe8,stroke:#1e5a3c,color:#0f2e1f
+    classDef person fill:#fdeee4,stroke:#eb6834,color:#3d1a09
+    class B ai
+    class D,E rule
+    class A,C,F person
+```
+
+The reviewer works in three steps. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read: violet with a dashed line is what the AI read, black with a solid line is what a person confirmed. Last, the answer, ready to copy.
+
+![RightFit in six screens: the problems of a pump package beside their pages, why the draft answer is B, confirming what the AI read, the answer ready to copy, an air handling unit at its fourth revision, and what changed since the third](docs/images/tour.gif)
+
+The same application keeps a project's rules and shows what changed between revisions. The pump tools from the midterm, booster sizing and the standby test, are screens of it too.
+
+| What changed since the last revision | The consultant's own rules | Booster sizing |
+|---|---|---|
+| ![The list of files of revision 4 against revision 3: unchanged, renamed, changed, new and removed](docs/images/since.png) | ![The Rules screen: rules the consultant typed in words or wrote by hand, switched on or off](docs/images/rules.png) | ![The peak flow and head a building needs, the suggested set's curve and the sets that fit](docs/images/booster.png) |
 
 ## Where AI is used
 
@@ -42,6 +65,11 @@ The checks are plain Python with no AI in them, so the same package always gives
 | Reading values from the documents | AI reader | A person | Not measured yet: 1 of 116 values confirmed so far |
 | Turning a rule typed in words, or a BOQ line, into items to check | AI, labelled as AI output | | Not measured; the reviewer sees each item before it counts |
 | The whole review | RightFit | General AI chatbots | The protocol was written before any run (`eval/chatbot_baseline/`); no run yet |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/models-dark.svg">
+  <img alt="Our own models against the plain way, scored once on locked data. Page type, 184 pages: our model 62 %, keywords 35 %. Product family, 37 rows: our model 76 % (28 of 37), family words 95 % (35 of 37)" src="docs/images/models.svg">
+</picture>
 
 More in [`spec/constitution/mission.md`](spec/constitution/mission.md) §8 and in [`eval/`](eval/).
 
@@ -80,6 +108,19 @@ The architect clicks the pump set in the model. RightFit finds the room it stand
 | S4 | Does it go through a door of the room, standing, on its narrow side? | I9-2022 art. 17.11, to confirm |
 | S5 | Can one pump alone carry the duty, as the standby test found? | I9-2022 art. 6.56, confirmed by Luca |
 | S6 | Is there an approval for contact with drinking water? | Order MS 275/2012, read on the official text |
+
+```mermaid
+flowchart LR
+    A["Click the pump<br/>in the Revit model"] --> B["RightFit reads its room<br/>doors, contents,<br/>pipes, circuit"]
+    B --> C["S1 to S6<br/>fits the room, clashes,<br/>service space, door,<br/>standby, drinking water"]
+    C --> D["Next Option<br/>each alternative<br/>in its place"]
+    D --> E["Swap, once you confirm<br/>Ctrl+Z puts it back"]
+    E --> F["K1 to K3<br/>pipes, circuit, weight"]
+    classDef rule fill:#e3efe8,stroke:#1e5a3c,color:#0f2e1f
+    classDef person fill:#fdeee4,stroke:#eb6834,color:#3d1a09
+    class B,C,F rule
+    class A,D,E person
+```
 
 Next Option shows each alternative in the pump's place as a preview: the maker's Revit family or 3D DWG when the project has it, otherwise a stand-in drawn from the catalogue sizes. Swap puts the chosen alternative into the model once the architect confirms it. It keeps the mark and comments, writes RightFit's verdict into the element and shows what the swap changes: pipe ends that no longer meet the set (K1), more motor power on the circuit, which goes back to the electrical engineer (K2), and the change in weight, which goes to the structural engineer (K3). Ctrl+Z undoes the whole swap.
 
