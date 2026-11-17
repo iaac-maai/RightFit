@@ -11,6 +11,7 @@ import rf_setup
 doc, uidoc = revit.doc, revit.uidoc
 if not rf_setup.settings().get("project"):
     forms.alert("Pick the project first (RightFit > Settings).", exitscript=True)
+rf_app.clear_drawing(doc)  # show the real pump again before asking for it
 try:
     pump = rf_app.pick_pump(uidoc)
 except Exception:

@@ -52,7 +52,36 @@ def build(doc, tr_room):
     return notes
 
 
+def _remove_old(doc, name):
+    """Delete a test room built before, so building again replaces it instead of doubling it."""
+    from Autodesk.Revit.DB import DirectShape, FamilyInstance, SpatialElement
+    old = []
+    for e in FilteredElementCollector(doc).OfClass(DirectShape):
+        if rf_model.name_of(e).startswith(u"RFT ") or rf_model.name_of(e).startswith(u"RF "):
+            old.append(e.Id)
+    for cls in (Wall, FamilyInstance, DirectShape):
+        for e in FilteredElementCollector(doc).OfClass(cls):
+            p = e.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+            note = (p.AsString() or u"") if p is not None else u""
+            if note.startswith(u"RFT") or note.startswith(u"front:"):  # front: marks older stand-in pumps
+                old.append(e.Id)
+    for e in FilteredElementCollector(doc).OfClass(SpatialElement):
+        p = e.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)
+        n = e.get_Parameter(BuiltInParameter.ROOM_NAME)
+        if (p is not None and (p.AsString() or u"") == u"RFT room") or (n is not None and n.AsString() == name):
+            old.append(e.Id)
+    for i in old:
+        try:
+            doc.Delete(i)
+        except Exception:
+            pass  # already gone with its host
+    return len(old)
+
+
 def _build(doc, tr_room, t, lvl, notes):
+    if _remove_old(doc, tr_room.get("name", u"Test room")):
+        notes.append(u"replaced the test room built before")
+        doc.Regenerate()
     X, Y, H = tr_room["x"], tr_room["y"], tr_room["height"]
     t2 = tr_room.get("wall", 200) / 2
     wtype = doc.GetDefaultElementTypeId(ElementTypeGroup.WallType)
@@ -67,6 +96,7 @@ def _build(doc, tr_room, t, lvl, notes):
     doc.Regenerate()
     room = doc.Create.NewRoom(lvl, UV(ft(X / 2), ft(Y / 2)))
     room.Name = tr_room.get("name", u"Test room")
+    room.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT room")
     try:
         room.get_Parameter(BuiltInParameter.ROOM_UPPER_OFFSET).Set(ft(H))
     except Exception:
@@ -135,10 +165,11 @@ def _build(doc, tr_room, t, lvl, notes):
                 sym = rf_draw.load_symbol(doc, path, entry.get("type"))
                 inst, _ = rf_draw.place_family(doc, sym, frame, s, base, lvl, float(entry.get("rotate", 0)))
                 inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).Set(u"P-01")
+                inst.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump")
             else:
                 body = [-s["L"] / 2, -s["W"] / 2, s["L"] / 2, s["W"] / 2, base, base + s["H"]]
-                ds = rf_draw.Painter(doc, frame, []).stand_in_single(s, body, u"RFT pump: ",
+                ds = rf_draw.Painter(doc, frame, []).stand_in_single(s, body, u"RFT pump - ",
                                                                       BuiltInCategory.OST_MechanicalEquipment)
-                ds.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"front:" + front)
+                ds.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(u"RFT pump front:" + front)
                 notes.append(u"the pump is a stand-in from the catalogue sizes: add the maker's .rfa to see it")
     t.Commit()

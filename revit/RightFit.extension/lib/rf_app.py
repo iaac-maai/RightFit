@@ -30,12 +30,25 @@ COLOUR_MD = {"FAIL": "red", "flag": "darkorange", "unclear": "gray", "info": "gr
 class PumpFilter(ISelectionFilter):
     def AllowElement(self, el):
         try:
+            if rf_model.name_of(el).startswith(u"RF "):
+                return False  # RightFit's own preview drawing, not a pump
             return el.Category is not None and eid(el.Category.Id) in [int(c) for c in rf_model.PUMP_CATEGORIES]
         except Exception:
             return False
 
     def AllowReference(self, ref, point):
         return False
+
+
+def clear_drawing(doc):
+    """Remove RightFit's previews and show the pump again, so the architect clicks the real pump."""
+    st = rf_setup.state()
+    t = Transaction(doc, u"RightFit: clear")
+    t.Start()
+    rf_draw.clear(doc, st.get("hidden", []))
+    t.Commit()
+    st["hidden"] = []
+    rf_setup.save_state(st)
 
 
 def pick_pump(uidoc):
@@ -265,7 +278,7 @@ def swap(doc, uidoc, g, s):
         how = u"placed the maker's family " + os.path.basename(path)
     else:
         body, _ = rf_model.space_checks.body_and_zones(s, {}, sit.base_z)
-        new, b = painter.stand_in_single(s, body, u"RFT pump: ", BuiltInCategory.OST_MechanicalEquipment), body
+        new, b = painter.stand_in_single(s, body, u"RFT pump - ", BuiltInCategory.OST_MechanicalEquipment), body
         how = u"placed a stand-in (test room)"
     new_s["L"], new_s["W"], new_s["H"] = b[2] - b[0], b[3] - b[1], b[5] - b[4]
     res = swap_checks(new_s, g["current"], room, g["service"], pipes, g["circuit"], sit.base_z, sit.size)

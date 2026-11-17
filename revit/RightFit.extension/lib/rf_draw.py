@@ -16,6 +16,7 @@ from Autodesk.Revit.DB import (Arc, BoundingBoxXYZ, BuiltInCategory, BuiltInPara
                                GeometryObject, Level, Line, OverrideGraphicSettings, Transform, View3D,
                                ViewFamily, ViewFamilyType, ViewOrientation3D, Wall, XYZ)
 from Autodesk.Revit.DB.Structure import StructuralType
+from System import Int64
 from System.Collections.Generic import List
 
 from rf_model import corners, eid, ft, geometry_points, local_box, mm, name_of
@@ -188,7 +189,7 @@ def clear(doc, unhide=()):
         n += 1
     ids = List[ElementId]()
     for i in unhide:
-        el = doc.GetElement(ElementId(i))
+        el = doc.GetElement(ElementId(Int64(i)))  # Int64: Revit 2026 has several ElementId(number) forms
         if el is not None:
             ids.Add(el.Id)
     for v in FilteredElementCollector(doc).OfClass(View3D):
