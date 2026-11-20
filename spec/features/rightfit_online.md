@@ -104,7 +104,20 @@ The people who run RightFit see every account and every project, and can put thi
 
 Drafted on 20 Nov 2026, as Luca asked, in `web/legal/` and shown in the app: the Terms of Service, the Privacy Policy (GDPR Articles 13 and 14), the Data Processing Agreement (GDPR Article 28, with the processing, the security measures and the sub-processors in three annexes), the Cookie Policy and the Legal Notice (LSSI-CE Article 10). Everyone accepts the terms, having read the privacy policy, at first sign-in; the consultant who opens a project accepts the data processing agreement for their organisation, because the forms and files of a project are its data and RightFit processes them for it. The versions and dates are recorded. The operator's own records are in `docs/legal/`. They are drafts until a lawyer has read them and the operator is named [O].
 
-## 11. Phases
+## 11. The project's own data online (MAF-35, Luca, 20 Nov 2026)
+
+Luca wanted the project's data in the online app as in the review app on the laptop: the MAF packages, their files, the reviews and the BOQ. `web/scripts/import_project.py` takes the project the review app has open and puts it online:
+
+| What | Where it goes | What is left out |
+|---|---|---|
+| every package: form, revision, discipline, products, files, pages | D1, table `package` | |
+| the original files of each package | the private R2 bucket `rightfit-files`, read only through the Worker | |
+| RightFit's draft review of the packages already read: the answer, the problems and questions with their files, pages and rules | R2, one JSON file per package | it is the laptop's draft of that day; it becomes live once the engine runs online (MAF-33) |
+| the BOQ lines: chapter (the sheet), row, number, text, unit, quantity, producer, standards | D1, table `boq_line` | the prices, and the BOQ file itself, which stay on the laptop |
+
+The project is **locked**: besides being a member, a person needs the team password, which only the team knows and which is kept as a Cloudflare secret (`TEAM_PASSWORD`). The browser keeps a hash of it for 7 days, never the password. Five wrong tries in 15 minutes make a person wait, and every try goes in the activity log. Until forms have a branch (MAF-32), a subcontractor sees none of the imported packages or the BOQ.
+
+## 12. Phases
 
 | ID | What | Done when |
 |---|---|---|
@@ -113,11 +126,11 @@ Drafted on 20 Nov 2026, as Luca asked, in `web/legal/` and shown in the app: the
 | MAF-33 | The engine on Render: the Worker sends a package to RightFit's checks and shows the draft, labelled | the draft online matches the review app's on P01 and P02 |
 | MAF-34 | The BOQ register, after MAF-31 to MAF-33 (Luca, 20 Nov): for each category of the BOQ, which lines an approved form already covers. One form covers a range: a data sheet for 30 diameters of one pipe covers all 30 lines, so they need no form each | its own spec, written when MAF-33 is done |
 
-## 12. Tests
+## 13. Tests
 
 The rules of who may invite whom, who sees what and who opens Management are one small module, `web/worker/roles.ts`, with tests that run with Node's own test runner (`npm test`). The routes are tried locally with five accounts, the way people would use them: a person who is not a member gets "not found" for the project, a subcontractor can't invite a contractor nor see another subcontractor, an invitation can't be accepted from an account with another email nor twice, only a consultant takes people out, and deleting an account withdraws its pending invitations. Management was tried the same way: an admin address typed with a password gets nothing, the same address verified gets everything, a project keeps its last consultant, and every change made there is logged.
 
-## 13. Open questions [O]
+## 14. Open questions [O]
 
 - Suppliers in the chain, invited by a subcontractor to add the makers' documents. Left out on 20 Nov 2026: letting the makers' resellers into a project could bring conflicts of interest (Luca). Kept as an idea for later.
 - Sending invitations by email, through a mail service (the link is copied by hand in MAF-31).

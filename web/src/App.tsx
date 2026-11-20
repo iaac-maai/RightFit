@@ -5,7 +5,7 @@ import { Admin, AdminProject } from "./pages/Admin";
 import { Home } from "./pages/Home";
 import { Join } from "./pages/Join";
 import { LEGAL_PATHS, Legal, type LegalDoc } from "./pages/Legal";
-import { Project } from "./pages/Project";
+import { Project, type ProjectView } from "./pages/Project";
 import { SignIn, TermsGate } from "./pages/SignIn";
 import { DeleteAccount } from "./ui";
 import type { Session } from "./types";
@@ -13,7 +13,7 @@ import type { Session } from "./types";
 type AdminTab = "overview" | "people" | "projects" | "activity";
 type Route =
   | { page: "home" }
-  | { page: "project"; id: string }
+  | { page: "project"; id: string; view: ProjectView; code?: string }
   | { page: "join"; token: string }
   | { page: "admin"; tab: AdminTab }
   | { page: "admin-project"; id: string }
@@ -21,8 +21,11 @@ type Route =
 
 function parse(path: string): Route {
   const clean = path.replace(/\/+$/, "") || "/";
-  const project = clean.match(/^\/p\/([\w-]+)$/);
-  if (project) return { page: "project", id: project[1] };
+  const project = clean.match(/^\/p\/([\w-]+)(?:\/(packages|boq))?(?:\/(P\d+))?$/);
+  if (project) {
+    const [, id, part, code] = project;
+    return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | undefined) ?? "team"), code };
+  }
   const join = clean.match(/^\/join\/([\w-]+)$/);
   if (join) return { page: "join", token: join[1] };
   const adminProject = clean.match(/^\/admin\/p\/([\w-]+)$/);
@@ -73,7 +76,7 @@ export function App() {
       <Rail session={session} route={route} project={openProject} />
       <main>
         {route.page === "home" && <Home session={session} />}
-        {route.page === "project" && <Project id={route.id} onLoaded={setProjectName} />}
+        {route.page === "project" && <Project id={route.id} view={route.view} code={route.code} onLoaded={setProjectName} />}
         {route.page === "join" && <Join token={route.token} session={session} />}
         {adminPage && !session.admin && (
           <div className="screen"><p className="err" role="alert">This page is for the people who run RightFit.</p></div>

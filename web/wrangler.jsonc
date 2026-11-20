@@ -8,5 +8,7 @@
   "d1_databases": [
     // made on 20 Nov 2026 with: npx wrangler d1 create rightfit-db --location weur (Western Europe)
     { "binding": "DB", "database_name": "rightfit-db", "database_id": "d15e95b2-2269-44ce-9f51-71191b88e108" }
-  ]
+  ],
+  // the private files: the packages' originals and RightFit's draft reviews (npx wrangler r2 bucket create rightfit-files)
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "rightfit-files" }]
 }

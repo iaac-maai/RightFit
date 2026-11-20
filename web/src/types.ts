@@ -12,7 +12,7 @@ export interface Session {
   admin: boolean;
 }
 
-export interface ProjectCard { id: string; name: string; country: Country; role: Role; company: string; people: number }
+export interface ProjectCard { id: string; name: string; country: Country; locked: boolean; role: Role; company: string; people: number }
 
 export interface WaitingInvitation {
   id: string; role: Role; company: string; createdAt: string; expiresAt: string; project: string;
@@ -31,7 +31,7 @@ export interface PendingInvitation {
 }
 
 export interface ProjectData {
-  project: { id: string; name: string; country: Country; createdAt: string };
+  project: { id: string; name: string; country: Country; createdAt: string; locked: number; packages: number; boqLines: number };
   me: { id: string; role: Role; company: string };
   people: TeamPerson[];
   invitations: PendingInvitation[];
@@ -60,4 +60,26 @@ export interface AdminProjectData {
   people: AdminMember[];
   invitations: PendingInvitation[];
   events: AdminEvent[];
+}
+
+// The project's own data (worker/project_data.ts)
+export interface PackageRow {
+  code: string; formNo: string; revision: number; discipline: string; items: string[]; files: number; pages: number | null;
+  letter: "A" | "B" | "C" | null; label: string | null; problems: number | null; questions: number | null;
+  toConfirm: number | null; readings: number | null; reviewedAt: string | null;
+}
+export interface PackageFile { name: string; size: number; pages: number | null }
+export interface Finding {
+  check: string; check_name: string; product?: string; doc?: string; verdict: string; confirmed: boolean; reason: string;
+  sources?: string[] | null; rules?: { id: string; status: string }[] | null; blocking?: boolean;
+}
+export interface PackageReview {
+  review_date: string; delivery_date?: string; draft_answer: { letter: string; label: string; reasons: string[] };
+  counts: Record<string, number>; problems: Finding[]; questions: Finding[];
+  documents: { no: number; file: string; type: string; listed_as: string; status: string }[]; answer_text: string;
+}
+export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null }
+export interface BoqLine {
+  file: string; sheet: string; row: number; nr: string | null; text: string; unit: string | null; qty: string | number | null;
+  producer: string | null; standards: string | null;
 }

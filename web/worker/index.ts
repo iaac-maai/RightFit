@@ -3,6 +3,7 @@
 // Auth), the terms, membership of the project, then what the role allows (roles.ts). Every query names the person
 // or the project, so nobody reads a project they are not in. Management lives in admin.ts.
 import { adminRoute } from "./admin";
+import { access, dataRoute } from "./project_data";
 import { googleOn, makeAuth } from "./auth";
 import {
   deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
@@ -77,12 +78,14 @@ async function route(request: Request, env: Env): Promise<Response> {
   let m = path.match(/^\/api\/invitations\/([\w-]+)\/(accept|decline|withdraw)$/);
   if (m && method === "POST") return answerInvitation(env, m[1], m[2] as "accept" | "decline" | "withdraw", user);
   m = path.match(/^\/api\/projects\/([\w-]+)$/);
-  if (m && method === "GET") return project(env, m[1], user);
+  if (m && method === "GET") return project(request, env, m[1], user);
   m = path.match(/^\/api\/projects\/([\w-]+)\/invitations$/);
   if (m && method === "POST") return invite(request, env, m[1], user, url.origin);
   m = path.match(/^\/api\/projects\/([\w-]+)\/members\/([\w-]+)\/remove$/);
   if (m && method === "POST") return removeMember(env, m[1], m[2], user);
 
+  const data = await dataRoute(request, env, user, path, method);
+  if (data) return data;
   return json({ error: "No such endpoint." }, 404);
 }
 
@@ -138,17 +141,17 @@ async function deleteMine(env: Env, userId: string) {
 // waiting for their address (only an address Google verified: anyone else joins through the link)
 async function home(env: Env, user: User) {
   const { results: mine } = await env.DB.prepare(
-    `SELECT p.id, p.name, p.country, m.id AS member_id, m.role, m.company
+    `SELECT p.id, p.name, p.country, p.locked, m.id AS member_id, m.role, m.company
        FROM member m JOIN project p ON p.id = m.project_id
       WHERE m.user_id = ? ORDER BY p.created_at DESC`,
-  ).bind(user.id).all<{ id: string; name: string; country: string; member_id: string; role: Role; company: string }>();
+  ).bind(user.id).all<{ id: string; name: string; country: string; locked: number; member_id: string; role: Role; company: string }>();
   const { results: everyone } = await env.DB.prepare(
     "SELECT id, project_id, role, invited_by FROM member WHERE project_id IN (SELECT project_id FROM member WHERE user_id = ?)",
   ).bind(user.id).all<{ id: string; project_id: string; role: Role; invited_by: string | null }>();
   const projects = mine.map((p) => {
     const team = everyone.filter((e) => e.project_id === p.id).map(person);
     const me = team.find((t) => t.id === p.member_id) ?? { id: p.member_id, role: p.role, invitedBy: null };
-    return { id: p.id, name: p.name, country: p.country, role: p.role, company: p.company, people: visiblePeople(team, me).length };
+    return { id: p.id, name: p.name, country: p.country, locked: Boolean(p.locked), role: p.role, company: p.company, people: visiblePeople(team, me).length };
   });
   let invitations: unknown[] = [];
   if (user.emailVerified) {
@@ -188,10 +191,15 @@ async function createProject(request: Request, env: Env, user: User) {
 
 // GET /api/projects/<id>: the project, the people this member may see, the pending invitations they may see,
 // and what they may do here
-async function project(env: Env, projectId: string, user: User) {
-  const me = await membership(env, projectId, user.id);
-  if (!me) return notFound();
-  const info = await env.DB.prepare("SELECT id, name, country, created_at AS createdAt FROM project WHERE id = ?").bind(projectId).first();
+async function project(request: Request, env: Env, projectId: string, user: User) {
+  const me = await access(request, env, projectId, user); // a member, with the team password for a locked project
+  if (me instanceof Response) return me;
+  const info = await env.DB.prepare(
+    `SELECT id, name, country, created_at AS createdAt, locked,
+            (SELECT COUNT(*) FROM package k WHERE k.project_id = project.id) AS packages,
+            (SELECT COUNT(*) FROM boq_line b WHERE b.project_id = project.id) AS boqLines
+       FROM project WHERE id = ?`,
+  ).bind(projectId).first();
   const { results: rows } = await env.DB.prepare(
     `SELECT m.id, m.role, m.company, m.invited_by, m.joined_at, u.name, u.email, u.image
        FROM member m JOIN "user" u ON u.id = m.user_id WHERE m.project_id = ? ORDER BY m.joined_at`,

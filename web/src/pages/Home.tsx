@@ -53,6 +53,7 @@ export function Home({ session }: { session: Session }) {
             {projects.map((p) => (
               <a key={p.id} className="row project-row" href={`/p/${p.id}`} onClick={go(`/p/${p.id}`)}>
                 <span className="typed name">{p.name}</span>
+                {p.locked && <span className="chip">locked</span>}
                 <span className="meta">{country(p.country)}</span>
                 <span className="chip">{ROLE_LABEL[p.role]}</span>
                 <span className="meta">{plural(p.people, "person", "people")}</span>

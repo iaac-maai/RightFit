@@ -14,6 +14,7 @@ RightFit online uses only cookies that are strictly necessary to provide the ser
 |---|---|---|---|
 | `better-auth.session_token` (on secure connections, `__Secure-better-auth.session_token`) | keeps you signed in; it holds a signed session identifier, not your password | up to 7 days; deleted when you sign out | RightFit online (first party) |
 | a short-lived sign-in security cookie | while you sign in with Google, checks that the sign-in started in your own browser | a few minutes; deleted when the sign-in ends | RightFit online (first party) |
+| `rf_team` | opens a locked project after you give the team password; it holds a hash of the password, never the password | 7 days | RightFit online (first party) |
 
 The session cookie is marked `HttpOnly`, so scripts on the page cannot read it, and `SameSite=Lax`, so other websites cannot use it to act on your behalf. On secure connections it is also marked `Secure`.
 

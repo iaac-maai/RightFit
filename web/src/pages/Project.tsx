@@ -1,10 +1,13 @@
 // One project: the team drawn as the chain of who brought in whom, and inviting the next people
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { REVIEWERS, ROLE_LABEL, ROLE_NOTE, type Role } from "../../worker/roles";
-import { api, post } from "../api";
+import { ApiError, api, go, post } from "../api";
 import { aRole, country, day, daysLeft, plural } from "../format";
 import { Icon, Modal, Monogram, PLUS } from "../ui";
 import type { CreatedInvitation, PendingInvitation, ProjectData, TeamPerson } from "../types";
+import { Boq, PackageView, Packages, TeamLock } from "./ProjectData";
+
+export type ProjectView = "team" | "packages" | "package" | "boq";
 
 // The order of people under one inviter: reviewers first, then down the chain
 const TIER: Record<Role, number> = { consultant: 0, designer: 1, site_supervisor: 1, client: 1, contractor: 2, subcontractor: 3 };
@@ -29,18 +32,25 @@ function chain(people: TeamPerson[], invitations: PendingInvitation[]) {
   return { roots, loose };
 }
 
-export function Project({ id, onLoaded }: { id: string; onLoaded: (p: { id: string; name: string }) => void }) {
+export function Project({ id, view, code, onLoaded }: {
+  id: string; view: ProjectView; code?: string; onLoaded: (p: { id: string; name: string }) => void;
+}) {
   const [data, setData] = useState<ProjectData | null>(null);
   const [error, setError] = useState("");
   const [inviting, setInviting] = useState<Preset | null>(null);
   const [removing, setRemoving] = useState<TeamPerson | null>(null);
+  const [locked, setLocked] = useState<string | null>(null); // the project's name, while it waits for the team password
 
   const load = useCallback(() => api<ProjectData>(`/api/projects/${id}`).then(
-    (found) => { setData(found); onLoaded({ id: found.project.id, name: found.project.name }); },
-    (err: Error) => setError(err.message),
+    (found) => { setLocked(null); setData(found); onLoaded({ id: found.project.id, name: found.project.name }); },
+    (err: Error) => {
+      if (err instanceof ApiError && err.data.need === "team") setLocked(String(err.data.project ?? "This project"));
+      else setError(err.message);
+    },
   ), [id, onLoaded]);
   useEffect(() => { setData(null); setError(""); void load(); }, [load]);
 
+  if (locked) return <TeamLock name={locked} onUnlocked={() => void load()} />;
   if (error && !data) return <div className="screen"><p className="err" role="alert">{error}</p></div>;
   if (!data) return <div className="screen"><span className="spinner" aria-label="Loading" /></div>;
 
@@ -85,7 +95,21 @@ export function Project({ id, onLoaded }: { id: string; onLoaded: (p: { id: stri
       </header>
       {error && <p className="err" role="alert">{error}</p>}
 
-      <div className="project-grid">
+      {(project.packages > 0 || project.boqLines > 0) && (
+        <nav className="tabs" aria-label="The project">
+          {([["team", "Team", `/p/${id}`], ["packages", `Packages (${project.packages})`, `/p/${id}/packages`],
+             ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`]] as const).map(([key, label, path]) => (
+            <a key={key} href={path} onClick={go(path)} aria-current={view === key || (key === "packages" && view === "package") ? "page" : undefined}>{label}</a>
+          ))}
+          {Boolean(project.locked) && <span className="lock-note">Locked: opened with the team password</span>}
+        </nav>
+      )}
+
+      {view === "packages" && <Packages projectId={id} />}
+      {view === "package" && code && <PackageView projectId={id} code={code} />}
+      {view === "boq" && <Boq projectId={id} />}
+
+      {view === "team" && <div className="project-grid">
         <section className="sheet team" aria-label="The team">
           <div className="sheet-head">
             <span className="lab">The team</span>
@@ -118,7 +142,7 @@ export function Project({ id, onLoaded }: { id: string; onLoaded: (p: { id: stri
             <p>The forms come here next. A subcontractor prepares a form, the contractor checks it with RightFit and sends it on, and the reviewers answer. Everyone sees whose turn it is, and since when.</p>
           </section>
         </aside>
-      </div>
+      </div>}
 
       <InviteDialog project={project} me={me} mayInvite={mayInvite} preset={inviting} onClose={() => setInviting(null)} onCreated={() => void load()} />
       <RemoveDialog project={project} person={removing} onClose={() => setRemoving(null)} onRemoved={() => { setRemoving(null); void load(); }} />
