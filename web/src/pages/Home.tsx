@@ -107,7 +107,9 @@ function NewProject({ open, onClose }: { open: boolean; onClose: () => void }) {
     setBusy(true);
     setError("");
     try {
-      const { id } = await post<{ id: string }>("/api/projects", { name: form.get("name"), country: form.get("country"), company: form.get("company") });
+      const { id } = await post<{ id: string }>("/api/projects", {
+        name: form.get("name"), country: form.get("country"), company: form.get("company"), dpa: form.get("dpa") === "on",
+      });
       onClose();
       navigate(`/p/${id}`);
     } catch (err) {
@@ -137,6 +139,10 @@ function NewProject({ open, onClose }: { open: boolean; onClose: () => void }) {
             <input name="company" type="text" maxLength={120} />
           </label>
         </div>
+        <label className="tick">
+          <input type="checkbox" name="dpa" required />
+          <span>I am authorised to open this project for my organisation, and I accept the <a href="/data-processing" target="_blank" rel="noreferrer">Data Processing Agreement</a> on its behalf: the forms and files of the project are its data, and RightFit processes them for it.</span>
+        </label>
         {error && <p className="err" role="alert">{error}</p>}
         <div className="actions">
           <button className="btn p" disabled={busy}>Open the project</button>

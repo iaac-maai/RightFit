@@ -1,23 +1,21 @@
 // The API of RightFit online (spec/features/rightfit_online.md). One Worker on Cloudflare answers every /api/...
 // request; every other path is the React page. Each request is checked here, in this order: an account (Better
 // Auth), the terms, membership of the project, then what the role allows (roles.ts). Every query names the person
-// or the project, so nobody reads a project they are not in.
-import { googleOn, makeAuth, type AuthEnv } from "./auth";
+// or the project, so nobody reads a project they are not in. Management lives in admin.ts.
+import { adminRoute } from "./admin";
+import { googleOn, makeAuth } from "./auth";
 import {
-  isRole, mayInvite, mayWithdraw, rolesInvitableBy, ROLE_LABEL, visibleInvitations, visiblePeople, type Person, type Role,
+  deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
+} from "./data";
+import {
+  isAdmin, isRole, mayInvite, mayWithdraw, rolesInvitableBy, ROLE_LABEL, visibleInvitations, visiblePeople, type Person, type Role,
 } from "./roles";
 
-interface Env extends AuthEnv {
-  DB: D1Database;
-  ASSETS: Fetcher;
-}
-
-// The version of the terms and privacy note a person accepts (src/components/Legal.tsx shows the same date)
-const TERMS_VERSION = "2026-11-20";
+// The versions of the documents a person accepts (web/legal/ carries the same dates: change them together)
+const TERMS_VERSION = "2026-11-20"; // the terms of service, read with the privacy policy
+const DPA_VERSION = "2026-11-20"; // the data processing agreement a consultant accepts for their organisation
 const INVITATION_DAYS = 14;
 
-interface User { id: string; name: string; email: string; emailVerified: boolean; image?: string | null }
-interface MemberRow { id: string; project_id: string; user_id: string; role: Role; company: string; invited_by: string | null; joined_at: string }
 interface InvitationRow {
   id: string; project_id: string; email: string; role: Role; company: string; invited_by: string; created_at: string;
   expires_at: string; state: "pending" | "accepted" | "declined" | "withdrawn"; project: string;
@@ -56,17 +54,22 @@ async function route(request: Request, env: Env): Promise<Response> {
   if (!session) return json({ error: "Sign in to RightFit.", need: "account", google: googleOn(env) }, 401);
   const user = { ...session.user, emailVerified: Boolean(session.user.emailVerified) } as User;
   const termsAccepted = await accepted(env, user.id);
+  const admin = isAdmin(user, env.ADMIN_EMAILS);
 
   if (path === "/api/session") {
     return json({
       user: { name: user.name, email: user.email, image: user.image ?? null, emailVerified: user.emailVerified },
-      termsAccepted, termsVersion: TERMS_VERSION,
+      termsAccepted, termsVersion: TERMS_VERSION, dpaVersion: DPA_VERSION, admin,
     });
   }
   if (path === "/api/terms/accept" && method === "POST") return accept(env, user.id);
-  if (path === "/api/account/delete" && method === "POST") return deleteAccount(env, user.id);
+  if (path === "/api/account/delete" && method === "POST") return deleteMine(env, user.id);
   if (!termsAccepted) return json({ error: "Accept the terms first.", need: "terms" }, 403);
 
+  if (path.startsWith("/api/admin/")) {
+    // Management answers "not found" to everyone else, so it doesn't show it exists
+    return admin ? adminRoute(request, env, user, path, method) : json({ error: "No such endpoint." }, 404);
+  }
   if (path === "/api/home" && method === "GET") return home(env, user);
   if (path === "/api/projects" && method === "POST") return createProject(request, env, user);
   if (joinLink && method === "POST") return joinByLink(env, joinLink[1], user);
@@ -85,44 +88,21 @@ async function route(request: Request, env: Env): Promise<Response> {
 
 // ---- Small helpers ----------------------------------------------------------
 
-const json = (body: unknown, status = 200, headers?: HeadersInit) => Response.json(body, { status, headers });
-const now = () => new Date().toISOString();
-const newId = () => crypto.randomUUID();
 const notFound = () => json({ error: "No such project, or you are not in it." }, 404);
 const roleWord = (role: Role) => ROLE_LABEL[role].toLowerCase();
 const person = (m: { id: string; role: Role; invited_by: string | null }): Person => ({ id: m.id, role: m.role, invitedBy: m.invited_by });
+const emailOf = (value: unknown) => text(value, 254).toLowerCase();
+const looksLikeEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 function sameOrigin(request: Request, url: URL) {
   const origin = request.headers.get("Origin");
   return !origin || origin === url.origin;
 }
 
-async function readBody(request: Request): Promise<Record<string, unknown>> {
-  try {
-    const value = await request.json();
-    return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
-}
-
-const text = (value: unknown, max: number) => (typeof value === "string" ? value.trim().slice(0, max) : "");
-const emailOf = (value: unknown) => text(value, 254).toLowerCase();
-const looksLikeEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
 // The secret in an invitation link: 32 random bytes, written with the letters a URL allows
 function newToken() {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-async function membership(env: Env, projectId: string, userId: string) {
-  return env.DB.prepare("SELECT * FROM member WHERE project_id = ? AND user_id = ?").bind(projectId, userId).first<MemberRow>();
 }
 
 // ---- Terms and the account ----------------------------------------------------------
@@ -132,46 +112,24 @@ async function accepted(env: Env, userId: string) {
   return Boolean(row);
 }
 
-// POST /api/terms/accept: the person ticked "I agree"; we keep which version and when
+// POST /api/terms/accept: the person accepted the terms and read the privacy policy; we keep which version and when
 async function accept(env: Env, userId: string) {
-  await env.DB.prepare('INSERT OR IGNORE INTO consent ("userId", "termsVersion", "acceptedAt") VALUES (?, ?, ?)')
-    .bind(userId, TERMS_VERSION, now()).run();
+  await env.DB.batch([
+    env.DB.prepare('INSERT OR IGNORE INTO consent ("userId", "termsVersion", "acceptedAt") VALUES (?, ?, ?)').bind(userId, TERMS_VERSION, now()),
+    logged(env, userId, "terms.accepted", null, { version: TERMS_VERSION }),
+  ]);
   return json({ ok: true, termsVersion: TERMS_VERSION });
 }
 
-// POST /api/account/delete: the person, their sessions, sign-in links, consent and memberships. A project they run
-// alone with other people in it must go to another consultant first; a project with nobody else in it goes too.
-async function deleteAccount(env: Env, userId: string) {
-  const { results: run } = await env.DB.prepare(
-    `SELECT p.id, p.name,
-            (SELECT COUNT(*) FROM member c WHERE c.project_id = p.id AND c.role = 'consultant') AS consultants,
-            (SELECT COUNT(*) FROM member o WHERE o.project_id = p.id) AS people
-       FROM member m JOIN project p ON p.id = m.project_id
-      WHERE m.user_id = ? AND m.role = 'consultant'`,
-  ).bind(userId).all<{ id: string; name: string; consultants: number; people: number }>();
-  const handOver = run.filter((p) => p.consultants === 1 && p.people > 1);
-  if (handOver.length) {
-    return json({ error: `First make someone else a consultant of ${handOver.map((p) => p.name).join(", ")}.` }, 409);
-  }
-  const alone = run.filter((p) => p.people === 1).map((p) => p.id);
-  await env.DB.batch([
-    ...alone.flatMap((id) => [
-      env.DB.prepare("DELETE FROM invitation WHERE project_id = ?").bind(id),
-      env.DB.prepare("DELETE FROM member WHERE project_id = ?").bind(id),
-      env.DB.prepare("DELETE FROM project WHERE id = ?").bind(id),
-    ]),
-    env.DB.prepare("UPDATE invitation SET state = 'withdrawn' WHERE state = 'pending' AND invited_by IN (SELECT id FROM member WHERE user_id = ?)").bind(userId),
-    env.DB.prepare("DELETE FROM member WHERE user_id = ?").bind(userId),
-    env.DB.prepare('DELETE FROM consent WHERE "userId" = ?').bind(userId),
-    env.DB.prepare('DELETE FROM session WHERE "userId" = ?').bind(userId),
-    env.DB.prepare('DELETE FROM account WHERE "userId" = ?').bind(userId),
-    env.DB.prepare('DELETE FROM "user" WHERE id = ?').bind(userId),
-  ]);
+// POST /api/account/delete: everything of this person's goes (data.ts says what), and the browser forgets the session
+async function deleteMine(env: Env, userId: string) {
+  const handOver = await deleteAccount(env, userId, userId, "account.deleted");
+  if (handOver) return json({ error: `First make someone else a consultant of ${handOver.join(", ")}.` }, 409);
   const headers = new Headers();
   for (const name of ["better-auth.session_token", "__Secure-better-auth.session_token"]) {
     headers.append("Set-Cookie", `${name}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`);
   }
-  return json({ deleted: true, projectsDeleted: alone.length }, 200, headers);
+  return json({ deleted: true }, 200, headers);
 }
 
 // ---- Home and projects ----------------------------------------------------------
@@ -207,18 +165,23 @@ async function home(env: Env, user: User) {
   return json({ projects, invitations });
 }
 
-// POST /api/projects {name, country, company}: whoever opens a project is its first consultant
+// POST /api/projects {name, country, company, dpa}: whoever opens a project is its first consultant, and accepts the
+// data processing agreement for their organisation, because the forms and files of a project are its data
 async function createProject(request: Request, env: Env, user: User) {
   const body = await readBody(request);
   const name = text(body.name, 120);
   if (!name) return json({ error: "Give the project a name." }, 400);
+  if (body.dpa !== true) return json({ error: "Accept the data processing agreement for your organisation." }, 400);
   const country = body.country === "ES" ? "ES" : "RO";
   const id = newId();
   const at = now();
   await env.DB.batch([
-    env.DB.prepare("INSERT INTO project (id, name, country, created_by, created_at) VALUES (?, ?, ?, ?, ?)").bind(id, name, country, user.id, at),
+    env.DB.prepare(
+      "INSERT INTO project (id, name, country, created_by, created_at, dpa_version, dpa_accepted_by, dpa_accepted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+    ).bind(id, name, country, user.id, at, DPA_VERSION, user.id, at),
     env.DB.prepare("INSERT INTO member (id, project_id, user_id, role, company, invited_by, joined_at) VALUES (?, ?, ?, 'consultant', ?, NULL, ?)")
       .bind(newId(), id, user.id, text(body.company, 120), at),
+    logged(env, user.id, "project.opened", id, { dpa: DPA_VERSION }),
   ]);
   return json({ id }, 201);
 }
@@ -286,6 +249,7 @@ async function invite(request: Request, env: Env, projectId: string, user: User,
       `INSERT INTO invitation (id, project_id, email, role, company, invited_by, token_hash, created_at, expires_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     ).bind(id, projectId, email, role, company, me.id, await sha256(token), created.toISOString(), expires.toISOString()),
+    logged(env, user.id, "invitation.sent", projectId, { invitation: id, role: ROLE_LABEL[role] }),
   ]);
   return json({ id, link: `${origin}/join/${token}`, email, role, expiresAt: expires.toISOString() }, 201);
 }
@@ -329,6 +293,7 @@ async function join(env: Env, inv: InvitationRow, user: User) {
     env.DB.prepare("INSERT INTO member (id, project_id, user_id, role, company, invited_by, joined_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
       .bind(newId(), inv.project_id, user.id, inv.role, inv.company, inv.invited_by, now()),
     env.DB.prepare("UPDATE invitation SET state = 'accepted' WHERE id = ? AND state = 'pending'").bind(inv.id),
+    logged(env, user.id, "member.joined", inv.project_id, { invitation: inv.id, role: ROLE_LABEL[inv.role] }),
   ]);
   return json({ projectId: inv.project_id });
 }
@@ -343,12 +308,18 @@ async function answerInvitation(env: Env, id: string, action: "accept" | "declin
     const me = await membership(env, inv.project_id, user.id);
     if (!me) return missing();
     if (!mayWithdraw(person(me), inv.invited_by)) return json({ error: "Only whoever sent it, or a consultant, can withdraw it." }, 403);
-    await env.DB.prepare("UPDATE invitation SET state = 'withdrawn' WHERE id = ? AND state = 'pending'").bind(id).run();
+    await env.DB.batch([
+      env.DB.prepare("UPDATE invitation SET state = 'withdrawn' WHERE id = ? AND state = 'pending'").bind(id),
+      logged(env, user.id, "invitation.withdrawn", inv.project_id, { invitation: id }),
+    ]);
     return json({ ok: true });
   }
   if (!user.emailVerified || user.email.toLowerCase() !== inv.email) return missing();
   if (action === "accept") return join(env, inv, user);
-  await env.DB.prepare("UPDATE invitation SET state = 'declined' WHERE id = ? AND state = 'pending'").bind(id).run();
+  await env.DB.batch([
+    env.DB.prepare("UPDATE invitation SET state = 'declined' WHERE id = ? AND state = 'pending'").bind(id),
+    logged(env, user.id, "invitation.declined", inv.project_id, { invitation: id }),
+  ]);
   return json({ ok: true });
 }
 
@@ -366,6 +337,7 @@ async function removeMember(env: Env, projectId: string, memberId: string, user:
   await env.DB.batch([
     env.DB.prepare("UPDATE invitation SET state = 'withdrawn' WHERE invited_by = ? AND state = 'pending'").bind(memberId),
     env.DB.prepare("DELETE FROM member WHERE id = ?").bind(memberId),
+    logged(env, user.id, "member.removed", projectId, { member: memberId, role: ROLE_LABEL[target.role] }),
   ]);
   return json({ ok: true });
 }

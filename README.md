@@ -146,6 +146,10 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
 
+## RightFit online
+
+Since 20 Nov 2026 there is also a shared space around the review app (`web/`, spec `spec/features/rightfit_online.md`): the consultant opens a project and invites the contractor and the other reviewers, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and the terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, and runs on the laptop with `npm run dev`; it is not online yet.
+
 ## How the repository is organised
 
 The code follows the way a package travels: the files are read, the rules check them, and the application shows the result. Each folder has a short README of its own.
@@ -169,6 +173,7 @@ flowchart LR
 | Folder | What is in it |
 |---|---|
 | [`app/`](app/) | the application the reviewer opens in the browser, and the same checks as tools for AI agents |
+| [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, Management and the legal documents |
 | [`checks/`](checks/) | every check, in plain Python with no AI |
 | [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
 | [`data/`](data/) | the rules tables, and what the AI read from P01 and P02 |

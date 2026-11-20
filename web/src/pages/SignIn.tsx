@@ -116,7 +116,7 @@ export function SignIn({ google, joinToken, onSignedIn }: { google: boolean; joi
               </button>
             </p>
           </form>
-          <p className="fine">After you sign in, you are asked to accept the <a href="/terms">terms</a> and the <a href="/privacy">privacy note</a>.</p>
+          <p className="fine">After you sign in, you are asked to accept the <a href="/terms">Terms of Service</a>, having read the <a href="/privacy">Privacy Policy</a>. <a href="/legal-notice">Legal notice</a></p>
         </div>
       </section>
     </div>
@@ -147,12 +147,12 @@ export function TermsGate({ session, onAccepted }: { session: Session; onAccepte
           <h2>RightFit online is a student prototype.</h2>
           <ul className="points">
             <li>RightFit drafts. It never approves a form: the person who signs it answers for it.</li>
-            <li>We keep your name, your email and your place in each project, and later the forms and files you add. They live on Cloudflare, with the database in Western Europe.</li>
+            <li>We keep your name, your email address and your place in each project, on Cloudflare, with the database in Western Europe. The forms and files of a project belong to the organisation that opened it, and we process them for it.</li>
             <li>You can delete your account at any time, and your data goes with it.</li>
           </ul>
           <label className="tick">
             <input type="checkbox" required />
-            <span>I agree to the <a href="/terms" target="_blank" rel="noreferrer">terms</a> and the <a href="/privacy" target="_blank" rel="noreferrer">privacy note</a> of {session.termsVersion}.</span>
+            <span>I accept the <a href="/terms" target="_blank" rel="noreferrer">Terms of Service</a> of {session.termsVersion}, and I have read the <a href="/privacy" target="_blank" rel="noreferrer">Privacy Policy</a> and the <a href="/cookies" target="_blank" rel="noreferrer">Cookie Policy</a>.</span>
           </label>
           {error && <p className="err" role="alert">{error}</p>}
           <div className="actions">

@@ -60,5 +60,16 @@ export function makeAuth(env: AuthEnv, origin: string) {
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 }, // 7 days, renewed once a day while used
     // shortcut: the limiter's memory lives in one Worker instance, a D1 table would hold it across instances
     rateLimit: { enabled: true, window: 60, max: 20 },
+    // a new account goes in the activity log Management reads (by user id, never by email)
+    databaseHooks: {
+      user: {
+        create: {
+          after: async (user) => {
+            await env.DB.prepare("INSERT INTO event (at, actor, project_id, action, detail) VALUES (?, ?, NULL, 'account.created', '{}')")
+              .bind(new Date().toISOString(), user.id).run();
+          },
+        },
+      },
+    },
   });
 }

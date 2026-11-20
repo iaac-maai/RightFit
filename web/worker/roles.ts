@@ -106,3 +106,12 @@ export function visibleInvitations<T extends { invitedBy: string }>(invitations:
 
 // Withdraw a pending invitation: whoever sent it, or any consultant
 export const mayWithdraw = (viewer: Person, invitedBy: string) => viewer.id === invitedBy || viewer.role === "consultant";
+
+// Management: the accounts named in the ADMIN_EMAILS secret, and only with an address Google has verified (worker/admin.ts)
+export function adminList(value: string | undefined) {
+  return new Set((value ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean));
+}
+
+export function isAdmin(user: { email: string; emailVerified: boolean }, list: string | undefined) {
+  return user.emailVerified && adminList(list).has(user.email.trim().toLowerCase());
+}

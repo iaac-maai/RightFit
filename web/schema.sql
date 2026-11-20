@@ -19,7 +19,10 @@ create table if not exists project (
   name text not null,
   country text not null check (country in ('RO', 'ES')),
   created_by text not null,  -- the user who opened it
-  created_at text not null
+  created_at text not null,
+  dpa_version text not null,     -- the data processing agreement the consultant accepted for their organisation
+  dpa_accepted_by text not null, -- that consultant's user id
+  dpa_accepted_at text not null
 );
 
 -- A person in a project, with their role there; invited_by is the member who brought them in (empty for the
@@ -51,3 +54,16 @@ create table if not exists invitation (
 );
 create index if not exists invitation_project_idx on invitation (project_id, state);
 create index if not exists invitation_email_idx on invitation (email, state);
+
+-- What happened, for the people who run RightFit and for accountability: who did what, when, in which project.
+-- Kept 12 months (worker/admin.ts deletes older rows). It names people by user id, never by email.
+create table if not exists event (
+  id integer primary key autoincrement,
+  at text not null,
+  actor text,                -- the user id who did it; empty when RightFit did it
+  project_id text,
+  action text not null,      -- for example project.opened, invitation.sent, member.joined, admin.member_removed
+  detail text not null default '{}'
+);
+create index if not exists event_at_idx on event (at);
+create index if not exists event_project_idx on event (project_id, at);

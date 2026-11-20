@@ -194,7 +194,9 @@ function InviteDialog({ project, me, mayInvite, preset, onClose, onCreated }: {
     setCreated(null);
     setError("");
     setCopied(false);
-  }, [preset, mayInvite, me]);
+    // only when the dialog opens: the team reloads after an invitation is made, and that must not clear the link
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preset]);
 
   const pick = (next: Role) => {
     setRole(next);
@@ -242,7 +244,7 @@ function InviteDialog({ project, me, mayInvite, preset, onClose, onCreated }: {
               <label key={r} className={`role-opt${role === r ? " on" : ""}`}>
                 <input type="radio" name="role" value={r} checked={role === r} onChange={() => pick(r)} required />
                 <span>
-                  <b>{ROLE_LABEL[r]}</b>{r === me.role && <em> a colleague</em>}
+                  <span><b>{ROLE_LABEL[r]}</b>{r === me.role && <em> a colleague</em>}</span>
                   <small>{ROLE_NOTE[r]}</small>
                 </span>
               </label>

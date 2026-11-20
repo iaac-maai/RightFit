@@ -81,9 +81,11 @@ Better Auth's tables (`user`, `session`, `account`, `verification`) and:
 | Table | Columns |
 |---|---|
 | `consent` | person, terms version, date |
-| `project` | id, name, country (RO or ES), who created it, when |
+| `project` | id, name, country (RO or ES), who created it, when, and the data processing agreement the consultant accepted for their organisation (version, by whom, when) |
 | `member` | project, person, role, company, who invited them (member id), when they joined |
 | `invitation` | id, project, email, role, company, who invited (member id), the token's hash, when, expiry, state (pending, accepted, declined, withdrawn) |
+
+| `event` | the activity log: when, who (a user id, never an email), which project, what happened; kept 12 months |
 
 MAF-32 adds the forms, their files and their steps.
 
@@ -94,7 +96,15 @@ MAF-32 adds the forms, their files and their steps.
 - The project: the team as the chain, top to bottom, reviewers, contractor, subcontractors; each person with name, company, role and who invited them; pending invitations drawn dashed. Invite offers only the roles this person may invite.
 - English, as everything in the repository. The colours and type of the review app, so both read as RightFit. It works on a phone, at 375 px wide.
 
-## 9. Phases
+## 9. Management (Luca, 20 Nov 2026)
+
+The people who run RightFit see every account and every project, and can put things right: make another member a project's consultant, take someone out, withdraw an invitation, sign someone out everywhere, delete an account or a project (its name typed again). Only the accounts named in the `ADMIN_EMAILS` secret open Management, and only signed in with Google: an address typed next to a password proves nothing, as nobody checked it. Everyone else gets "not found" for it. Every change made there goes in the activity log, with the other steps people take (an account made, the terms accepted, a project opened, an invitation sent or answered, someone joining or taken out).
+
+## 10. The legal documents
+
+Drafted on 20 Nov 2026, as Luca asked, in `web/legal/` and shown in the app: the Terms of Service, the Privacy Policy (GDPR Articles 13 and 14), the Data Processing Agreement (GDPR Article 28, with the processing, the security measures and the sub-processors in three annexes), the Cookie Policy and the Legal Notice (LSSI-CE Article 10). Everyone accepts the terms, having read the privacy policy, at first sign-in; the consultant who opens a project accepts the data processing agreement for their organisation, because the forms and files of a project are its data and RightFit processes them for it. The versions and dates are recorded. The operator's own records are in `docs/legal/`. They are drafts until a lawyer has read them and the operator is named [O].
+
+## 11. Phases
 
 | ID | What | Done when |
 |---|---|---|
@@ -103,13 +113,14 @@ MAF-32 adds the forms, their files and their steps.
 | MAF-33 | The engine on Render: the Worker sends a package to RightFit's checks and shows the draft, labelled | the draft online matches the review app's on P01 and P02 |
 | MAF-34 | The BOQ register, after MAF-31 to MAF-33 (Luca, 20 Nov): for each category of the BOQ, which lines an approved form already covers. One form covers a range: a data sheet for 30 diameters of one pipe covers all 30 lines, so they need no form each | its own spec, written when MAF-33 is done |
 
-## 10. Tests
+## 12. Tests
 
-The rules of who may invite whom and who sees what are one small module, `web/worker/roles.ts`, with tests that run with Node's own test runner (`npm test`). The routes are tried locally with five accounts, the way people would use them: a person who is not a member gets "not found" for the project, a subcontractor can't invite a contractor nor see another subcontractor, an invitation can't be accepted from an account with another email nor twice, only a consultant takes people out, and deleting an account withdraws its pending invitations.
+The rules of who may invite whom, who sees what and who opens Management are one small module, `web/worker/roles.ts`, with tests that run with Node's own test runner (`npm test`). The routes are tried locally with five accounts, the way people would use them: a person who is not a member gets "not found" for the project, a subcontractor can't invite a contractor nor see another subcontractor, an invitation can't be accepted from an account with another email nor twice, only a consultant takes people out, and deleting an account withdraws its pending invitations. Management was tried the same way: an admin address typed with a password gets nothing, the same address verified gets everything, a project keeps its last consultant, and every change made there is logged.
 
-## 11. Open questions [O]
+## 13. Open questions [O]
 
 - Suppliers in the chain, invited by a subcontractor to add the makers' documents. Left out on 20 Nov 2026: letting the makers' resellers into a project could bring conflicts of interest (Luca). Kept as an idea for later.
 - Sending invitations by email, through a mail service (the link is copied by hand in MAF-31).
 - Whether a form's answer is the consultant's alone or each reviewer's; the register has four reviewer columns.
 - Who pays once the free plans of Cloudflare and Render are not enough.
+- Who operates the service in law: Luca, the team, or IAAC with its agreement; their name, address, contact and tax number complete the legal documents (`OPERATOR` in `web/src/pages/Legal.tsx`). A lawyer qualified in Spanish and EU data protection law should read the documents before people outside the team sign up.
