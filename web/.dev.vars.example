@@ -1,0 +1,7 @@
+# Copy to .dev.vars for the laptop (never committed). Online, set each one with: npx wrangler secret put <NAME>
+# A long random string that signs the session cookie
+BETTER_AUTH_SECRET=
+# Optional: "Continue with Google" shows only when both are set (Google Cloud, OAuth client, Web application,
+# redirect URI <address>/api/auth/callback/google)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=

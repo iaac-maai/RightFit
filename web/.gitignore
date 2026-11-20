@@ -1,0 +1,9 @@
+# installed packages (node_modules is a link to node_modules.nosync, which iCloud does not sync)
+node_modules
+node_modules.nosync
+# the local database and build output
+.wrangler/
+dist/
+# secrets: never in Git
+.dev.vars
+.env

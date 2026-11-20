@@ -1,0 +1,13 @@
+// RightFit online on Cloudflare: one Worker serves the page and answers /api/... (spec/features/rightfit_online.md)
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rightfit",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
+  "d1_databases": [
+    // On the laptop any id works. Before the first deploy: npx wrangler d1 create rightfit-db --location weur,
+    // then put the id it prints here
+    { "binding": "DB", "database_name": "rightfit-db", "database_id": "00000000-0000-0000-0000-000000000000" }
+  ]
+}
