@@ -33,6 +33,8 @@ The page opens at the address Vite prints. Google sign-in shows only when `GOOGL
 
 ## Online (Luca's Cloudflare account)
 
+Live since 20 Nov 2026 at https://rightfit.hackathon-team6-cubicasa-app.workers.dev, with the database `rightfit-db` in Western Europe. The secrets `BETTER_AUTH_SECRET` and `ADMIN_EMAILS` are set; `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` wait for the Google client. The steps, for a new account or a new database:
+
 ```bash
 npx wrangler d1 create rightfit-db --location weur   # put the id it prints in wrangler.jsonc
 npm run db:remote

@@ -6,8 +6,7 @@
   "compatibility_date": "2026-11-01",
   "assets": { "binding": "ASSETS", "not_found_handling": "single-page-application", "run_worker_first": ["/api/*"] },
   "d1_databases": [
-    // On the laptop any id works. Before the first deploy: npx wrangler d1 create rightfit-db --location weur,
-    // then put the id it prints here
-    { "binding": "DB", "database_name": "rightfit-db", "database_id": "00000000-0000-0000-0000-000000000000" }
+    // made on 20 Nov 2026 with: npx wrangler d1 create rightfit-db --location weur (Western Europe)
+    { "binding": "DB", "database_name": "rightfit-db", "database_id": "d15e95b2-2269-44ce-9f51-71191b88e108" }
   ]
 }
