@@ -75,7 +75,7 @@ The same site keeps the project's rules, shows what changed since the previous r
 
 ## Where AI is used
 
-The checks are plain Python with no AI in them, so the same package always gives the same result and every result names its rule. AI does the reading, and each AI part is measured against the plain way of doing the same job.
+AI reads, rules decide. The reading is probabilistic, so every AI part is measured against the plain way of doing the same job. The checks are deterministic: the same package gets the same result every time, and every result names its rule.
 
 | Job | Done by | Compared with | Result so far |
 |---|---|---|---|
