@@ -12,6 +12,7 @@ from app.review_server import boq_links, review
 from checks.maf.rules import load
 from ingest import rule_watch
 from model.page_classifier import CLASSES
+from model.train_pages import MODEL_PATH
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOLS = ["classify_pages", "compare_revisions", "list_packages", "list_rules", "review_package", "watch_rules"]
@@ -95,6 +96,12 @@ def test_compare_revisions_finds_revision_3_of_p02_and_lists_every_file():
     statuses = {a["status"] for a in got["attachments"]}
     assert statuses <= {"unchanged", "changed", "new", "removed"} and "unchanged" in statuses
     assert call("compare_revisions", package="../P02")[0]          # a name from the agent cannot leave data/raw
+
+
+def test_classify_pages_loads_the_model_train_pages_writes():
+    # Version 2, not version 1 (page_classifier.joblib). The server keeps its own copy of the path because importing
+    # model.train_pages loads scikit-learn, which takes seconds, and an agent gives up on a server that is slow to start.
+    assert MODEL == MODEL_PATH
 
 
 @pytest.mark.skipif(not (RAW / "P01").is_dir() or not MODEL.exists(),

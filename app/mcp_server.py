@@ -23,7 +23,7 @@ from checks.maf.rules import CHAINS  # noqa: E402
 # on a server that does not answer at once.
 DATA = ROOT / "data/maf/extracted"
 RAW = ROOT / "data/raw"   # the original packages, on the laptop only (git-ignored)
-MODEL = RAW / "models/page_classifier.joblib"
+MODEL = RAW / "models/page_classifier_v2.joblib"   # the file python -m model.train_pages writes
 READ_ONLY = ToolAnnotations(readOnlyHint=True)
 RESULT_FIELDS = ("check", "check_name", "product", "doc", "verdict", "confirmed", "reason", "sources", "rules",
                  "blocking", "evidence")
@@ -145,9 +145,10 @@ _model = None
 def classify_pages(package: str) -> dict:
     """What kind of document each PDF page of a package folder on this laptop is (declaration, data_sheet,
     certificate, manual or other), by RightFit's own page classifier and by a keyword search, side by side.
-    The classifier is AI output: a small model the team trained (TF-IDF and logistic regression on 443 public
-    pages). On the locked test it got 25% of package pages right, against 27% for the keyword search, so use
-    its labels as hints. A page without a text layer (a scan) is 'other' for both."""
+    The classifier is AI output: version 2 of a small model the team trained (TF-IDF and logistic regression on
+    885 pages from public manufacturer PDFs and 117 documents of real packages). On its locked test, 184 pages of
+    real packages, it got 115 right (62%) against 64 (35%) for the keyword search. Use its labels as hints: the
+    keywords still find more certificates. A page without a text layer (a scan) is 'other' for both."""
     global _model
     from model.page_classifier import MIN_TEXT, keyword_baseline, normalize, pdf_pages, predict
     folder = RAW / package
@@ -165,7 +166,7 @@ def classify_pages(package: str) -> dict:
         except Exception:   # a damaged or locked PDF is listed, the rest of the package is still classified
             unread.append(path.name)
     labels = predict(_model, [p["text"] for p in pages])
-    return {"package": package, "classifier": "RightFit page classifier v1 (AI output)",
+    return {"package": package, "classifier": "RightFit page classifier v2 (AI output)",
             "pages": [{"file": Path(p["file"]).name, "page": p["page"], "classifier": label,
                        "keywords": keyword_baseline(p["text"]), "has_text": len(normalize(p["text"])) >= MIN_TEXT}
                       for p, label in zip(pages, labels)],
