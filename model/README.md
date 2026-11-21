@@ -11,4 +11,4 @@ The models the team trained from scratch. Each one is compared with a plain rule
 | `family_rows.py` | the product rows of the forms, split so that the test rows stay locked |
 | `family_classifier.py` | the family model, and the family's words it is compared with |
 
-The trained models stay on the laptop, in `data/raw/models/`.
+The trained models stay out of Git, because the page classifier keeps the words it learned from real documents, and a few of them are names. They are on the laptop in `data/raw/models/`. The two scored versions, `page_classifier_v2.joblib` and `family_classifier.joblib`, are also in a private repository on Hugging Face, `lucaobejdeanu/rightfit-models`, with a card that explains them and how to load them. That repository must never be made public or moved to an organisation, where every member would see it.

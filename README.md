@@ -71,7 +71,7 @@ The checks are plain Python with no AI in them, so the same package always gives
   <img alt="Our own models against the plain way, scored once on locked data. Page type, 184 pages: our model 62 %, keywords 35 %. Product family, 37 rows: our model 76 % (28 of 37), family words 95 % (35 of 37)" src="docs/images/models.svg">
 </picture>
 
-More in [`spec/constitution/mission.md`](spec/constitution/mission.md) §8 and in [`eval/`](eval/). The trained models are not in Git: the page classifier keeps the words it learned from real documents, and a few of them are names.
+More in [`spec/constitution/mission.md`](spec/constitution/mission.md) §8 and in [`eval/`](eval/). The trained models are not in Git: the page classifier keeps the words it learned from real documents, and a few of them are names. They are in a private repository on Hugging Face, `lucaobejdeanu/rightfit-models`, with a card that explains them.
 
 ## Running it
 
@@ -143,6 +143,7 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
 - RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, with RightFit's review of the read packages and the rules, to read; see below.
 - 157 tests for the Python part (`pytest`) and 19 for RightFit online (`npm test` in `web/`) pass.
+- Since 21 Nov our two scored models are in a private repository on Hugging Face, with a card for the whole project.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
