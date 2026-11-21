@@ -71,7 +71,7 @@ The checks are plain Python with no AI in them, so the same package always gives
   <img alt="Our own models against the plain way, scored once on locked data. Page type, 184 pages: our model 62 %, keywords 35 %. Product family, 37 rows: our model 76 % (28 of 37), family words 95 % (35 of 37)" src="docs/images/models.svg">
 </picture>
 
-More in [`spec/constitution/mission.md`](spec/constitution/mission.md) §8 and in [`eval/`](eval/).
+More in [`spec/constitution/mission.md`](spec/constitution/mission.md) §8 and in [`eval/`](eval/). The trained models are not in Git: the page classifier keeps the words it learned from real documents, and a few of them are names.
 
 ## Running it
 
@@ -135,20 +135,27 @@ What the review of the code on 17 Nov 2026 found:
 
 It has been tried in Revit 2026 on a test room, not yet on the project's model, and its rules wait for Luca.
 
-## Where we are (17 Nov 2026)
+## Where we are (21 Nov 2026)
 
 - Two packages are read: P01, a set of Grundfos pumps, and P02, an air handling unit with its outdoor units, already at revision 4. Of what the AI read, 1 of 116 values and 2 of 15 documents are confirmed so far, so most results are still what a check would say.
-- 48 more packages from the same project are on our laptops. The app lists them; none is read yet.
+- 48 more packages from the same project are on our laptops, and since 21 Nov in RightFit online as well. The app lists them; none is read yet.
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
-- Since 17 Nov the rule watch asks the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions are kept in the project folder, a resubmission shows what changed since the previous revision, and our second own model names a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows).
-- Jeff's fit check in Revit was merged on 17 Nov; see above.
+- On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
+- RightFit online has been live since 20 Nov, with Google sign-in, and since 21 Nov it holds the project's own data in a locked project; see below.
+- The 157 tests of the Python part pass (`pytest`).
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
 
 ## RightFit online
 
-Since 20 Nov 2026 there is also a shared space around the review app (`web/`, spec `spec/features/rightfit_online.md`): the consultant opens a project and invites the contractor and the other reviewers, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and the terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, and is online at https://rightfit.hackathon-team6-cubicasa-app.workers.dev (Luca's Cloudflare account, database in Western Europe); on the laptop it runs with `npm run dev`. Sign-in works with Google, and the project's own data (the 51 packages with their files, RightFit's draft reviews and the BOQ lines, never the prices) is online in a locked project that opens with the team password as well.
+Since 20 Nov 2026 there is also a shared space around the review app (`web/`, spec `spec/features/rightfit_online.md`), online at https://rightfit.hackathon-team6-cubicasa-app.workers.dev. The consultant opens a project and invites the other reviewers, the client and the contractor, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and Management never opens a project's packages, files or BOQ.
+
+Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's draft review of the packages already read, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. Each package shows the draft RightFit made on the laptop, with its problems and the page behind each one.
+
+The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
+
+It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its tests; [`web/README.md`](web/README.md) has the steps.
 
 ## How the repository is organised
 
@@ -198,4 +205,4 @@ The files in the root:
 
 ## A few rules
 
-The repository is public, so nothing confidential goes into Git: no client, project, company or personal names, no prices, no original PDFs. Manufacturer names and model codes are fine. Every technical value needs a source, and when we can't find one the value stays `unclear`. Decisions go in `docs/decisions.md` so they don't get lost in chat.
+The repository is public, so nothing confidential goes into Git: no client, project, company or personal names, no prices, no original PDFs and no models trained on them. Manufacturer names and model codes are fine. Every technical value needs a source, and when we can't find one the value stays `unclear`. Decisions go in `docs/decisions.md` so they don't get lost in chat.
