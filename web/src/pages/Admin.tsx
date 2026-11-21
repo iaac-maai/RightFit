@@ -28,6 +28,9 @@ const ACTION: Record<string, (d: Record<string, unknown>) => string> = {
   "admin.invitation_withdrawn": () => "withdrew an invitation",
   "admin.signed_out": () => "signed someone out everywhere",
   "admin.account_deleted": () => "deleted an account",
+  "project.imported": (d) => `got its data from the laptop: ${String(d.packages ?? 0)} packages, ${String(d.files ?? 0)} files, ${String(d.boqLines ?? 0)} BOQ lines`,
+  "team.unlocked": () => "opened a locked project with the team password",
+  "team.unlock_failed": () => "gave a wrong team password",
 };
 
 const when = (iso: string) => new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -42,7 +45,7 @@ function EventRows({ events, showProject }: { events: AdminEvent[]; showProject:
           <div key={e.id} className="row event-row">
             <span className="typed when">{when(e.at)}</span>
             <span className="event-what">
-              <b>{e.actor ?? "A deleted account"}</b> {said}
+              <b>{e.actor ?? (e.action === "project.imported" ? "RightFit" : "A deleted account")}</b> {said}
               {e.action.startsWith("admin.") && <span className="chip">Management</span>}
             </span>
             {showProject && e.projectId && e.project && (

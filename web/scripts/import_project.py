@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
@@ -40,12 +41,21 @@ def sql(value):
     return "'" + str(value).replace("'", "''") + "'"
 
 
-def wrangler(args, where, stdin=None):
+class WranglerError(Exception):
+    pass
+
+
+def wrangler(args, where, stdin=None, tries=1):
+    """Run wrangler on the live Cloudflare (remote) or on the laptop's copy (local); a failed run is tried again,
+    a few seconds later, up to `tries` times, because a lost connection is often only a moment's."""
     flag = "--remote" if where == "remote" else "--local"
-    run = subprocess.run(["npx", "wrangler", *args, flag], cwd=WEB, input=stdin, text=True, capture_output=True)
-    if run.returncode:
-        sys.exit(f"wrangler {' '.join(args[:3])} failed:\n{run.stderr[-1500:]}")
-    return run.stdout
+    for attempt in range(1, tries + 1):
+        run = subprocess.run(["npx", "wrangler", *args, flag], cwd=WEB, input=stdin, text=True, capture_output=True)
+        if not run.returncode:
+            return run.stdout
+        if attempt < tries:
+            time.sleep(3 * attempt)
+    raise WranglerError(f"wrangler {' '.join(args[:3])} failed:\n{run.stderr[-1500:]}")
 
 
 def query(statement, where):
@@ -69,7 +79,9 @@ def main():
     ap.add_argument("--owner", help="the email of the consultant's account online, who opens the project")
     ap.add_argument("--project-id", help="import again into this project instead of opening a new one")
     ap.add_argument("--remote", action="store_true", help="the live database and bucket (otherwise the laptop's copy)")
-    ap.add_argument("--no-files", action="store_true", help="rows only, without uploading the files again")
+    ap.add_argument("--no-files", action="store_true", help="rows and reviews only, without uploading the packages' files again")
+    ap.add_argument("--workers", type=int, help="files uploaded at once: 4 online by default; 1 on the laptop, where "
+                                                "several local wranglers at once lose their connection")
     args = ap.parse_args()
     where = "remote" if args.remote else "local"
     if not args.project_id and not args.owner:
@@ -151,22 +163,24 @@ def main():
 
     work = Path(tempfile.mkdtemp(prefix="rightfit-import-"))   # outside the repository; deleted at the end
     try:
-        if not args.no_files:
-            for code, review in reviews.items():
-                path = work / f"{code}.json"
-                path.write_text(json.dumps(review, ensure_ascii=False))
-                uploads.append((f"projects/{pid}/reviews/{code}.json", path))
+        if args.no_files:
+            uploads = []   # the packages' files are already in the bucket
+        for code, review in reviews.items():   # the reviews always go, as they change with every import
+            path = work / f"{code}.json"
+            path.write_text(json.dumps(review, ensure_ascii=False))
+            uploads.append((f"projects/{pid}/reviews/{code}.json", path))
 
-            def put(item):
-                key, path = item
-                kind = TYPES.get(path.suffix.lower().lstrip("."), "application/json" if path.suffix == ".json" else "application/octet-stream")
-                wrangler(["r2", "object", "put", f"{BUCKET}/{key}", "--file", str(path), "--content-type", kind], where)
-                return key
+        def put(item):
+            key, path = item
+            kind = TYPES.get(path.suffix.lower().lstrip("."), "application/json" if path.suffix == ".json" else "application/octet-stream")
+            wrangler(["r2", "object", "put", f"{BUCKET}/{key}", "--file", str(path), "--content-type", kind], where, tries=3)
+            return key
 
-            with ThreadPoolExecutor(max_workers=6) as pool:
-                for n, _ in enumerate(pool.map(put, uploads), 1):
-                    if n % 25 == 0 or n == len(uploads):
-                        print(f"  {n} of {len(uploads)} files in the bucket", flush=True)
+        workers = args.workers or (4 if where == "remote" else 1)
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for n, _ in enumerate(pool.map(put, uploads), 1):
+                if n % 25 == 0 or n == len(uploads):
+                    print(f"  {n} of {len(uploads)} files in the bucket", flush=True)
         rows = work / "import.sql"
         rows.write_text("\n".join(statements) + "\n")
         wrangler(["d1", "execute", "rightfit-db", "--file", str(rows), "--yes"], where)
@@ -179,4 +193,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except WranglerError as err:   # nothing is half done: the rows are written only after every file is in the bucket
+        sys.exit(f"Stopped, and the database was not changed. {err}")

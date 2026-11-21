@@ -112,7 +112,8 @@ export function Packages({ projectId }: { projectId: string }) {
 function Source({ text, projectId, code, files }: { text: string; projectId: string; code: string; files: Set<string> }) {
   const m = text.match(/^(.*), p\. (\d+)$/);
   if (m && files.has(m[1])) {
-    return <a href={fileUrl(projectId, code, m[1], Number(m[2]))} target="_blank" rel="noreferrer">{m[1]}, page {m[2]}</a>;
+    const page = /\.pdf$/i.test(m[1]) ? Number(m[2]) : undefined; // a browser opens a PDF at a page, not a spreadsheet
+    return <a href={fileUrl(projectId, code, m[1], page)} target="_blank" rel="noreferrer">{m[1]}, page {m[2]}</a>;
   }
   return <span>{text}</span>;
 }

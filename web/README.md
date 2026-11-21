@@ -14,6 +14,9 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `worker/auth.ts` | sign-in with Better Auth: email and password, or Google |
 | `schema.sql` | the D1 tables: accounts, consent, projects (with the data processing agreement accepted), members, invitations, the activity log |
 | `legal/` | the Terms of Service, Privacy Policy, Data Processing Agreement, Cookie Policy and Legal Notice the app shows; `docs/legal/` has the operator's own records |
+| `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, BOQ lines) and the team password that opens a locked project |
+| `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices |
+| `migrations/` | changes for a database made before them; a new database gets everything from `schema.sql` |
 | `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations |
 | `wrangler.jsonc` | the Worker and its database on Cloudflare |
 
@@ -42,7 +45,11 @@ npx wrangler secret put BETTER_AUTH_SECRET
 npx wrangler secret put GOOGLE_CLIENT_ID
 npx wrangler secret put GOOGLE_CLIENT_SECRET
 npx wrangler secret put ADMIN_EMAILS   # the Google addresses that open Management, separated by commas
+npx wrangler secret put TEAM_PASSWORD  # opens a locked project's data, besides the account
+npx wrangler r2 bucket create rightfit-files --location weur
 npm run deploy
+# the project the review app has open, with its packages, files, reviews and BOQ lines (no prices):
+# python3 web/scripts/import_project.py --owner <the consultant's Google address> --remote
 ```
 
 Google needs an OAuth client of type Web application, with the redirect address `https://<the Worker's address>/api/auth/callback/google`. Secrets are typed in the terminal and never written in a file that Git sees.
