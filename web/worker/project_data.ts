@@ -2,7 +2,7 @@
 // RightFit's draft review of the packages already read, and the BOQ lines, imported from the laptop by
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
 import { json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
-import { REVIEWERS } from "./roles";
+import { REVIEWERS, mayChangeReview, mayChangeRules } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
 
 const TYPES: Record<string, string> = {
@@ -10,6 +10,30 @@ const TYPES: Record<string, string> = {
   doc: "application/msword", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", txt: "text/plain; charset=utf-8",
 };
+
+// Where a project's data sits in the private bucket. state is a package's readings and the reviewer's decisions, which
+// change online (review_edit.ts); reviews is the review the engine made from them, which the package's page reads.
+export const keys = (projectId: string, code?: string) => ({
+  tables: `projects/${projectId}/tables.json`,
+  state: `projects/${projectId}/state/${code}.json`,
+  view: `projects/${projectId}/reviews/${code}.json`,
+});
+
+// The rule tables the checks use, as the laptop's data/maf holds them, with the consultant's own rules of this project
+type Row = Record<string, string>;
+export interface Tables {
+  rules: Row[]; family_documents: Row[]; checklist: Row[]; library: unknown; consultant: Row[];
+  names: { doc_types: Record<string, string>; values: Record<string, string>; kinds: string[]; families: string[] };
+}
+const CHAINS: Record<string, string[]> = { RO: ["EU", "RO", "ANY"], ES: ["EU", "ES", "ANY"] }; // as in checks/maf/rules.py
+
+// What the Rules page shows: the law and practice for the project's country, the checklist, the consultant's rules
+export const rulesView = (t: Tables, location: string) => ({
+  location,
+  law: t.rules.filter((r) => (CHAINS[location] ?? CHAINS.RO).includes(r.jurisdiction)),
+  checklist: t.checklist,
+  mine: { rules: t.consultant, ...t.names },
+});
 
 // A member may open the project's data; a locked project also needs the team password's cookie
 export async function access(request: Request, env: Env, projectId: string, user: User): Promise<MemberRow | Response> {
@@ -37,11 +61,16 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   return json({ error: "No such endpoint." }, 404);
 }
 
-// The rules the checks used for the project's country (the law's, the checklist, the consultant's own), as imported
+// The rules the checks use for the project's country: the law's, the checklist, the consultant's own
 async function rules(env: Env, projectId: string, me: MemberRow) {
   if (!seesForms(me)) return json({ error: "The rules reach subcontractors once forms have their branch." }, 404);
-  const stored = await env.BUCKET.get(`projects/${projectId}/rules.json`);
-  return stored ? json(await stored.json()) : json({ error: "The rules come with the next import from the laptop." }, 404);
+  const tables = await env.BUCKET.get(keys(projectId).tables);
+  if (tables) {
+    const project = await env.DB.prepare("SELECT country FROM project WHERE id = ?").bind(projectId).first<{ country: string }>();
+    return json({ ...rulesView(await tables.json<Tables>(), project?.country ?? "RO"), mayEdit: mayChangeRules(me.role) });
+  }
+  const before = await env.BUCKET.get(`projects/${projectId}/rules.json`); // imported before the rules could change online
+  return before ? json({ ...(await before.json<object>()), mayEdit: false }) : json({ error: "The rules come with the next import from the laptop." }, 404);
 }
 
 // Forms belong to a branch only from MAF-32; until then a subcontractor sees none of the imported ones
@@ -68,9 +97,12 @@ async function onePackage(env: Env, projectId: string, code: string, me: MemberR
   const { results: files } = await env.DB.prepare(
     "SELECT name, size, pages FROM package_file WHERE project_id = ? AND code = ? ORDER BY name",
   ).bind(projectId, code).all();
-  const stored = await env.BUCKET.get(`projects/${projectId}/reviews/${code}.json`);
+  const k = keys(projectId, code);
+  const [stored, state] = await Promise.all([env.BUCKET.get(k.view), env.BUCKET.head(k.state)]);
   const review = stored ? await stored.json() : null;
-  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review });
+  // the reviewers change a review once its readings are online (they come with an import from the laptop)
+  const mayEdit = mayChangeReview(me.role) && Boolean(state);
+  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit });
 }
 
 // One original file, from the private bucket, shown in the browser

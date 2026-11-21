@@ -1,7 +1,8 @@
 // Tests for who may invite whom and who sees whom. Run with `npm test` (Node's own test runner, no packages).
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { isRole, mayInvite, mayWithdraw, rolesInvitableBy, visibleInvitations, visiblePeople, type Person } from "./roles.ts";
+import { ROLES, isRole, mayChangeReview, mayChangeRules, mayInvite, mayWithdraw, rolesInvitableBy, visibleInvitations, visiblePeople,
+  type Person } from "./roles.ts";
 
 // A made-up project: the consultant brings in a designer and the contractor; the contractor two subcontractor firms,
 // HVAC (whose first person brings in a colleague, who brings in a third) and electrical
@@ -74,4 +75,9 @@ test("a broken chain does not loop", () => {
     { id: "b", role: "subcontractor", invitedBy: "a" },
   ];
   assert.deepEqual(visiblePeople(loop, loop[0]).map((p) => p.id).sort(), ["a", "b"]);
+});
+
+test("only the reviewers change a review, and only the consultant changes the consultant's rules", () => {
+  assert.deepEqual(ROLES.filter(mayChangeReview), ["consultant", "designer", "site_supervisor", "client"]);
+  assert.deepEqual(ROLES.filter(mayChangeRules), ["consultant"]);
 });

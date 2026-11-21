@@ -108,7 +108,7 @@ export function Project({ id, view, code, step, onLoaded }: {
       )}
 
       {view === "packages" && <Packages projectId={id} />}
-      {view === "package" && code && <PackageView projectId={id} code={code} step={step ?? "problems"} />}
+      {view === "package" && code && <PackageView key={code} projectId={id} code={code} step={step ?? "problems"} />}
       {view === "boq" && <Boq projectId={id} />}
       {view === "rules" && <Rules projectId={id} />}
 

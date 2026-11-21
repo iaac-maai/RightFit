@@ -21,7 +21,8 @@ We work in Python, with Git and GitHub (`iaac-maai/RightFit`, a public repositor
 | Cloudflare Workers, D1 and R2, with Wrangler | RightFit online (`web/`, `spec/features/rightfit_online.md`): the Worker serves the page and answers the API, D1 keeps the accounts, projects, members and invitations, R2 the package files; free plan, on Luca's account |
 | React, with Vite and TypeScript | The page of RightFit online |
 | Better Auth | Sign-in to RightFit online, with Google or with an email and a password; sessions in D1 |
-| Render | The engine of RightFit online (MAF-33): RightFit's checks behind a small API; free plan, on Luca's account |
+| Cloudflare Python Workers | The engine of RightFit online (MAF-33, since 21 Nov 2026): the laptop's own review code (`app/engine.py`, `app/review_core.py`, `checks/maf/`) in a Worker that only the site's Worker calls; standard library only, no package to install |
+| Render | Kept for later: a server for reading new packages online (OCR, the AI, our models), which a Worker cannot run |
 
 The hood version also planned SigLIP/CLIP image matching, a BM25 keyword baseline and a vision model for tagging finishes. The MAF review doesn't need any of them.
 
@@ -116,7 +117,7 @@ Each top folder has a short README that says what is in it. We create a folder o
 
 - The Python version and environment manager. We have tested with Python 3.14 so far.
 - Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not. What already goes to an online model is in `mission.md` §9.
-- Answered on 20 Nov 2026, where the application runs: both. The review app stays on the laptop, and RightFit online, the project space where the parties meet, runs on Cloudflare, with the checks on Render (`spec/features/rightfit_online.md`).
+- Answered on 20 Nov 2026, where the application runs: both. The review app stays on the laptop, and RightFit online, the project space where the parties meet, runs on Cloudflare, with the checks on Cloudflare as well since 21 Nov 2026, in a Python Worker (`spec/features/rightfit_online.md`).
 - Which agent the team uses with the MCP server.
 
 ## 7. Dependencies

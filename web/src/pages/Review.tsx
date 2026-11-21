@@ -1,12 +1,12 @@
 // One package's review online, in the laptop's three steps (app/review/views/review.js): the problems with what passed,
-// what the AI read page by page, and the draft answer; the document opens beside them. Everything here comes from
-// the laptop's checks and the reviewer's decisions taken there; online it is read, not changed, until the checks run
-// online as well (spec/features/rightfit_online.md, section 11).
-import { createContext, useContext, useState, type MouseEvent, type SyntheticEvent } from "react";
-import { go } from "../api";
+// what the AI read page by page, and the draft answer; the document opens beside them. Every result comes from the
+// laptop's checks, run by the engine (web/engine/). A reviewer ticks readings and decides on findings and AI
+// suggestions here; each change goes to the engine, which runs the checks again (spec/features/rightfit_online.md, 11).
+import { createContext, useContext, useId, useState, type MouseEvent, type SyntheticEvent } from "react";
+import { go, post } from "../api";
 import { day, plural } from "../format";
 import { RULE_STATUS, STATUS_RULE, groups, passed, placeOf, plainReason, readingPages, shown, why, type Place, type Row } from "../review";
-import type { CheckResult, Match, PackageData, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
+import type { AiFinding, CheckResult, Match, PackageData, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
 import { fileUrl, useData } from "./ProjectData";
 
 export type Step = "problems" | "readings" | "answer";
@@ -43,12 +43,32 @@ const Mark = ({ ok, by }: { ok: boolean; by?: string | null }) => (
     aria-label={ok ? "confirmed" : "not confirmed yet"}>{ok ? "✓" : ""}</span>
 );
 
+// What a reviewer may change, and how a change goes to the engine and comes back as the new review
+interface EditApi { may: boolean; busy: boolean; change: (body: Record<string, unknown>) => Promise<boolean> }
+const Edit = createContext<EditApi>({ may: false, busy: false, change: async () => false });
+type Target = { kind: "value"; item: string; key: string } | { kind: "document"; file: string } | { kind: "match"; file: string; item: string | null };
+
+// A reading's box: a tick a reviewer can set or clear; for anyone else, the mark of what was confirmed
+function Tick({ target, ok, label, by }: { target: Target; ok: boolean; label: string; by?: string | null }) {
+  const edit = useContext(Edit);
+  if (!edit.may) return <Mark ok={ok} by={by} />;
+  return (
+    <input type="checkbox" className="tick-box" checked={ok} disabled={edit.busy} aria-label={label}
+      title={ok ? `Confirmed${by ? ` by ${by}` : ""}` : "Tick it when it is correct"}
+      onChange={(e) => void edit.change({ op: "confirm", targets: [{ ...target, verified: e.target.checked }] })} />
+  );
+}
+
 export function PackageView({ projectId, code, step }: { projectId: string; code: string; step: Step }) {
   const { data, error } = useData<PackageData>(`/api/projects/${projectId}/packages/${code}`);
   const [place, setPlace] = useState<Place | null>(null);
+  const [edited, setEdited] = useState<PackageReview | null>(null); // the review the last change brought back
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState("");
   if (error) return <p className="err" role="alert">{error}</p>;
   if (!data) return <span className="spinner" aria-label="Loading" />;
-  const { package: p, files, review: v } = data;
+  const { package: p, files, mayEdit } = data;
+  const v = edited ?? data.review;
   const back = <a className="back" href={`/p/${projectId}/packages`} onClick={go(`/p/${projectId}/packages`)}>All packages</a>;
   if (!v || !v.results) {
     return (
@@ -82,9 +102,27 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
     ["answer", "3 Answer", `${plural(v.answer.lines.length, "comment", "comments")}`],
   ];
   const pages = v.documents.reduce((n, d) => n + d.pages, 0);
+  const edit: EditApi = {
+    may: Boolean(mayEdit),
+    busy,
+    change: async (body) => {
+      setBusy(true);
+      setProblem("");
+      try {
+        setEdited((await post<{ review: PackageReview }>(`/api/projects/${projectId}/packages/${code}/change`, body)).review);
+        return true;
+      } catch (err) {
+        setProblem((err as Error).message);
+        return false;
+      } finally {
+        setBusy(false);
+      }
+    },
+  };
 
   return (
     <Pane.Provider value={pane}>
+    <Edit.Provider value={edit}>
       {back}
       <header className="project-head">
         <div className="fld title"><span className="lab">Form</span><h2 className="typed big-title">MAF {v.form.form_no} rev {v.form.revision}</h2></div>
@@ -99,8 +137,8 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
             <span className="lab">RightFit's draft answer, not an answer yet</span>
             <b>{v.status.label}</b>
             <span className="meta">
-              Drafted on the laptop{p.reviewedAt ? ` on ${day(p.reviewedAt)}` : ""} for a review dated {day(v.review)}.
-              {" "}Nobody has answered this form yet: the reviewer checks the draft, changes it and signs it.
+              RightFit's checks ran{p.reviewedAt && !edited ? ` on ${day(p.reviewedAt)}` : edited ? " again just now" : ""} for a review dated {day(v.review)}.
+              {" "}Nobody has answered this form yet: the reviewers check the draft, change it and sign it.
             </span>
           </div>
         </div>
@@ -111,8 +149,9 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
         </details>
       </section>
       <p className="hold">
-        {c.to_confirm ? `${c.to_confirm} of ${c.readings} readings are still as the AI read them, so the results are what the checks would say once a person confirms them. ` : ""}
-        Online you read the review; the ticks and decisions are made in RightFit on the laptop for now, and come here with the next import.
+        {c.to_confirm ? `Nothing counts until a person confirms it: ${c.to_confirm} of ${c.readings} readings are still as the AI read them, so the results are what the checks would say. ` : "Every reading is confirmed. "}
+        {mayEdit ? "Tick a reading when it is correct, beside a problem or page by page on the Readings step. Each tick and decision runs the checks again, as on the laptop."
+          : "The reviewers confirm the readings and decide on the findings; you read the review."}
       </p>
 
       <nav className="steps" aria-label="Review steps">
@@ -121,7 +160,9 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
             {label}<small>{sub}</small>
           </a>
         ))}
+        <span className="saving" role="status">{busy ? "Running the checks again…" : ""}</span>
       </nav>
+      {problem && <p className="err" role="alert">{problem}</p>}
 
       <div className="review-work">
         <div className="review-list">
@@ -133,6 +174,7 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
       </div>
 
       <Files projectId={projectId} code={code} files={files} docs={v.documents} />
+    </Edit.Provider>
     </Pane.Provider>
   );
 }
@@ -194,9 +236,9 @@ function Finding({ v, row, first }: { v: PackageReview; row: Row; first: boolean
           {f.evidence.map((e, i) => (
             <div key={i} className="f"><span className="lab">Quoted by the AI</span><span className="typed"><span className="un">{e.quote}</span></span><PageLink file={e.source} page={e.page} /></div>
           ))}
-          <p className="ai-note">AI suggestion. No rule checks this and it changes no check result. It goes into the answer only if the reviewer adds it.</p>
+          <p className="ai-note">AI suggestion. No rule checks this and it changes no check result. It goes into the answer only if a reviewer adds it.</p>
           <p className="fine">Comment it would add: {f.suggested_comment}</p>
-          {f.status === "rejected" && f.note && <p className="fine">Why it is not relevant: {f.note}</p>}
+          <AiActions f={f} />
         </div>
       </details>
     );
@@ -212,25 +254,27 @@ function Finding({ v, row, first }: { v: PackageReview; row: Row; first: boolean
       <summary>
         {tag}<b>{r.title}</b>
         {!r.confirmed && !r.dismissed && <span className="un-tag">on readings nobody has confirmed yet</span>}
-        {kept && <span className="meta">kept in the answer</span>}
+        {kept && <span className="kept">✓ kept in the answer</span>}
       </summary>
       <div className="finding-body">
         <p className="say"><Linked text={r.comment || plainReason(r.reason)} name={MAKER} /></p>
         {d && (
           <div className="f"><span className="lab">Read as</span>
             <span className="typed"><span className={d.status === "verified" ? "co" : "un"}>{d.type}{d.covers.length ? `, covers ${d.covers.join("; ")}` : ""}</span></span>
-            <PageLink file={d.file} page={1} /><Mark ok={d.status === "verified"} />
+            <PageLink file={d.file} page={1} /><Tick target={{ kind: "document", file: d.file }} ok={d.status === "verified"} label={`${d.file} is read correctly`} />
           </div>
         )}
         {r.evidence.map((e) => (
           <div key={`${e.item}|${e.key}`} className="f"><span className="lab">{e.what}</span><Typed value={e.value} unit={e.unit} ok={e.status === "verified"} />
-            <PageLink file={e.source} page={e.page} /><Mark ok={e.status === "verified"} /></div>
+            <PageLink file={e.source} page={e.page} />
+            <Tick target={{ kind: "value", item: e.item, key: e.key }} ok={e.status === "verified"} by={e.checked_by} label={`${e.what} is correct`} /></div>
         ))}
         {sources.map((s) => {
           const m = /^(.*), p\. (\S+)$/.exec(s);
           return <div key={s} className="f"><span className="lab">Where</span><span className="typed small">{m ? m[1] : s}</span>{m && <PageLink file={m[1]} page={m[2]} />}</div>;
         })}
-        {r.dismissed && <p className="gone">The reviewer marked this as not a problem: {r.dismissed}. It is left out of the answer.</p>}
+        {r.dismissed && <p className="gone">A reviewer marked this as not a problem: {r.dismissed}. It is left out of the answer.</p>}
+        <ResultActions r={r} kept={kept} />
         <details className="why">
           <summary>Why this was raised</summary>
           <p><Linked text={plainReason(r.reason)} name={MAKER} /></p>
@@ -251,13 +295,73 @@ function Finding({ v, row, first }: { v: PackageReview; row: Row; first: boolean
   );
 }
 
+// Keep a finding in the answer, mark it as not a problem with the reason, or put it back
+function ResultActions({ r, kept }: { r: CheckResult; kept: boolean }) {
+  const edit = useContext(Edit);
+  const id = useId();
+  const [asking, setAsking] = useState(false);
+  const [reason, setReason] = useState("");
+  if (!edit.may) return null;
+  const decide = (decision: unknown) => edit.change({ op: "decisions", decisions: { [r.key]: decision } });
+  if (r.dismissed) {
+    return <div className="btns"><button type="button" className="btn" disabled={edit.busy} onClick={() => void decide(null)}>Put it back in the answer</button></div>;
+  }
+  if (asking) {
+    return (
+      <div className="reason-box">
+        <label htmlFor={id}>Why is it not a problem? The reason stays with the decision; it does not go into the answer.</label>
+        <textarea id={id} value={reason} maxLength={500} placeholder="For example: agreed with the client at the site meeting" onChange={(e) => setReason(e.target.value)} />
+        <div className="btns">
+          <button type="button" className="btn p" disabled={edit.busy}
+            onClick={async () => { if (await decide({ decision: "dismissed", reason })) setAsking(false); }}>Mark as not a problem</button>
+          <button type="button" className="link" onClick={() => setAsking(false)}>Cancel</button>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="btns">
+      {kept ? <button type="button" className="link quiet" disabled={edit.busy} onClick={() => void decide(null)}>Open it again</button>
+        : <button type="button" className="btn p" disabled={edit.busy} onClick={() => void decide({ decision: "kept" })}>Keep in the answer</button>}
+      <button type="button" className="btn" disabled={edit.busy} onClick={() => setAsking(true)}>Not a problem</button>
+    </div>
+  );
+}
+
+// An AI suggestion goes into the answer only when a reviewer adds it
+function AiActions({ f }: { f: AiFinding }) {
+  const edit = useContext(Edit);
+  const id = useId();
+  const [note, setNote] = useState(f.note ?? "");
+  if (!edit.may) return f.status === "rejected" && f.note ? <p className="fine">Why it is not relevant: {f.note}</p> : null;
+  const set = (status: AiFinding["status"]) => edit.change({ op: "decide", id: f.id, status, note: status === "rejected" ? note : null });
+  const options: [AiFinding["status"], string][] = [["accepted", "Add to the answer"], ["rejected", "Not relevant"], ["suggested", "Decide later"]];
+  return (
+    <>
+      <div className="seg" role="radiogroup" aria-label="The reviewer's decision">
+        {options.map(([status, text]) => (
+          <button key={status} type="button" role="radio" aria-checked={f.status === status} disabled={edit.busy} onClick={() => void set(status)}>{text}</button>
+        ))}
+      </div>
+      {f.status === "rejected" && (
+        <div className="reason-box">
+          <label htmlFor={id}>Why is it not relevant?</label>
+          <textarea id={id} value={note} maxLength={500} onChange={(e) => setNote(e.target.value)} />
+          <div className="btns"><button type="button" className="btn" disabled={edit.busy || note === (f.note ?? "")} onClick={() => void set("rejected")}>Save the reason</button></div>
+        </div>
+      )}
+    </>
+  );
+}
+
 // ------------------------------------------------------------------ step 2, what the AI read, page by page
 function Readings({ v }: { v: PackageReview }) {
   const pane = useContext(Pane);
+  const edit = useContext(Edit);
   const { docs, form, missing } = readingPages(v);
   const valueLine = (x: Reading) => (
     <div key={`${x.item}|${x.key}`} className="v">
-      <Mark ok={x.status === "verified"} by={x.checked_by} />
+      <Tick target={{ kind: "value", item: x.item, key: x.key }} ok={x.status === "verified"} by={x.checked_by} label={`${x.what} is correct`} />
       <span>{x.what}<small>{x.product}</small></span>
       <span><Typed value={x.value} unit={x.unit} ok={x.status === "verified"} />
         {x.status === "verified" && <span className="by">{x.checked_by || "reviewer"}{x.verified_on ? `, ${day(x.verified_on)}` : ""}</span>}</span>
@@ -265,33 +369,44 @@ function Readings({ v }: { v: PackageReview }) {
   );
   const matchLine = (d: ReviewDoc, m: Match) => (
     <div key={`m|${d.file}|${m.item}`} className="v">
-      <Mark ok={m.status === "verified"} />
+      <Tick target={{ kind: "match", file: d.file, item: m.item }} ok={m.status === "verified"} label={`This document covers ${m.product}`} />
       <span>Covers this product<small>{m.product}</small></span>
       <span className="typed"><span className={m.status === "verified" ? "co" : "un"}>{m.kind}</span></span>
     </div>
   );
   return (
     <section className="sheet readings" aria-label="What the AI read">
-      <p className="hold">Each line is what the AI read, with the page it came from. A person confirms it in RightFit on the laptop; until then, every check that rests on it stays a question.</p>
+      <p className="hold">{edit.may ? "Check each line against the page and tick it. Unticked lines stay as the AI read them, and every check that rests on them stays a question."
+        : "Each line is what the AI read, with the page it came from. Until a reviewer ticks it, every check that rests on it stays a question."}</p>
       {docs.map(({ d, pages, loose }) => (
         <div key={d.file}>
           <div className="dg"><b>{pad(d.no)} · {d.file}</b><span>{d.type} · {plural(d.pages, "page", "pages")}</span></div>
           <div className="v">
-            <Mark ok={d.status === "verified"} />
+            <Tick target={{ kind: "document", file: d.file }} ok={d.status === "verified"} label={`${d.file} is what it says`} />
             <span>What this document is<small>Listed in the form as {d.listed_as || "not listed"}</small></span>
             <span className="typed"><span className={d.status === "verified" ? "co" : "un"}>{d.type}</span></span>
           </div>
           {loose.matches.map((m) => matchLine(d, m))}
           {loose.values.map(valueLine)}
-          {pages.map((pg) => (
+          {pages.map((pg) => {
+            const open: Target[] = [
+              ...pg.values.filter((x) => x.status !== "verified").map((x): Target => ({ kind: "value", item: x.item, key: x.key })),
+              ...pg.matches.filter((m) => m.status !== "verified").map((m): Target => ({ kind: "match", file: d.file, item: m.item })),
+            ];
+            return (
             <div key={pg.page}>
               <div className="pgh">
                 <a href={pane.url(d.file, pg.page)} target="_blank" rel="noreferrer" onClick={(e) => pane.show(e, { file: d.file, page: pg.page })}>Page {pg.page}</a>
+                {edit.may && open.length > 1 && (
+                  <button type="button" className="link all" disabled={edit.busy}
+                    onClick={() => void edit.change({ op: "confirm", targets: open.map((t) => ({ ...t, verified: true })) })}>Confirm all {open.length} on this page</button>
+                )}
               </div>
               {pg.values.map(valueLine)}
               {pg.matches.map((m) => matchLine(d, m))}
             </div>
-          ))}
+            );
+          })}
         </div>
       ))}
       {form.length > 0 && (
@@ -302,7 +417,7 @@ function Readings({ v }: { v: PackageReview }) {
       )}
       {missing.length > 0 && (
         <>
-          <div className="dg"><b>Not found in the documents</b><span>A person agrees, or finds it, on the laptop</span></div>
+          <div className="dg"><b>Not found in the documents</b><span>{edit.may ? "Tick it when you agree the package does not state it" : "A reviewer agrees, or finds it"}</span></div>
           {missing.map(valueLine)}
         </>
       )}

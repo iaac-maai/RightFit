@@ -27,8 +27,8 @@ flowchart LR
   W --> D[(D1: accounts, projects, members, invitations, forms)]
   W --> R[(R2: the package files)]
   W --> G[Google: sign-in]
-  W -->|key| E[engine on Render: RightFit's checks]
-  H[Hugging Face, a private repository: our page and family classifiers] -.->|at start-up, with a token| E
+  W -->|service binding| E[engine, a Python Worker on Cloudflare: RightFit's checks]
+  H[Hugging Face, a private repository: our page and family classifiers] -.->|later, for reading new packages online| E
 ```
 
 | Part | Where | What it keeps |
@@ -37,7 +37,7 @@ flowchart LR
 | The Worker | Cloudflare | the API, sign-in and the rules of who may do what (`web/worker/`) |
 | D1 | Cloudflare | accounts, projects, members, invitations, and later the forms and their steps |
 | R2 | Cloudflare | the files of the packages (MAF-32) |
-| The engine | Render | nothing: it runs the checks on a package and answers (MAF-33) |
+| The engine | Cloudflare, a Python Worker with no address of its own (`web/engine/`) | nothing: it runs the laptop's own review code (`app/engine.py`, `app/review_core.py`, `checks/maf/`) on what the Worker sends and answers (MAF-33) |
 | Our models | Hugging Face, private | the page classifier and the family classifier, each with its model card; private because they learned from the real packages and their words can carry names from the forms |
 
 ## 4. Roles, and who invites whom
@@ -116,7 +116,18 @@ Luca wanted the project's data in the online app as in the review app on the lap
 | the rules the checks used for the project's country: the law's, the reviewers' checklist, the consultant's own | R2, `rules.json` | |
 | the BOQ lines: chapter (the sheet), row, number, text, unit, quantity, producer, standards | D1, table `boq_line` | the prices, and the BOQ file itself, which stay on the laptop |
 
-A package opens in the laptop's three steps (problems, readings, answer), with the document beside them on a wide screen, and the project has a Rules tab. Online they are read, not changed (Luca, 21 Nov 2026, asked why the editing was missing): ticking a reading, keeping or dismissing a finding, deciding on an AI suggestion and changing a rule all make the checks run again, and the checks run only on the laptop until the engine runs online (MAF-33). The page says so, and calls the letter RightFit's draft, not an answer.
+A package opens in the laptop's three steps (problems, readings, answer), with the document beside them on a wide screen, and the project has a Rules tab. The letter is called RightFit's draft, not an answer.
+
+**Editing online (Luca, 21 Nov 2026).** The reviewers (consultant, designer, site supervisor, client) tick readings, one or a whole page at a time, keep a finding in the answer or mark it as not a problem with the reason, and decide on the AI's suggestions; the consultant alone switches the consultant's rules on or off and writes new ones by hand. The contractor and the subcontractors read the review. Each change goes to the engine, which applies it with the laptop's own code and runs the checks again; the Worker keeps the result:
+
+| What | Where it is kept |
+|---|---|
+| a package's readings, the BOQ lines found for it and the reviewer's decisions (its state), which change online | R2, `state/<package>.json`, changed only when nobody else changed it in between (two people at once: the later one starts again from the other's change) |
+| the review the engine made from them, which the package's page reads | R2, `reviews/<package>.json`, and its letter and counts in D1 for the list |
+| the rule tables of `data/maf` with this project's consultant's rules | R2, `tables.json`; a rule change reviews every read package again |
+| who changed what, without the values | the activity log in Management |
+
+Each tick and decision keeps the name of the person who made it and the day. An import from the laptop again keeps what is online: a package whose state is online, and the consultant's rules online, stay as they are; `--replace-online-work` writes the laptop's over them. Writing a rule in one's own words for the AI to turn into one stays on the laptop (it needs the AI key), as do the marks on the page, the comparison with the previous revision, another country or other dates, and the downloads.
 
 The project is **locked**: besides being a member, a person needs the team password, which only the team knows and which is kept as a Cloudflare secret (`TEAM_PASSWORD`). The browser keeps a hash of it for 7 days, never the password. Five wrong tries in 15 minutes make a person wait, and every try goes in the activity log. Until forms have a branch (MAF-32), a subcontractor sees none of the imported packages or the BOQ.
 
@@ -126,14 +137,14 @@ The project is **locked**: besides being a member, a person needs the team passw
 |---|---|---|
 | MAF-31 | Accounts, projects, roles and invitations, with Google | it runs locally and online, and the rules of who may invite whom and who sees what have tests |
 | MAF-32 | Forms: a subcontractor prepares a form and its files, the contractor checks and sends it, each reviewer answers; everyone sees whose turn it is and since when | a form goes from a subcontractor to the reviewers and back, online |
-| MAF-33 | The engine on Render: the Worker sends a package to RightFit's checks and shows the draft, labelled | the draft online matches the review app's on P01 and P02 |
+| MAF-33 | The engine: the Worker sends a package and a person's change to RightFit's checks and shows the new draft, labelled. Since 21 Nov a Python Worker on Cloudflare with the laptop's own code, not Render; reading a new package online (OCR, the AI, our models) still needs a server, later | the draft online matches the review app's on P01 and P02 (done 21 Nov: `tests/test_engine.py`, and on Cloudflare the same letter and counts) |
 | MAF-34 | The BOQ register, after MAF-31 to MAF-33 (Luca, 20 Nov): for each category of the BOQ, which lines an approved form already covers. One form covers a range: a data sheet for 30 diameters of one pipe covers all 30 lines, so they need no form each | its own spec, written when MAF-33 is done |
 
 ## 13. Tests
 
 The rules of who may invite whom, who sees what and who opens Management are one small module, `web/worker/roles.ts`, with tests that run with Node's own test runner (`npm test`). The routes are tried locally with five accounts, the way people would use them: a person who is not a member gets "not found" for the project, a subcontractor can't invite a contractor nor see another subcontractor, an invitation can't be accepted from an account with another email nor twice, only a consultant takes people out, and deleting an account withdraws its pending invitations. Management was tried the same way: an admin address typed with a password gets nothing, the same address verified gets everything, a project keeps its last consultant, and every change made there is logged.
 
-A package's review is arranged online by `web/src/review.ts` (what is open, product by product; what passed; the readings page by page; the page a problem opens), with its own tests in `web/src/review.test.ts`. Every result in it comes from the laptop's checks.
+The engine is `app/engine.py` with its tests in `tests/test_engine.py`: on P01 it gives the laptop's review exactly, a tick confirms one reading under the reviewer's name, a finding marked not a problem leaves the answer, a consultant's rule switched off stops its findings, a rule written by hand is checked and numbered, and an unknown change is refused. Who may change a review or the rules is in `web/worker/roles.ts`, with its test. A package's review is arranged online by `web/src/review.ts` (what is open, product by product; what passed; the readings page by page; the page a problem opens), with its own tests in `web/src/review.test.ts`. Every result in it comes from the laptop's checks.
 
 ## 14. Open questions [O]
 

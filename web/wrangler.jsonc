@@ -10,5 +10,8 @@
     { "binding": "DB", "database_name": "rightfit-db", "database_id": "d15e95b2-2269-44ce-9f51-71191b88e108" }
   ],
   // the private files: the packages' originals and RightFit's draft reviews (npx wrangler r2 bucket create rightfit-files)
-  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "rightfit-files" }]
+  "r2_buckets": [{ "binding": "BUCKET", "bucket_name": "rightfit-files" }],
+  // the checks engine (web/engine/): the laptop's own Python, which only this Worker can call; on the laptop too,
+  // `npm run dev` calls the engine on Cloudflare (remote), as the checks need no data of the laptop's
+  "services": [{ "binding": "ENGINE", "service": "rightfit-engine", "remote": true }]
 }

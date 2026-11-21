@@ -31,6 +31,11 @@ const ACTION: Record<string, (d: Record<string, unknown>) => string> = {
   "project.imported": (d) => `got its data from the laptop: ${String(d.packages ?? 0)} packages, ${String(d.files ?? 0)} files, ${String(d.boqLines ?? 0)} BOQ lines`,
   "team.unlocked": () => "opened a locked project with the team password",
   "team.unlock_failed": () => "gave a wrong team password",
+  "review.confirmed": (d) => `confirmed ${String(d.readings ?? 0)} readings in ${String(d.code ?? "a package")}`,
+  "review.decided": (d) => `decided on findings in ${String(d.code ?? "a package")}`,
+  "review.ai_decided": (d) => `decided on an AI suggestion in ${String(d.code ?? "a package")}: ${String(d.status ?? "")}`,
+  "rules.added": () => "added a consultant's rule",
+  "rules.switched": (d) => `switched the consultant's rule ${String(d.rule ?? "")} ${d.active ? "on" : "off"}`,
 };
 
 const when = (iso: string) => new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });

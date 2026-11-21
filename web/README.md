@@ -14,10 +14,12 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `worker/auth.ts` | sign-in with Better Auth: email and password, or Google |
 | `schema.sql` | the D1 tables: accounts, consent, projects (with the data processing agreement accepted), members, invitations, the activity log |
 | `legal/` | the Terms of Service, Privacy Policy, Data Processing Agreement, Cookie Policy and Legal Notice the app shows; `docs/legal/` has the operator's own records |
-| `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, BOQ lines) and the team password that opens a locked project |
-| `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices |
+| `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, the rules, BOQ lines) and the team password that opens a locked project |
+| `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the consultant's rules; each change goes to the engine |
+| `engine/` | the checks engine: a Python Worker with no address of its own that runs the laptop's review code (`app/engine.py`); `build.py` copies that code in before Wrangler bundles it |
+| `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices; an import again keeps what was confirmed or decided online, unless `--replace-online-work` |
 | `migrations/` | changes for a database made before them; a new database gets everything from `schema.sql` |
-| `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations |
+| `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations, a package's review in three steps (`src/review.ts` arranges it, with its tests) and the rules |
 | `wrangler.jsonc` | the Worker and its database on Cloudflare |
 
 ## On the laptop
@@ -32,7 +34,7 @@ npm run db:local
 npm run dev
 ```
 
-The page opens at the address Vite prints. Google sign-in shows only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in `.dev.vars`; Management opens only for the addresses in `ADMIN_EMAILS`, signed in with Google. `npm test` runs the rules' tests, and `npm run check` the TypeScript check.
+The page opens at the address Vite prints. Google sign-in shows only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set in `.dev.vars`; Management opens only for the addresses in `ADMIN_EMAILS`, signed in with Google. `npm test` runs the rules' tests, and `npm run check` the TypeScript check. On the laptop too, a change to a review is checked by the engine on Cloudflare (`remote` in `wrangler.jsonc`): the checks need nothing of the laptop's.
 
 ## Online (Luca's Cloudflare account)
 
@@ -47,6 +49,7 @@ npx wrangler secret put GOOGLE_CLIENT_SECRET
 npx wrangler secret put ADMIN_EMAILS   # the Google addresses that open Management, separated by commas
 npx wrangler secret put TEAM_PASSWORD  # opens a locked project's data, besides the account
 npx wrangler r2 bucket create rightfit-files --location weur
+(cd engine && npx wrangler deploy -c wrangler.jsonc)   # the checks engine first: the site's Worker calls it by name
 npm run deploy
 # the project the review app has open, with its packages, files, reviews and BOQ lines (no prices):
 # python3 web/scripts/import_project.py --owner <the consultant's Google address> --remote

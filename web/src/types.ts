@@ -99,7 +99,7 @@ export interface PackageReview {
   documents: ReviewDoc[]; results: CheckResult[]; ai_findings: AiFinding[]; notes: string[];
   answer: { lines: string[]; text: string }; decisions: Record<string, Decision>;
 }
-export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null }
+export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean }
 
 // The rules the checks used for the project's country (worker/project_data.ts, rules)
 export interface LawRule {
@@ -113,7 +113,8 @@ export interface ConsultantRule {
 }
 export interface ProjectRules {
   location: Country; law: LawRule[]; checklist: ChecklistItem[];
-  mine: { rules: ConsultantRule[]; doc_types: Record<string, string>; values: Record<string, string> };
+  mine: { rules: ConsultantRule[]; doc_types: Record<string, string>; values: Record<string, string>; kinds?: string[]; families?: string[] };
+  mayEdit?: boolean;
 }
 export interface BoqLine {
   file: string; sheet: string; row: number; nr: string | null; text: string; unit: string | null; qty: string | number | null;

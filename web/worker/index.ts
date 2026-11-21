@@ -4,6 +4,7 @@
 // or the project, so nobody reads a project they are not in. Management lives in admin.ts.
 import { adminRoute } from "./admin";
 import { access, dataRoute } from "./project_data";
+import { editRoute } from "./review_edit";
 import { googleOn, makeAuth } from "./auth";
 import {
   deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
@@ -84,6 +85,8 @@ async function route(request: Request, env: Env): Promise<Response> {
   m = path.match(/^\/api\/projects\/([\w-]+)\/members\/([\w-]+)\/remove$/);
   if (m && method === "POST") return removeMember(env, m[1], m[2], user);
 
+  const edit = await editRoute(request, env, user, path, method);
+  if (edit) return edit;
   const data = await dataRoute(request, env, user, path, method);
   if (data) return data;
   return json({ error: "No such endpoint." }, 404);

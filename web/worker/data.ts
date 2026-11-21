@@ -9,6 +9,7 @@ export interface Env extends AuthEnv {
   ADMIN_EMAILS?: string; // the accounts that may open Management: npx wrangler secret put ADMIN_EMAILS
   BUCKET: R2Bucket; // the private files: the packages' originals and RightFit's draft reviews
   TEAM_PASSWORD?: string; // opens a locked project's data: npx wrangler secret put TEAM_PASSWORD
+  ENGINE?: Fetcher; // the checks engine (web/engine/), through a service binding
 }
 
 export interface User { id: string; name: string; email: string; emailVerified: boolean; image?: string | null }

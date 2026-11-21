@@ -9,6 +9,11 @@ export type Role = (typeof ROLES)[number];
 // The people who answer the forms
 export const REVIEWERS: readonly Role[] = ["consultant", "designer", "site_supervisor", "client"];
 
+// Who changes a package's review online: the reviewers tick readings and decide on findings, and the consultant alone
+// changes the consultant's own rules. The contractor and the subcontractors submit the forms, so they read the review.
+export const mayChangeReview = (role: Role) => REVIEWERS.includes(role);
+export const mayChangeRules = (role: Role) => role === "consultant";
+
 export const ROLE_LABEL: Record<Role, string> = {
   consultant: "Consultant",
   designer: "Designer",

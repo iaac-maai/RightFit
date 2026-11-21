@@ -1,7 +1,9 @@
 """Put the current RightFit project from this laptop into RightFit online (spec/features/rightfit_online.md, section 11):
-its MAF packages, the original files of each, RightFit's draft review of the packages already read, and the BOQ lines
-without the prices. Files go to the private R2 bucket, rows to the D1 database; the project is locked, so its data
-opens only with the team password as well. Nothing it reads or writes goes into Git.
+its MAF packages, the original files of each, RightFit's review of the packages already read with their readings and
+decisions, the rule tables, and the BOQ lines without the prices. Files go to the private R2 bucket, rows to the D1
+database; the project is locked, so its data opens only with the team password as well. The reviewers change the
+reviews online from then on, so an import again keeps what was confirmed, decided or changed online, unless
+--replace-online-work. Nothing it reads or writes goes into Git.
 
 Run from the repository root:
   python3 web/scripts/import_project.py --owner <email of the consultant's account online> --remote
@@ -9,6 +11,7 @@ Run from the repository root:
 Without --remote it fills the laptop's copy (the local D1 and R2 that `npm run dev` uses), to try it first.
 """
 import argparse
+import copy
 import json
 import re
 import subprocess
@@ -58,6 +61,18 @@ def wrangler(args, where, stdin=None, tries=1):
     raise WranglerError(f"wrangler {' '.join(args[:3])} failed:\n{run.stderr[-1500:]}")
 
 
+def online(key, where):
+    """An object already in the bucket, read as JSON, or None when there is none. Any other failure stops the import,
+    so a lost connection is never taken for "nothing online" and never leads to overwriting what was done online."""
+    try:
+        out = wrangler(["r2", "object", "get", f"{BUCKET}/{key}", "--pipe"], where)
+    except WranglerError as err:
+        if re.search(r"does not exist|not found|NoSuchKey", str(err), re.I):
+            return None
+        raise
+    return json.loads(out[out.index("{"):])
+
+
 def query(statement, where):
     out = wrangler(["d1", "execute", "rightfit-db", "--json", "--command", statement], where)
     return json.loads(out[out.index("["):])[0]["results"]
@@ -82,14 +97,17 @@ def main():
     ap.add_argument("--no-files", action="store_true", help="rows and reviews only, without uploading the packages' files again")
     ap.add_argument("--workers", type=int, help="files uploaded at once: 4 online by default; 1 on the laptop, where "
                                                 "several local wranglers at once lose their connection")
+    ap.add_argument("--replace-online-work", action="store_true",
+                    help="write the laptop's readings, decisions and consultant's rules over what was confirmed, decided "
+                         "or changed online (without it, what is online stays as it is)")
     args = ap.parse_args()
     where = "remote" if args.remote else "local"
     if not args.project_id and not args.owner:
         sys.exit("Give --owner (to open a new project) or --project-id (to import again).")
 
     from app.review_server import (boq_files, boq_links, consultant_screen, current_project, decisions_file,
-                                   package_list, read_decisions, review, rules_for_location)
-    from checks.maf.rules import load
+                                   package_list, read_decisions, review)
+    from checks.maf.rules import library, load
     from ingest.boq import read_boq
 
     project = current_project()   # the project the review app has open: its name, packages, originals and BOQ folder
@@ -118,18 +136,38 @@ def main():
     statements += [f"DELETE FROM {t} WHERE project_id = {sql(pid)};" for t in ("package_file", "package", "boq_line")]
     statements.append(f"UPDATE project SET locked = 1 WHERE id = {sql(pid)};")
 
-    # The packages, and RightFit's draft review of those already read: the whole page the laptop shows (every check,
-    # what passed, the readings, the AI's suggestions, the answer), with the reviewer's decisions taken on the laptop.
-    # BOQ lines are only those already read (read=False): the import never asks the AI anything.
+    # The rule tables the checks use (data/maf), with the consultant's own rules. Once the rules can change online, the
+    # consultant's rules online stay as they are, unless --replace-online-work.
+    screen = consultant_screen()
+    tables = {"rules": load("rules.csv"), "family_documents": load("family_documents.csv"), "checklist": load("checklist.csv"),
+              "library": library(), "consultant": screen["rules"],
+              "names": {k: screen[k] for k in ("doc_types", "values", "kinds", "families")}}
+    again = bool(args.project_id) and not args.replace_online_work
+    before = online(f"projects/{pid}/tables.json", where) if again else None
+    if before is not None:
+        tables["consultant"] = before["consultant"]
+
+    # The packages, and RightFit's review of those already read: the whole page the laptop shows (every check, what
+    # passed, the readings, the AI's suggestions, the answer). With it go the package's readings, the BOQ lines found
+    # for it and the reviewer's decisions (its state), which the reviewers change online from then on: a package whose
+    # state is already online keeps it, unless --replace-online-work. BOQ lines are only those already read
+    # (read=False): the import never asks the AI anything.
     packages = package_list(Path(project["packages"]), Path(project["originals"]), Path(project["boq"]), country)
-    reviews = {}
+    states, reviews, kept = {}, {}, []
     for p in packages:
         if p.get("letter"):
-            pkg = json.loads((Path(project["packages"]) / f"{p['id']}.json").read_text())
-            decisions = read_decisions(decisions_file(Path(project["folder"]), p["id"]))
-            dismissed = {k: d["reason"] for k, d in decisions.items() if d["decision"] == "dismissed"}
-            view = review(pkg, country, None, None, dismissed, boq_links(pkg, read=False, folder=Path(project["boq"])))
-            reviews[p["id"]] = {**view, "decisions": decisions}
+            view = online(f"projects/{pid}/reviews/{p['id']}.json", where) if again and online(
+                f"projects/{pid}/state/{p['id']}.json", where) is not None else None
+            if view is not None:
+                kept.append(p["id"])
+            else:
+                pkg = json.loads((Path(project["packages"]) / f"{p['id']}.json").read_text())
+                boq = boq_links(pkg, read=False, folder=Path(project["boq"]))
+                decisions = read_decisions(decisions_file(Path(project["folder"]), p["id"]))
+                dismissed = {k: d["reason"] for k, d in decisions.items() if d["decision"] == "dismissed"}
+                states[p["id"]] = {"pkg": pkg, "boq": boq, "decisions": decisions}
+                view = {**review(copy.deepcopy(pkg), country, None, None, dismissed, boq, tables), "decisions": decisions}
+                reviews[p["id"]] = view
             c = view["counts"]   # the list online shows the same letter and counts as the page
             p.update(letter=view["status"]["letter"], label=view["status"]["label"], problems=c["problems"],
                      questions=c["questions"], to_confirm=c["to_confirm"], readings=c["readings"])
@@ -141,10 +179,6 @@ def main():
                                          p.get("letter"), p.get("label"), p.get("problems"), p.get("questions"),
                                          p.get("to_confirm"), p.get("readings"), now if p.get("letter") else None, now))
             + ");")
-
-    # The rules the checks use for the project's country, shown on the project's Rules page
-    rules = {"location": country, "law": rules_for_location(country), "checklist": load("checklist.csv"),
-             "mine": consultant_screen()}
 
     # The original files of each package (reading a file brings it back from iCloud first)
     uploads = []
@@ -179,13 +213,11 @@ def main():
     try:
         if args.no_files:
             uploads = []   # the packages' files are already in the bucket
-        for code, view in reviews.items():   # the reviews and the rules always go, as they change with every import
-            path = work / f"{code}.json"
-            path.write_text(json.dumps(view, ensure_ascii=False))
-            uploads.append((f"projects/{pid}/reviews/{code}.json", path))
-        path = work / "rules.json"
-        path.write_text(json.dumps(rules, ensure_ascii=False))
-        uploads.append((f"projects/{pid}/rules.json", path))
+        for key, value in [("tables.json", tables), *((f"reviews/{c}.json", v) for c, v in reviews.items()),
+                           *((f"state/{c}.json", v) for c, v in states.items())]:
+            path = work / key.replace("/", "-")
+            path.write_text(json.dumps(value, ensure_ascii=False))
+            uploads.append((f"projects/{pid}/{key}", path))
 
         def put(item):
             key, path = item
@@ -205,8 +237,9 @@ def main():
         for f in work.iterdir():
             f.unlink()
         work.rmdir()
-    print(f"Imported into project {pid} ({where}): {len(packages)} packages, {len(reviews)} with RightFit's draft, "
-          f"{len(uploads)} files, {lines} BOQ lines. The project is locked: it opens with the team password.")
+    print(f"Imported into project {pid} ({where}): {len(packages)} packages, {len(reviews)} reviews from the laptop"
+          + (f", {len(kept)} kept as changed online ({', '.join(kept)})" if kept else "")
+          + f", {len(uploads)} files, {lines} BOQ lines. The project is locked: it opens with the team password.")
 
 
 if __name__ == "__main__":

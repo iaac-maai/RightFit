@@ -101,7 +101,7 @@ Since 20 Nov 2026 there is also a shared space around the review app (`web/`, sp
 
 ![Who invites whom: the consultant opens the project and invites the designer, the site supervisor and the client, who review, and the contractor, who invites two subcontractors. Each subcontractor sees its own branch and never the other's. An invitation is a link for one email, valid 14 days. A locked project opens its packages, files, review and BOQ only with the team password as well, and Management sees people and projects, never the packages](docs/images/chain.svg)
 
-Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's review of the packages already read, the rules the checks used, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. A package RightFit has read opens in the laptop's three steps, problems, readings and answer, with every check and what passed, and a Rules tab shows the law's rules, the reviewers' checklist and the consultant's own. Online they can be read but not changed: confirming a reading, deciding on a finding or changing a rule runs the checks again, and the checks run only on the laptop until the engine runs online (MAF-33).
+Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's review of the packages already read, the rules the checks used, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. A package RightFit has read opens in the laptop's three steps, problems, readings and answer, with every check and what passed, and a Rules tab shows the law's rules, the reviewers' checklist and the consultant's own. Since the evening of 21 Nov the reviewers also work there: they tick what the AI read, keep a finding in the answer or mark it as not a problem with the reason, and decide on the AI's suggestions, while the consultant switches the consultant's rules on or off and writes new ones. Each change runs the checks again, in a Python Worker on Cloudflare that holds the laptop's own review code and answers only the site.
 
 ![How a person gets in, in four steps along a line: 01 your account, with Google or an email and a password; 02 the terms, which open the first time and again when they change, with a box ticked, I agree; 03 your role, from an invitation link for your email or a project you open; 04 the team password, for a locked project and its own data, as a field fills with dots and a lock opens](docs/images/way_in.svg)
 
@@ -134,7 +134,7 @@ flowchart LR
     class U,X person
 ```
 
-The checks run on the laptop. The review app reads the project folder, runs the checks and keeps what the reviewer confirms and decides, and agents reach the same checks through the MCP server, which only reads. RightFit online is the shared space: the Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. `web/scripts/import_project.py` puts the laptop's review of each package, the rules and the original files there, and until the checks run online (MAF-33), confirming and deciding stay on the laptop. Our two models are kept in the private repository on Hugging Face.
+The checks run on the laptop and online, from the same code (`app/review_core.py`). The review app reads the project folder, runs the checks and keeps what the reviewer confirms and decides, and agents reach the same checks through the MCP server, which only reads. RightFit online is the shared space: the Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. `web/scripts/import_project.py` puts the laptop's review of each package, the rules and the original files there; from then on the reviewers confirm and decide online, where the engine (`web/engine/`) runs the checks again, and a later import keeps what was done online. Our two models are kept in the private repository on Hugging Face.
 
 ## Parts, and when they came
 
@@ -249,7 +249,7 @@ flowchart LR
 | Folder | What is in it |
 |---|---|
 | [`app/`](app/) | the application the reviewer opens in the browser, and the same checks as tools for AI agents |
-| [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, the project's review and rules to read, Management and the legal documents |
+| [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, the project's review and rules, edited by the reviewers, Management and the legal documents |
 | [`checks/`](checks/) | every check, in plain Python with no AI |
 | [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
 | [`data/`](data/) | the rules tables, and what the AI read from P01 and P02 |
