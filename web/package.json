@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "check": "tsc -b",
-    "test": "node --test worker/*.test.ts",
+    "test": "node --test worker/*.test.ts src/*.test.ts",
     "deploy": "tsc -b && vite build && wrangler deploy",
     "db:local": "wrangler d1 execute rightfit-db --local --file=schema.sql",
     "db:remote": "wrangler d1 execute rightfit-db --remote --file=schema.sql"

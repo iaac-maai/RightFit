@@ -1,14 +1,14 @@
-// A project's own data: its MAF packages, the files of each, RightFit's draft review of those already read, and the
-// BOQ lines. Imported from the laptop (web/scripts/import_project.py); a locked project opens with the team password.
+// A project's own data: its MAF packages and the BOQ lines (a package's review is in Review.tsx, the rules in Rules.tsx).
+// Imported from the laptop (web/scripts/import_project.py); a locked project opens with the team password.
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { api, go, post } from "../api";
-import { day, plural } from "../format";
-import type { BoqLine, Finding, PackageData, PackageRow } from "../types";
+import { plural } from "../format";
+import type { BoqLine, PackageRow } from "../types";
 
-const fileUrl = (projectId: string, code: string, name: string, page?: number) =>
+export const fileUrl = (projectId: string, code: string, name: string, page?: number) =>
   `/api/projects/${projectId}/files/${code}/${encodeURIComponent(name)}${page ? `#page=${page}` : ""}`;
 
-function useData<T>(path: string) {
+export function useData<T>(path: string) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
@@ -105,108 +105,6 @@ export function Packages({ projectId }: { projectId: string }) {
       </div>
       {!shown.length && <p className="empty">No package matches.</p>}
     </section>
-  );
-}
-
-// "file.pdf, p. 2" in a finding's sources becomes a link to that page of the file, when the package holds the file
-function Source({ text, projectId, code, files }: { text: string; projectId: string; code: string; files: Set<string> }) {
-  const m = text.match(/^(.*), p\. (\d+)$/);
-  if (m && files.has(m[1])) {
-    const page = /\.pdf$/i.test(m[1]) ? Number(m[2]) : undefined; // a browser opens a PDF at a page, not a spreadsheet
-    return <a href={fileUrl(projectId, code, m[1], page)} target="_blank" rel="noreferrer">{m[1]}, page {m[2]}</a>;
-  }
-  return <span>{text}</span>;
-}
-
-function Findings({ title, items, projectId, code, files }: { title: string; items: Finding[]; projectId: string; code: string; files: Set<string> }) {
-  if (!items.length) return null;
-  return (
-    <section className="sheet" aria-label={title}>
-      <div className="sheet-head"><span className="lab">{title}</span><span className="count">{items.length}</span></div>
-      <ol className="findings">
-        {items.map((f, i) => (
-          <li key={i}>
-            <div className="finding-head">
-              <span className="chip">{f.check}</span>
-              <b>{f.check_name}</b>
-              {f.product && <span className="meta">{f.product}</span>}
-              {!f.confirmed && <span className="un-tag">on readings nobody has confirmed yet</span>}
-            </div>
-            <p>{f.reason}</p>
-            {(f.sources?.length || f.rules?.length) ? (
-              <div className="finding-meta">
-                {f.sources?.map((s, j) => <Source key={j} text={s} projectId={projectId} code={code} files={files} />)}
-                {f.rules?.map((r) => <span key={r.id} className="meta">rule {r.id}, {r.status.replace(/_/g, " ")}</span>)}
-              </div>
-            ) : null}
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-export function PackageView({ projectId, code }: { projectId: string; code: string }) {
-  const { data, error } = useData<PackageData>(`/api/projects/${projectId}/packages/${code}`);
-  if (error) return <p className="err" role="alert">{error}</p>;
-  if (!data) return <span className="spinner" aria-label="Loading" />;
-  const { package: p, files, review } = data;
-  const names = new Set(files.map((f) => f.name));
-  return (
-    <>
-      <a className="back" href={`/p/${projectId}/packages`} onClick={go(`/p/${projectId}/packages`)}>All packages</a>
-      <header className="project-head">
-        <div className="fld title"><span className="lab">Form</span><h2 className="typed big-title">{p.formNo} rev {p.revision}</h2></div>
-        <div className="fld"><span className="lab">Discipline</span><span className="typed">{p.discipline || "—"}</span></div>
-        <div className="fld"><span className="lab">Products</span><span className="typed">{p.items.join(", ")}</span></div>
-      </header>
-
-      {review ? (
-        <section className="sheet draft-sheet" aria-label="RightFit's draft answer">
-          <div className="draft-answer">
-            <i className={`letter ${review.draft_answer.letter}`}>{review.draft_answer.letter}</i>
-            <div>
-              <span className="lab">RightFit's draft answer</span>
-              <b>{review.draft_answer.label}</b>
-              <span className="meta">
-                {plural(review.counts.problems ?? 0, "problem", "problems")}, {plural(review.counts.questions ?? 0, "question", "questions")};
-                {" "}{review.counts.to_confirm ?? 0} of {review.counts.readings ?? 0} readings still to confirm.
-                {" "}Drafted on the laptop{p.reviewedAt ? ` on ${day(p.reviewedAt)}` : ""}, for a review on {day(review.review_date)}. A person decides.
-              </span>
-            </div>
-          </div>
-        </section>
-      ) : (
-        <p className="sheet-note band-note">RightFit has not read this package yet: its files are here, the draft comes once it is read.</p>
-      )}
-
-      {review && <Findings title="Problems" items={review.problems} projectId={projectId} code={code} files={names} />}
-      {review && <Findings title="Questions for a person" items={review.questions} projectId={projectId} code={code} files={names} />}
-
-      <section className="sheet" aria-label="The package's files">
-        <div className="sheet-head"><span className="lab">The package's files</span><span className="count">{files.length}</span></div>
-        <div className="rows">
-          {files.map((f) => {
-            const listed = review?.documents.find((d) => d.file === f.name);
-            return (
-              <a key={f.name} className="row file-row" href={fileUrl(projectId, code, f.name)} target="_blank" rel="noreferrer">
-                <span className="typed grow">{f.name}</span>
-                {listed && <span className="meta">{listed.type}</span>}
-                <span className="meta">{f.pages ? plural(f.pages, "page", "pages") : `${Math.max(1, Math.round(f.size / 1024))} KB`}</span>
-              </a>
-            );
-          })}
-          {!files.length && <p className="empty">No file of this package is online.</p>}
-        </div>
-      </section>
-
-      {review && (
-        <details className="sheet answer-text">
-          <summary className="sheet-head"><span className="lab">The draft answer's text</span></summary>
-          <pre>{review.answer_text}</pre>
-        </details>
-      )}
-    </>
   );
 }
 

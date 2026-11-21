@@ -5,9 +5,11 @@ import { ApiError, api, go, post } from "../api";
 import { aRole, country, day, daysLeft, plural } from "../format";
 import { Icon, Modal, Monogram, PLUS } from "../ui";
 import type { CreatedInvitation, PendingInvitation, ProjectData, TeamPerson } from "../types";
-import { Boq, PackageView, Packages, TeamLock } from "./ProjectData";
+import { Boq, Packages, TeamLock } from "./ProjectData";
+import { PackageView, type Step } from "./Review";
+import { Rules } from "./Rules";
 
-export type ProjectView = "team" | "packages" | "package" | "boq";
+export type ProjectView = "team" | "packages" | "package" | "boq" | "rules";
 
 // The order of people under one inviter: reviewers first, then down the chain
 const TIER: Record<Role, number> = { consultant: 0, designer: 1, site_supervisor: 1, client: 1, contractor: 2, subcontractor: 3 };
@@ -32,8 +34,8 @@ function chain(people: TeamPerson[], invitations: PendingInvitation[]) {
   return { roots, loose };
 }
 
-export function Project({ id, view, code, onLoaded }: {
-  id: string; view: ProjectView; code?: string; onLoaded: (p: { id: string; name: string }) => void;
+export function Project({ id, view, code, step, onLoaded }: {
+  id: string; view: ProjectView; code?: string; step?: Step; onLoaded: (p: { id: string; name: string }) => void;
 }) {
   const [data, setData] = useState<ProjectData | null>(null);
   const [error, setError] = useState("");
@@ -98,7 +100,7 @@ export function Project({ id, view, code, onLoaded }: {
       {(project.packages > 0 || project.boqLines > 0) && (
         <nav className="tabs" aria-label="The project">
           {([["team", "Team", `/p/${id}`], ["packages", `Packages (${project.packages})`, `/p/${id}/packages`],
-             ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`]] as const).map(([key, label, path]) => (
+             ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`], ["rules", "Rules", `/p/${id}/rules`]] as const).map(([key, label, path]) => (
             <a key={key} href={path} onClick={go(path)} aria-current={view === key || (key === "packages" && view === "package") ? "page" : undefined}>{label}</a>
           ))}
           {Boolean(project.locked) && <span className="lock-note">Locked: opened with the team password</span>}
@@ -106,8 +108,9 @@ export function Project({ id, view, code, onLoaded }: {
       )}
 
       {view === "packages" && <Packages projectId={id} />}
-      {view === "package" && code && <PackageView projectId={id} code={code} />}
+      {view === "package" && code && <PackageView projectId={id} code={code} step={step ?? "problems"} />}
       {view === "boq" && <Boq projectId={id} />}
+      {view === "rules" && <Rules projectId={id} />}
 
       {view === "team" && <div className="project-grid">
         <section className="sheet team" aria-label="The team">

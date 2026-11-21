@@ -87,8 +87,9 @@ def main():
     if not args.project_id and not args.owner:
         sys.exit("Give --owner (to open a new project) or --project-id (to import again).")
 
-    from app import mcp_server
-    from app.review_server import boq_files, current_project, package_list
+    from app.review_server import (boq_files, boq_links, consultant_screen, current_project, decisions_file,
+                                   package_list, read_decisions, review, rules_for_location)
+    from checks.maf.rules import load
     from ingest.boq import read_boq
 
     project = current_project()   # the project the review app has open: its name, packages, originals and BOQ folder
@@ -117,12 +118,21 @@ def main():
     statements += [f"DELETE FROM {t} WHERE project_id = {sql(pid)};" for t in ("package_file", "package", "boq_line")]
     statements.append(f"UPDATE project SET locked = 1 WHERE id = {sql(pid)};")
 
-    # The packages, and RightFit's draft review of those already read
+    # The packages, and RightFit's draft review of those already read: the whole page the laptop shows (every check,
+    # what passed, the readings, the AI's suggestions, the answer), with the reviewer's decisions taken on the laptop.
+    # BOQ lines are only those already read (read=False): the import never asks the AI anything.
     packages = package_list(Path(project["packages"]), Path(project["originals"]), Path(project["boq"]), country)
     reviews = {}
     for p in packages:
         if p.get("letter"):
-            reviews[p["id"]] = mcp_server.review_package(p["id"], country)
+            pkg = json.loads((Path(project["packages"]) / f"{p['id']}.json").read_text())
+            decisions = read_decisions(decisions_file(Path(project["folder"]), p["id"]))
+            dismissed = {k: d["reason"] for k, d in decisions.items() if d["decision"] == "dismissed"}
+            view = review(pkg, country, None, None, dismissed, boq_links(pkg, read=False, folder=Path(project["boq"])))
+            reviews[p["id"]] = {**view, "decisions": decisions}
+            c = view["counts"]   # the list online shows the same letter and counts as the page
+            p.update(letter=view["status"]["letter"], label=view["status"]["label"], problems=c["problems"],
+                     questions=c["questions"], to_confirm=c["to_confirm"], readings=c["readings"])
         statements.append(
             "INSERT INTO package (project_id, code, form_no, revision, discipline, items, files, pages, letter, label, problems, "
             "questions, to_confirm, readings, reviewed_at, imported_at) VALUES ("
@@ -131,6 +141,10 @@ def main():
                                          p.get("letter"), p.get("label"), p.get("problems"), p.get("questions"),
                                          p.get("to_confirm"), p.get("readings"), now if p.get("letter") else None, now))
             + ");")
+
+    # The rules the checks use for the project's country, shown on the project's Rules page
+    rules = {"location": country, "law": rules_for_location(country), "checklist": load("checklist.csv"),
+             "mine": consultant_screen()}
 
     # The original files of each package (reading a file brings it back from iCloud first)
     uploads = []
@@ -165,10 +179,13 @@ def main():
     try:
         if args.no_files:
             uploads = []   # the packages' files are already in the bucket
-        for code, review in reviews.items():   # the reviews always go, as they change with every import
+        for code, view in reviews.items():   # the reviews and the rules always go, as they change with every import
             path = work / f"{code}.json"
-            path.write_text(json.dumps(review, ensure_ascii=False))
+            path.write_text(json.dumps(view, ensure_ascii=False))
             uploads.append((f"projects/{pid}/reviews/{code}.json", path))
+        path = work / "rules.json"
+        path.write_text(json.dumps(rules, ensure_ascii=False))
+        uploads.append((f"projects/{pid}/rules.json", path))
 
         def put(item):
             key, path = item

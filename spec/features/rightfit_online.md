@@ -112,8 +112,11 @@ Luca wanted the project's data in the online app as in the review app on the lap
 |---|---|---|
 | every package: form, revision, discipline, products, files, pages | D1, table `package` | |
 | the original files of each package | the private R2 bucket `rightfit-files`, read only through the Worker | |
-| RightFit's draft review of the packages already read: the answer, the problems and questions with their files, pages and rules | R2, one JSON file per package | it is the laptop's draft of that day; it becomes live once the engine runs online (MAF-33) |
+| RightFit's review of the packages already read: the whole page the laptop shows (every check with its readings, rules and pages, what passed, the AI's suggestions, the readings page by page, the draft answer) and the reviewer's decisions taken on the laptop | R2, one JSON file per package | it is the laptop's draft of that day; it becomes live once the engine runs online (MAF-33) |
+| the rules the checks used for the project's country: the law's, the reviewers' checklist, the consultant's own | R2, `rules.json` | |
 | the BOQ lines: chapter (the sheet), row, number, text, unit, quantity, producer, standards | D1, table `boq_line` | the prices, and the BOQ file itself, which stay on the laptop |
+
+A package opens in the laptop's three steps (problems, readings, answer), with the document beside them on a wide screen, and the project has a Rules tab. Online they are read, not changed (Luca, 21 Nov 2026, asked why the editing was missing): ticking a reading, keeping or dismissing a finding, deciding on an AI suggestion and changing a rule all make the checks run again, and the checks run only on the laptop until the engine runs online (MAF-33). The page says so, and calls the letter RightFit's draft, not an answer.
 
 The project is **locked**: besides being a member, a person needs the team password, which only the team knows and which is kept as a Cloudflare secret (`TEAM_PASSWORD`). The browser keeps a hash of it for 7 days, never the password. Five wrong tries in 15 minutes make a person wait, and every try goes in the activity log. Until forms have a branch (MAF-32), a subcontractor sees none of the imported packages or the BOQ.
 
@@ -129,6 +132,8 @@ The project is **locked**: besides being a member, a person needs the team passw
 ## 13. Tests
 
 The rules of who may invite whom, who sees what and who opens Management are one small module, `web/worker/roles.ts`, with tests that run with Node's own test runner (`npm test`). The routes are tried locally with five accounts, the way people would use them: a person who is not a member gets "not found" for the project, a subcontractor can't invite a contractor nor see another subcontractor, an invitation can't be accepted from an account with another email nor twice, only a consultant takes people out, and deleting an account withdraws its pending invitations. Management was tried the same way: an admin address typed with a password gets nothing, the same address verified gets everything, a project keeps its last consultant, and every change made there is logged.
+
+A package's review is arranged online by `web/src/review.ts` (what is open, product by product; what passed; the readings page by page; the page a problem opens), with its own tests in `web/src/review.test.ts`. Every result in it comes from the laptop's checks.
 
 ## 14. Open questions [O]
 

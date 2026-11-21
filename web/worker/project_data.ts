@@ -24,7 +24,7 @@ export async function access(request: Request, env: Env, projectId: string, user
 
 export async function dataRoute(request: Request, env: Env, user: User, path: string, method: string): Promise<Response | null> {
   if (path === "/api/team/unlock" && method === "POST") return unlock(request, env, user);
-  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files)(?:\/(P\d+))?(?:\/([^/]+))?$/);
+  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules)(?:\/(P\d+))?(?:\/([^/]+))?$/);
   if (!m || method !== "GET") return null;
   const [, projectId, what, code, name] = m;
   const me = await access(request, env, projectId, user);
@@ -33,7 +33,15 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   if (what === "packages" && code && !name) return onePackage(env, projectId, code, me);
   if (what === "files" && code && name) return file(env, projectId, code, name, me);
   if (what === "boq" && !code) return boq(env, projectId, me);
+  if (what === "rules" && !code) return rules(env, projectId, me);
   return json({ error: "No such endpoint." }, 404);
+}
+
+// The rules the checks used for the project's country (the law's, the checklist, the consultant's own), as imported
+async function rules(env: Env, projectId: string, me: MemberRow) {
+  if (!seesForms(me)) return json({ error: "The rules reach subcontractors once forms have their branch." }, 404);
+  const stored = await env.BUCKET.get(`projects/${projectId}/rules.json`);
+  return stored ? json(await stored.json()) : json({ error: "The rules come with the next import from the laptop." }, 404);
 }
 
 // Forms belong to a branch only from MAF-32; until then a subcontractor sees none of the imported ones
