@@ -5,8 +5,11 @@
 import { createContext, useContext, useId, useState, type MouseEvent, type SyntheticEvent } from "react";
 import { go, post } from "../api";
 import { day, plural } from "../format";
-import { RULE_STATUS, STATUS_RULE, groups, passed, placeOf, plainReason, readingPages, shown, why, type Place, type Row } from "../review";
-import type { AiFinding, CheckResult, Match, PackageData, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
+import {
+  RULE_STATUS, STATUS_RULE, confirmedValues, groups, notAProblem, passed, placeOf, plainReason, quotesOf, readingPages, shown, why, type Place,
+  type Quote, type Row,
+} from "../review";
+import type { AiFinding, CheckResult, Match, PackageData, PackageExtra, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
 import { fileUrl, useData } from "./ProjectData";
 
 export type Step = "problems" | "readings" | "answer";
@@ -26,11 +29,11 @@ function Linked({ text, name }: { text: string; name?: string }) {
   return <>{parts.map((p, i) => (i % 2 ? <a key={i} href={p} target="_blank" rel="noreferrer">{name ?? p}</a> : p))}</>;
 }
 
-function PageLink({ file, page }: { file: string; page: number | string | null }) {
+function PageLink({ file, page, quotes }: { file: string; page: number | string | null; quotes?: Quote[] }) {
   const pane = useContext(Pane);
   if (!pane.isDoc(file)) return <span className="goto meta">form</span>;
   const n = Number(page) || 1;
-  return <a className="goto" href={pane.url(file, n)} target="_blank" rel="noreferrer" onClick={(e) => pane.show(e, { file, page: n })}>p. {n}</a>;
+  return <a className="goto" href={pane.url(file, n)} target="_blank" rel="noreferrer" onClick={(e) => pane.show(e, { file, page: n, quotes })}>p. {n}</a>;
 }
 
 // A value as the AI read it (violet, dashed) or as a person confirmed it (ink)
@@ -142,6 +145,7 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
             </span>
           </div>
         </div>
+        <Since extra={data.extra ?? null} />
         <details className="why-b">
           <summary>Why {v.status.letter}?</summary>
           <p>{STATUS_RULE[v.status.letter]}</p>
@@ -168,9 +172,10 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
         <div className="review-list">
           {step === "problems" && <Problems v={v} />}
           {step === "readings" && <Readings v={v} />}
-          {step === "answer" && <Answer v={v} projectId={projectId} />}
+          {step === "answer" && <Answer v={v} projectId={projectId} code={code} />}
         </div>
-        {open && <Document doc={v.documents.find((d) => d.file === open.file)} place={open} url={url} />}
+        {open && <Document v={v} step={step} place={open} url={url} extra={data.extra ?? null} onPlace={setPlace}
+          image={(no, page) => `/api/projects/${projectId}/pages/${code}/${no}/${page}.png`} />}
       </div>
 
       <Files projectId={projectId} code={code} files={files} docs={v.documents} />
@@ -234,7 +239,7 @@ function Finding({ v, row, first }: { v: PackageReview; row: Row; first: boolean
         <div className="finding-body">
           <p className="say">{f.finding}</p>
           {f.evidence.map((e, i) => (
-            <div key={i} className="f"><span className="lab">Quoted by the AI</span><span className="typed"><span className="un">{e.quote}</span></span><PageLink file={e.source} page={e.page} /></div>
+            <div key={i} className="f"><span className="lab">Quoted by the AI</span><span className="typed"><span className="un">{e.quote}</span></span><PageLink file={e.source} page={e.page} quotes={quotesOf(f.evidence)} /></div>
           ))}
           <p className="ai-note">AI suggestion. No rule checks this and it changes no check result. It goes into the answer only if a reviewer adds it.</p>
           <p className="fine">Comment it would add: {f.suggested_comment}</p>
@@ -266,7 +271,7 @@ function Finding({ v, row, first }: { v: PackageReview; row: Row; first: boolean
         )}
         {r.evidence.map((e) => (
           <div key={`${e.item}|${e.key}`} className="f"><span className="lab">{e.what}</span><Typed value={e.value} unit={e.unit} ok={e.status === "verified"} />
-            <PageLink file={e.source} page={e.page} />
+            <PageLink file={e.source} page={e.page} quotes={quotesOf(r.evidence)} />
             <Tick target={{ kind: "value", item: e.item, key: e.key }} ok={e.status === "verified"} by={e.checked_by} label={`${e.what} is correct`} /></div>
         ))}
         {sources.map((s) => {
@@ -426,7 +431,7 @@ function Readings({ v }: { v: PackageReview }) {
 }
 
 // ------------------------------------------------------------------ step 3, the draft answer and what was checked
-function Answer({ v, projectId }: { v: PackageReview; projectId: string }) {
+function Answer({ v, projectId, code }: { v: PackageReview; projectId: string; code: string }) {
   const [copied, setCopied] = useState("");
   const c = v.counts;
   const used = new Map(v.results.flatMap((r) => r.rules).map((u) => [u.id, u.status]));
@@ -444,6 +449,11 @@ function Answer({ v, projectId }: { v: PackageReview; projectId: string }) {
         {copied && <p className="fine" role="status">{copied}</p>}
         {v.answer.lines.length ? <ol>{v.answer.lines.map((line, i) => <li key={i}><Linked text={line} /></li>)}</ol> : <p className="empty">No comments.</p>}
         <p className="sign">Drafted by RightFit from the checks and the reviewer's decisions. A person checks it and signs it; the tool certifies nothing.</p>
+        <div className="btns">
+          <button type="button" className="btn" onClick={() => save(`${code}_answer.txt`, v.answer.text, "text/plain")}>Download the draft</button>
+          <button type="button" className="btn" onClick={() => save(`${code}_confirmed_values.csv`, confirmedValues(v), "text/csv")}>The confirmed values</button>
+          <button type="button" className="btn" onClick={() => save(`${code}_not_a_problem.csv`, notAProblem(v), "text/csv")}>What was marked not a problem</button>
+        </div>
       </article>
       <section className="sheet checked" aria-label="What RightFit checked">
         <div className="sheet-head"><span className="lab">What RightFit checked</span></div>
@@ -453,7 +463,7 @@ function Answer({ v, projectId }: { v: PackageReview; projectId: string }) {
             {" "}{official} of the {legal.length} legal rules used here {official === 1 ? "was" : "were"} read in the official text, so this is not a statement of compliance.
             {" "}<a href={`/p/${projectId}/rules`} onClick={go(`/p/${projectId}/rules`)}>See the rules</a>
           </p>
-          <p>Certificates were checked for {day(v.review)}, the review date, and for {day(v.delivery)}, the expected delivery.</p>
+          <Dates v={v} />
           <span className="lab">The result</span>
           <ul>
             <li>{c.passed} passed on values a person confirmed</li>
@@ -479,20 +489,113 @@ function Answer({ v, projectId }: { v: PackageReview; projectId: string }) {
   );
 }
 
+// What changed since the previous revision of the same form, file by file (no AI; ingest/revisions.py on the laptop)
+function Since({ extra }: { extra: PackageExtra | null }) {
+  const r = extra?.revisions;
+  if (!r?.previous || !r.attachments) return null;
+  const line = (a: NonNullable<typeof r.attachments>[number]) => {
+    if (a.status === "removed") return <><b>removed</b> {a.previous}</>;
+    if (a.status === "new") return <><b>new</b> {a.file}</>;
+    if (a.status === "unchanged") return <><b>unchanged</b> {a.file}{a.renamed ? `: the same file as ${a.previous}, renamed` : ""}</>;
+    return <><b>changed</b> {a.file}: closest to {a.previous} ({a.how === "look" ? "by the look of its pages" : "by its text"}, similarity {Number(a.similarity).toFixed(2)}{a.pages ? `; ${a.same_pages} of ${a.pages} pages keep the same text` : ""})</>;
+  };
+  return (
+    <details className="why-b">
+      <summary>Since revision {r.revision}</summary>
+      <p>Compared with revision {r.revision} of the same form, file by file: the same file, or the closest by text, or by the look of the pages for a scan. No AI. Open both files before relying on a pair.</p>
+      <ul>{r.attachments.map((a, i) => <li key={i}>{line(a)}</li>)}</ul>
+    </details>
+  );
+}
+
+// A file the browser saves, made here from the review on the page
+function save(name: string, text: string, type: string) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+// The dates the certificates are checked for; a reviewer changes them and the checks run again with them
+function Dates({ v }: { v: PackageReview }) {
+  const edit = useContext(Edit);
+  const [review, setReview] = useState(v.review);
+  const [delivery, setDelivery] = useState(v.delivery);
+  return (
+    <>
+      <p>Certificates were checked for {day(v.review)}, the review date, and for {day(v.delivery)}, the expected delivery.</p>
+      {edit.may && (
+        <details className="dates">
+          <summary>Change the dates</summary>
+          <p className="fine">The dates decide whether a certificate is still valid at the review and at delivery.</p>
+          <div className="date-row">
+            <label>Review date<input type="date" value={review} onChange={(e) => setReview(e.target.value)} /></label>
+            <label>Expected delivery<input type="date" value={delivery} onChange={(e) => setDelivery(e.target.value)} /></label>
+          </div>
+          <div className="btns">
+            <button type="button" className="btn p" disabled={edit.busy || !review || !delivery}
+              onClick={() => void edit.change({ op: "settings", review, delivery })}>Check again with these dates</button>
+            <button type="button" className="link" disabled={edit.busy}
+              onClick={() => void edit.change({ op: "settings", review: null, delivery: null })}>Back to the form's dates</button>
+          </div>
+        </details>
+      )}
+    </>
+  );
+}
+
 // ------------------------------------------------------------------ the document beside the work, and the package's files
-function Document({ doc, place, url }: { doc: ReviewDoc | undefined; place: Place; url: (file: string, page?: number) => string }) {
+// The page beside the work: drawn on the laptop at the import, with the quoted lines marked (violet and dashed what the
+// AI read, ink once a person confirmed it). Without a page image (not a PDF, or not imported yet) the PDF opens as it is.
+function Document({ v, step, place, url, extra, image, onPlace }: {
+  v: PackageReview; step: Step; place: Place; url: (file: string, page?: number) => string; extra: PackageExtra | null;
+  image: (no: number, page: number) => string; onPlace: (p: Place) => void;
+}) {
+  const [missing, setMissing] = useState<string | null>(null); // the image that did not load
+  const [big, setBig] = useState(false);
+  const doc = v.documents.find((d) => d.file === place.file);
   const pdf = /\.pdf$/i.test(place.file);
-  const fit = `${url(place.file, place.page)}&view=FitH&navpanes=0`; // the page across the pane, without the thumbnails
+  const src = doc && pdf ? image(doc.no, place.page) : null;
+  const here = (q: { file?: string; source?: string; page: number | string | null }) => Number(q.page) === place.page;
+  const wanted: { quote: string; ok: boolean }[] = step === "readings"
+    ? [...v.items.flatMap((i) => i.values).filter((x) => x.source === place.file && here(x) && x.quote).map((x) => ({ quote: String(x.quote), ok: x.status === "verified" })),
+      ...(doc?.matches ?? []).filter((m) => here(m) && m.quote).map((m) => ({ quote: String(m.quote), ok: m.status === "verified" }))]
+    : (place.quotes ?? []).filter((q) => q.file === place.file && q.page === place.page);
+  const onPage = extra?.marks[place.file]?.[String(place.page)] ?? {};
+  const unmarked = wanted.filter((w) => !(onPage[w.quote] ?? []).length);
+  const go = (page: number) => onPlace({ file: place.file, page, quotes: place.quotes });
   return (
     <aside className="doc-pane sheet" aria-label="The document">
-      <div className="sheet-head">
-        <span className="typed small grow">{doc ? `${pad(doc.no)} · ` : ""}{place.file}</span>
-        {pdf && <span className="meta">page {place.page}</span>}
-        <a className="meta" href={url(place.file, place.page)} target="_blank" rel="noreferrer">Open in a new tab</a>
+      <div className="sheet-head doc-head">
+        <select aria-label="Document" value={place.file} onChange={(e) => onPlace({ file: e.target.value, page: 1 })}>
+          {v.documents.map((d) => <option key={d.file} value={d.file}>{pad(d.no)} · {d.type} · {d.file}</option>)}
+        </select>
+        {pdf && doc && (
+          <span className="pg">
+            <button type="button" className="mini" disabled={place.page <= 1} aria-label="Previous page" onClick={() => go(place.page - 1)}>‹</button>
+            Page {place.page} of {doc.pages}
+            <button type="button" className="mini" disabled={place.page >= doc.pages} aria-label="Next page" onClick={() => go(place.page + 1)}>›</button>
+            <button type="button" className="mini" aria-pressed={big} aria-label="Zoom the page" onClick={() => setBig(!big)}>{big ? "−" : "+"}</button>
+          </span>
+        )}
+        <a className="meta" href={url(place.file, place.page)} target="_blank" rel="noreferrer">Open the PDF</a>
       </div>
       {place.own === false && <p className="sheet-note band">No page in this package shows this, so the product's data sheet is open.</p>}
-      {pdf ? <iframe key={`${place.file}#${place.page}`} src={fit} title={`${place.file}, page ${place.page}`} />
-        : <p className="empty">This file is not a PDF, so it opens in a new tab.</p>}
+      {unmarked.length > 0 && src && missing !== src && (
+        <p className="scan">{unmarked.length < wanted.length ? "Some lines could not be marked" : "This page is a scan, so the line cannot be marked"}. Look for: {unmarked.map((w) => `"${w.quote}"`).join("; ")}</p>
+      )}
+      <div className="doc-scroll">
+        {src && missing !== src ? (
+          <div className={`page${big ? " big" : ""}`}>
+            <img src={src} alt={`Page ${place.page} of ${place.file}`} onError={() => setMissing(src)} />
+            {wanted.flatMap((w, i) => (onPage[w.quote] ?? []).map(([x, y, wd, h], j) => (
+              <i key={`${i}-${j}`} className={`m${w.ok ? " ok" : ""}`} style={{ left: `${x}%`, top: `${y}%`, width: `${wd}%`, height: `${h}%` }} />
+            )))}
+          </div>
+        ) : pdf ? <iframe key={`${place.file}#${place.page}`} src={`${url(place.file, place.page)}&view=FitH&navpanes=0`} title={`${place.file}, page ${place.page}`} />
+          : <p className="empty">This file is not a PDF, so it opens in a new tab.</p>}
+      </div>
     </aside>
   );
 }

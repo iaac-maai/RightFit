@@ -81,11 +81,19 @@ export function parseSource(s: string) {
 
 // The page a problem points to: its first reading on a document, the document it is about, or its first source.
 // A problem with no page of its own still opens a real page, the data sheet of its product, marked own: false.
-export interface Place { file: string; page: number; own?: boolean }
+export interface Quote { file: string; page: number; quote: string; ok: boolean }
+export interface Place { file: string; page: number; own?: boolean; quotes?: Quote[] }
+
+// The quoted lines a finding rests on, to mark them on their pages
+export const quotesOf = (evidence: { source: string; page: number | string | null; quote: string | null; status?: string }[]): Quote[] =>
+  evidence.filter((e) => e.quote && Number(e.page) > 0)
+    .map((e) => ({ file: e.source, page: Number(e.page), quote: String(e.quote), ok: e.status === "verified" }));
 export function placeOf(v: PackageReview, row: Row): Place | null {
   const isDoc = (file: string) => v.documents.some((d) => d.file === file);
-  const e = (row.kind === "ai" ? row.f.evidence : row.r.evidence).find((x) => isDoc(x.source));
-  if (e) return { file: e.source, page: Number(e.page) || 1 };
+  const evidence = row.kind === "ai" ? row.f.evidence : row.r.evidence;
+  const quotes = quotesOf(evidence);
+  const e = evidence.find((x) => isDoc(x.source));
+  if (e) return { file: e.source, page: Number(e.page) || 1, quotes };
   if (row.kind === "result") {
     if (row.r.doc && isDoc(row.r.doc)) return { file: row.r.doc, page: 1 };
     const s = row.r.sources.map(parseSource).find((p) => isDoc(p.file));
@@ -103,3 +111,13 @@ export const shown = (value: Value, unit: string | null) =>
 // A check's reason without the checklist's codes and register rows, and with words in place of field names
 export const plainReason = (text: string) =>
   text.replace(/^CL-\d+\s+/, "").replace(/\s*\(register [^)]*\)/g, "").replace(/([a-z])_([a-z])/g, "$1 $2");
+
+// Rows as a CSV file, as the laptop's downloads write them: a cell with a comma, a quote or a new line goes in quotes
+export const csv = (rows: unknown[][]) =>
+  `${rows.map((r) => r.map((v) => { const t = String(v ?? ""); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; }).join(",")).join("\n")}\n`;
+
+// What the downloads hold: the confirmed values, and the findings marked not a problem with their reason
+export const confirmedValues = (v: PackageReview) => csv([["item", "value", "reading", "unit", "file", "page"],
+  ...v.items.flatMap((i) => i.values.filter((x) => x.status === "verified").map((x) => [`${i.name} (${i.model})`, x.what, x.value, x.unit, x.source, x.page]))]);
+export const notAProblem = (v: PackageReview) => csv([["check", "about", "why"],
+  ...v.results.filter((r) => r.dismissed).map((r) => [r.check, r.product || r.doc || "package", r.dismissed])]);

@@ -22,10 +22,10 @@ type Route =
 
 function parse(path: string): Route {
   const clean = path.replace(/\/+$/, "") || "/";
-  const project = clean.match(/^\/p\/([\w-]+)(?:\/(packages|boq|rules))?(?:\/(P\d+)(?:\/(problems|readings|answer))?)?$/);
+  const project = clean.match(/^\/p\/([\w-]+)(?:\/(packages|boq|rules|booster))?(?:\/(P\d+)(?:\/(problems|readings|answer))?)?$/);
   if (project) {
     const [, id, part, code, step] = project;
-    return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | "rules" | undefined) ?? "team"), code, step: step as Step | undefined };
+    return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | "rules" | "booster" | undefined) ?? "team"), code, step: step as Step | undefined };
   }
   const join = clean.match(/^\/join\/([\w-]+)$/);
   if (join) return { page: "join", token: join[1] };

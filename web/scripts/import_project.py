@@ -19,6 +19,7 @@ import sys
 import tempfile
 import time
 import uuid
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,7 @@ sys.path.insert(0, str(ROOT))
 
 DPA_VERSION = "2026-11-20"  # the data processing agreement in web/legal/, as in web/worker/index.ts
 BUCKET = "rightfit-files"
+SITE = "https://rightfit.hackathon-team6-cubicasa-app.workers.dev"   # RightFit online, where the laptop's app links
 TYPES = {"pdf": "application/pdf", "xls": "application/vnd.ms-excel", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
          "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}
 
@@ -97,6 +99,8 @@ def main():
     ap.add_argument("--no-files", action="store_true", help="rows and reviews only, without uploading the packages' files again")
     ap.add_argument("--workers", type=int, help="files uploaded at once: 4 online by default; 1 on the laptop, where "
                                                 "several local wranglers at once lose their connection")
+    ap.add_argument("--pages", action="store_true",
+                    help="upload the page images of the read packages, as an import with the files does")
     ap.add_argument("--replace-online-work", action="store_true",
                     help="write the laptop's readings, decisions and consultant's rules over what was confirmed, decided "
                          "or changed online (without it, what is online stays as it is)")
@@ -105,8 +109,8 @@ def main():
     if not args.project_id and not args.owner:
         sys.exit("Give --owner (to open a new project) or --project-id (to import again).")
 
-    from app.review_server import (boq_files, boq_links, consultant_screen, current_project, decisions_file,
-                                   package_list, read_decisions, review)
+    from app.review_server import (boq_files, boq_links, consultant_screen, current_project, decisions_file, find_marks,
+                                   original, package_list, page_png, read_decisions, review, revisions)
     from checks.maf.rules import library, load
     from ingest.boq import read_boq
 
@@ -180,6 +184,34 @@ def main():
                                          p.get("to_confirm"), p.get("readings"), now if p.get("letter") else None, now))
             + ");")
 
+    # What only the laptop can read from the original PDFs, for the package's page online: the comparison with the
+    # previous revision of the form, where each quoted line sits on its page (the yellow marks), and, with the files
+    # or --pages, every page of the attachments as an image to draw the marks on.
+    extras, images = {}, []
+    for p in packages:
+        if not p.get("letter"):
+            continue
+        pkg = json.loads((Path(project["packages"]) / f"{p['id']}.json").read_text())
+        quoted = defaultdict(set)   # (file, page) -> the quotes on it
+        places = [(x["source"], x.get("page"), x.get("quote")) for i in pkg["items"] for x in i["values"].values()]
+        places += [(d["file"], m.get("page"), m.get("quote")) for d in pkg["documents"] for m in d.get("matches", [])]
+        places += [(e["source"], e.get("page"), e.get("quote")) for f in pkg.get("ai_findings", []) for e in f.get("evidence", [])]
+        for file, page, quote in places:
+            if quote and str(page or "").isdigit():
+                quoted[(file, int(page))].add(quote)
+        marks = {}
+        for n, d in enumerate(pkg["documents"], 1):
+            path = original(p["id"], pkg, n, Path(project["originals"]))
+            if not path or path.suffix.lower() != ".pdf":
+                continue
+            for (file, page), quotes in sorted(quoted.items()):
+                if file == d["file"]:
+                    quotes = sorted(quotes)
+                    marks.setdefault(file, {})[str(page)] = dict(zip(quotes, find_marks(path, page, quotes)))
+            if not args.no_files or args.pages:
+                images += [(f"projects/{pid}/pages/{p['id']}/{n}/{page}.png", path, page) for page in range(1, d["pages"] + 1)]
+        extras[p["id"]] = {"revisions": revisions(p["id"], project["originals"]), "marks": marks}
+
     # The original files of each package (reading a file brings it back from iCloud first)
     uploads = []
     for p in packages:
@@ -214,10 +246,16 @@ def main():
         if args.no_files:
             uploads = []   # the packages' files are already in the bucket
         for key, value in [("tables.json", tables), *((f"reviews/{c}.json", v) for c, v in reviews.items()),
-                           *((f"state/{c}.json", v) for c, v in states.items())]:
+                           *((f"state/{c}.json", v) for c, v in states.items()), *((f"extra/{c}.json", v) for c, v in extras.items())]:
             path = work / key.replace("/", "-")
             path.write_text(json.dumps(value, ensure_ascii=False))
             uploads.append((f"projects/{pid}/{key}", path))
+        for n, (key, pdf, page) in enumerate(images):   # every page as a PNG, drawn as on the laptop's document pane
+            png = page_png(pdf, page)
+            if png:
+                path = work / f"page-{n}.png"
+                path.write_bytes(png)
+                uploads.append((key, path))
 
         def put(item):
             key, path = item
@@ -237,9 +275,13 @@ def main():
         for f in work.iterdir():
             f.unlink()
         work.rmdir()
+    if where == "remote" and project.get("folder") and (Path(project["folder"]) / "project.json").exists():
+        settings = Path(project["folder"]) / "project.json"   # git-ignored, as the whole project folder
+        kept_settings = json.loads(settings.read_text())
+        settings.write_text(json.dumps({**kept_settings, "online": {"site": SITE, "project": pid}}, indent=2) + "\n")
     print(f"Imported into project {pid} ({where}): {len(packages)} packages, {len(reviews)} reviews from the laptop"
           + (f", {len(kept)} kept as changed online ({', '.join(kept)})" if kept else "")
-          + f", {len(uploads)} files, {lines} BOQ lines. The project is locked: it opens with the team password.")
+          + f", {len(images)} page images, {len(uploads)} files, {lines} BOQ lines. The project is locked: it opens with the team password.")
 
 
 if __name__ == "__main__":

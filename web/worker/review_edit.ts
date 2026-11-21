@@ -6,20 +6,25 @@ import { json, logged, now, readBody, type Env, type User } from "./data";
 import { access, keys, rulesView, type Tables } from "./project_data";
 import { mayChangeReview, mayChangeRules } from "./roles";
 
-const PACKAGE_CHANGES = new Set(["confirm", "decide", "decisions"]);
+const PACKAGE_CHANGES = new Set(["confirm", "decide", "decisions", "settings"]);
 const RULE_CHANGES = new Set(["new_rule", "rule_active"]);
 const EVENT: Record<string, string> = {
-  confirm: "review.confirmed", decide: "review.ai_decided", decisions: "review.decided", new_rule: "rules.added", rule_active: "rules.switched",
+  confirm: "review.confirmed", decide: "review.ai_decided", decisions: "review.decided", settings: "review.dated",
+  new_rule: "rules.added", rule_active: "rules.switched",
 };
 const TRIES = 3; // two people changing the same thing at once: the later one starts again from the other's change
 const asJson = { httpMetadata: { contentType: "application/json" } };
 
-interface State { pkg: unknown; boq: unknown; decisions: Record<string, unknown> }
+// settings: the review and delivery dates a reviewer chose for this package (none: the form's own, as on the laptop)
+interface State { pkg: unknown; boq: unknown; decisions: Record<string, unknown>; settings?: { review: string | null; delivery: string | null } }
+const DATE = /^\d{4}-\d{2}-\d{2}$/;
 interface View { status: { letter: string; label: string }; counts: Record<string, number> }
 interface Answer { pkg?: unknown; decisions?: Record<string, unknown>; consultant?: Tables["consultant"]; view?: View; error?: string }
 type Change = Record<string, unknown> & { op: string };
 
 export async function editRoute(request: Request, env: Env, user: User, path: string, method: string): Promise<Response | null> {
+  const tool = path.match(/^\/api\/projects\/([\w-]+)\/booster$/);
+  if (tool && method === "POST") return booster(request, env, user, tool[1]);
   const m = path.match(/^\/api\/projects\/([\w-]+)\/(?:packages\/(P\d+)\/change|rules\/change)$/);
   if (!m || method !== "POST") return null;
   const [, projectId, code] = m;
@@ -45,9 +50,17 @@ async function changePackage(env: Env, projectId: string, code: string, change: 
     const stored = await env.BUCKET.get(k.state);
     if (!stored) return json({ error: "This package can be changed online after the next import from the laptop." }, 404);
     const state = await stored.json<State>();
-    const answer = await engine(env, { ...state, tables: data, location, reviewer: user.name, change });
+    let settings = state.settings ?? { review: null, delivery: null };
+    if (change.op === "settings") { // new dates: the engine reviews the package again with them, nothing else changes
+      const date = (v: unknown) => (v ? String(v) : null);
+      settings = { review: date(change.review), delivery: date(change.delivery) };
+      if (Object.values(settings).some((d) => d !== null && !DATE.test(d))) return json({ error: "A date is written like 2026-03-16." }, 400);
+    }
+    const answer = await engine(env, {
+      ...state, tables: data, location, reviewer: user.name, change: change.op === "settings" ? undefined : change, ...settings,
+    });
     if (answer.error || !answer.view) return json({ error: answer.error ?? "The checks engine did not answer." }, 400);
-    const saved = await env.BUCKET.put(k.state, JSON.stringify({ ...state, pkg: answer.pkg, decisions: answer.decisions }),
+    const saved = await env.BUCKET.put(k.state, JSON.stringify({ ...state, pkg: answer.pkg, decisions: answer.decisions, settings }),
       { ...asJson, onlyIf: { etagMatches: stored.etag } });
     if (!saved) continue; // someone else changed this package meanwhile: start again from their change
     await publish(env, projectId, code, answer.view);
@@ -75,13 +88,25 @@ async function changeRules(env: Env, projectId: string, change: Change, user: Us
     for (const { code } of results) {
       const st = await env.BUCKET.get(keys(projectId, code).state);
       if (!st) continue;
-      const again = await engine(env, { ...(await st.json<State>()), tables, location, reviewer: user.name });
+      const before = await st.json<State>();
+      const again = await engine(env, { ...before, tables, location, reviewer: user.name, ...(before.settings ?? {}) });
       if (again.view) await publish(env, projectId, code, again.view);
     }
     await logged(env, user.id, EVENT[change.op], projectId, detail(change)).run();
     return json({ ...rulesView(tables, location), mayEdit: true });
   }
   return json({ error: "Someone else is changing the rules right now: try again." }, 409);
+}
+
+// POST /api/projects/:id/booster: the booster set sizing, run by the engine as on the laptop's Booster sizing screen.
+// {sets: true} lists the catalogue's sets; {flats, floors, submitted, mains_m} sizes one building.
+async function booster(request: Request, env: Env, user: User, projectId: string) {
+  const me = await access(request, env, projectId, user);
+  if (me instanceof Response) return me;
+  if (!env.ENGINE) return json({ error: "The checks engine is not connected." }, 503);
+  const body = await readBody(request);
+  const answer = await engine(env, body.sets ? { tool: "booster_sets" } : { tool: "booster", args: body }) as Record<string, unknown>;
+  return json(answer, answer.error ? 400 : 200);
 }
 
 async function engine(env: Env, body: unknown): Promise<Answer> {
@@ -106,6 +131,7 @@ function detail(change: Change): Record<string, unknown> {
   if (change.op === "confirm") return { readings: Array.isArray(change.targets) ? change.targets.length : 0 };
   if (change.op === "decisions") return { findings: change.decisions && typeof change.decisions === "object" ? Object.keys(change.decisions).length : 0 };
   if (change.op === "decide") return { status: String(change.status) };
+  if (change.op === "settings") return { review: change.review ?? null, delivery: change.delivery ?? null };
   if (change.op === "rule_active") return { rule: String(change.rule_id), active: Boolean(change.active) };
   return {};
 }

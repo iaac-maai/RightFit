@@ -1,7 +1,7 @@
 // Tests for how a package's review is arranged on the page. Run with `npm test`.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { groups, passed, placeOf, readingPages, why } from "./review.ts";
+import { csv, groups, notAProblem, passed, placeOf, readingPages, why } from "./review.ts";
 import type { CheckResult, PackageReview } from "./types.ts";
 
 // A made-up package: one pump, one data sheet, a problem, a question, a finding marked not a problem, a pass
@@ -52,5 +52,10 @@ test("readings sit on their document's page; the form's own and the missing ones
 
 test("a problem opens the page its reading came from", () => {
   const row = groups(view)[0].rows[0];
-  assert.deepEqual(placeOf(view, row), { file: "sheet.pdf", page: 2 });
+  assert.deepEqual(placeOf(view, row), { file: "sheet.pdf", page: 2, quotes: [{ file: "sheet.pdf", page: 2, quote: "12", ok: false }] });
+});
+
+test("the downloads write what a spreadsheet reads back, commas and quotes included", () => {
+  assert.equal(csv([["a", "b, c"], ['say "x"', null]]), 'a,"b, c"\n"say ""x""",\n');
+  assert.equal(notAProblem(view), "check,about,why\nV1,Pump (X1),agreed on site\n");
 });

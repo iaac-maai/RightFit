@@ -99,7 +99,15 @@ export interface PackageReview {
   documents: ReviewDoc[]; results: CheckResult[]; ai_findings: AiFinding[]; notes: string[];
   answer: { lines: string[]; text: string }; decisions: Record<string, Decision>;
 }
-export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean }
+// What the laptop read from the PDFs at the import: the comparison with the previous revision, and where each quoted
+// line sits on its page (rectangles in percent of the page: left, top, width, height)
+export interface Revision { status: "unchanged" | "changed" | "new" | "removed"; file?: string; previous?: string; renamed?: boolean;
+  how?: string; similarity?: number; pages?: number; same_pages?: number }
+export interface PackageExtra {
+  revisions: { previous: string | null; revision?: number; attachments?: Revision[] };
+  marks: Record<string, Record<string, Record<string, [number, number, number, number][]>>>;
+}
+export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean; extra?: PackageExtra | null }
 
 // The rules the checks used for the project's country (worker/project_data.ts, rules)
 export interface LawRule {

@@ -17,6 +17,7 @@ export const keys = (projectId: string, code?: string) => ({
   tables: `projects/${projectId}/tables.json`,
   state: `projects/${projectId}/state/${code}.json`,
   view: `projects/${projectId}/reviews/${code}.json`,
+  extra: `projects/${projectId}/extra/${code}.json`, // what the laptop read from the PDFs: the revision comparison, the marks
 });
 
 // The rule tables the checks use, as the laptop's data/maf holds them, with the consultant's own rules of this project
@@ -48,6 +49,12 @@ export async function access(request: Request, env: Env, projectId: string, user
 
 export async function dataRoute(request: Request, env: Env, user: User, path: string, method: string): Promise<Response | null> {
   if (path === "/api/team/unlock" && method === "POST") return unlock(request, env, user);
+  const pg = path.match(/^\/api\/projects\/([\w-]+)\/pages\/(P\d+)\/(\d{1,3})\/(\d{1,4})\.png$/);
+  if (pg && method === "GET") {
+    const me = await access(request, env, pg[1], user);
+    if (me instanceof Response) return me;
+    return pageImage(env, pg[1], pg[2], pg[3], pg[4], me);
+  }
   const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules)(?:\/(P\d+))?(?:\/([^/]+))?$/);
   if (!m || method !== "GET") return null;
   const [, projectId, what, code, name] = m;
@@ -98,11 +105,12 @@ async function onePackage(env: Env, projectId: string, code: string, me: MemberR
     "SELECT name, size, pages FROM package_file WHERE project_id = ? AND code = ? ORDER BY name",
   ).bind(projectId, code).all();
   const k = keys(projectId, code);
-  const [stored, state] = await Promise.all([env.BUCKET.get(k.view), env.BUCKET.head(k.state)]);
+  const [stored, state, more] = await Promise.all([env.BUCKET.get(k.view), env.BUCKET.head(k.state), env.BUCKET.get(k.extra)]);
   const review = stored ? await stored.json() : null;
+  const extra = more ? await more.json() : null;
   // the reviewers change a review once its readings are online (they come with an import from the laptop)
   const mayEdit = mayChangeReview(me.role) && Boolean(state);
-  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit });
+  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit, extra });
 }
 
 // One original file, from the private bucket, shown in the browser
@@ -126,6 +134,16 @@ async function file(env: Env, projectId: string, code: string, encoded: string, 
       "Cache-Control": "private, max-age=300",
       "X-Content-Type-Options": "nosniff",
     },
+  });
+}
+
+// One page of an attachment as an image, drawn on the laptop at the import, for the marks on the quoted lines
+async function pageImage(env: Env, projectId: string, code: string, no: string, page: string, me: MemberRow) {
+  if (!seesForms(me)) return json({ error: "No such page." }, 404);
+  const object = await env.BUCKET.get(`projects/${projectId}/pages/${code}/${no}/${page}.png`);
+  if (!object) return json({ error: "No such page." }, 404);
+  return new Response(object.body, {
+    headers: { "Content-Type": "image/png", "Cache-Control": "private, max-age=86400", "X-Content-Type-Options": "nosniff" },
   });
 }
 

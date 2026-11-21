@@ -15,11 +15,11 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `schema.sql` | the D1 tables: accounts, consent, projects (with the data processing agreement accepted), members, invitations, the activity log |
 | `legal/` | the Terms of Service, Privacy Policy, Data Processing Agreement, Cookie Policy and Legal Notice the app shows; `docs/legal/` has the operator's own records |
 | `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, the rules, BOQ lines) and the team password that opens a locked project |
-| `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the consultant's rules; each change goes to the engine |
+| `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the review dates, the consultant's rules; each change goes to the engine; and the booster sizing |
 | `engine/` | the checks engine: a Python Worker with no address of its own that runs the laptop's review code (`app/engine.py`); `build.py` copies that code in before Wrangler bundles it |
-| `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices; an import again keeps what was confirmed or decided online, unless `--replace-online-work` |
+| `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices; an import again keeps what was confirmed or decided online, unless `--replace-online-work`; with the files or `--pages` it also draws every page of the read packages for the marks |
 | `migrations/` | changes for a database made before them; a new database gets everything from `schema.sql` |
-| `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations, a package's review in three steps (`src/review.ts` arranges it, with its tests) and the rules |
+| `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations, a package's review in three steps with its pages and their marks (`src/review.ts` arranges it, with its tests), the rules and booster sizing (`src/chart.tsx` draws the curves) |
 | `wrangler.jsonc` | the Worker and its database on Cloudflare |
 
 ## On the laptop
