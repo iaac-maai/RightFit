@@ -63,7 +63,7 @@ flowchart LR
 
 ![The review in three steps. 01 The problems: a declaration page gets its product line marked in red, and the finding D2 beside it says the declaration names SL1 and SLV, none of the items submitted. 02 The readings: P01's duty point, 15 m3/h at 50 m, is violet and dashed until a person ticks it, then black and solid, while the maximum pressure, 10 bar, stays violet. 03 The answer: a red B stamp, approved as noted, four comments, a button to copy the answer, and a person signs](docs/images/steps.svg)
 
-The reviewer works in three steps. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read: violet with a dashed line is what the AI read, black with a solid line is what a person confirmed. Last, the answer, ready to copy.
+The reviewer works in three steps. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read: violet with a dashed line is what the AI read, black with a solid line is what a person confirmed. Last, the answer, ready to copy. The same three steps open online, on every package RightFit has read.
 
 ![RightFit in six screens: the problems of a pump package beside their pages, why the draft answer is B, confirming what the AI read, the answer ready to copy, an air handling unit at its fourth revision, and what changed since the third](docs/images/tour.gif)
 
@@ -97,7 +97,7 @@ The two models taught us two things. The first page classifier learned only from
 
 ## RightFit online
 
-Since 20 Nov 2026 there is also a shared space around the review app (`web/`, spec `spec/features/rightfit_online.md`), online at https://rightfit.hackathon-team6-cubicasa-app.workers.dev. The consultant opens a project and invites the other reviewers, the client and the contractor, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and Management never opens a project's packages, files or BOQ.
+RightFit online is where the team works, at https://rightfit.hackathon-team6-cubicasa-app.workers.dev since 20 Nov 2026 (`web/`, spec `spec/features/rightfit_online.md`). The consultant opens a project and invites the other reviewers, the client and the contractor, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and Management never opens a project's packages, files or BOQ.
 
 ![Who invites whom: the consultant opens the project and invites the designer, the site supervisor and the client, who review, and the contractor, who invites two subcontractors. Each subcontractor sees its own branch and never the other's. An invitation is a link for one email, valid 14 days. A locked project opens its packages, files, review and BOQ only with the team password as well, and Management sees people and projects, never the packages](docs/images/chain.svg)
 
@@ -109,32 +109,26 @@ A person gets in in four steps: an account, with Google or with an email and a p
 
 The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
 
-It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 19 tests; [`web/README.md`](web/README.md) has the steps.
+It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 20 tests; [`web/README.md`](web/README.md) has the steps.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-    X["An agent"] -->|"MCP, read only"| T
-    subgraph laptop["On the laptop"]
-        direction TB
-        F[("Project folder<br/>forms, PDFs, BOQs")] --> A["Review app<br/>app/review_server.py"]
-        A --> C["Checks<br/>checks/, plain Python"]
-        T["MCP server<br/>app/mcp_server.py"] --> C
-    end
+    U["Consultant, reviewers,<br/>contractor, subcontractors"] -->|"Google or email"| W
     subgraph online["RightFit online, on Cloudflare"]
-        direction TB
-        W["Worker<br/>accounts, roles, invitations,<br/>team password"] --> S[("D1 and R2, private<br/>projects, people, packages,<br/>files, reviews, rules")]
+        direction LR
+        W["Site Worker<br/>accounts, roles, invitations,<br/>team password"] <-->|"each change,<br/>the new review"| E["Checks engine<br/>a Python Worker,<br/>the checks in plain Python"]
+        W --> S[("D1 and R2, private<br/>projects, people, packages,<br/>files, reviews, rules")]
     end
-    A -->|"import_project.py"| S
-    U["Consultant, contractor,<br/>subcontractors"] -->|"Google or email"| W
+    N["A new package"] -.->|"read and imported<br/>from the laptop, for now"| S
     classDef rule fill:#e3efe8,stroke:#1e5a3c,color:#0f2e1f
     classDef person fill:#fdeee4,stroke:#eb6834,color:#3d1a09
-    class C rule
-    class U,X person
+    class E rule
+    class U person
 ```
 
-The checks run on the laptop and online, from the same code (`app/review_core.py`). The review app reads the project folder, runs the checks and keeps what the reviewer confirms and decides, and agents reach the same checks through the MCP server, which only reads. RightFit online is the shared space: the Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. `web/scripts/import_project.py` puts the laptop's review of each package, the rules and the original files there; from then on the reviewers confirm and decide online, where the engine (`web/engine/`) runs the checks again, and a later import keeps what was done online. Our two models are kept in the private repository on Hugging Face.
+Everything a reviewer does happens online. The site's Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. When a reviewer ticks a reading, keeps or dismisses a finding or decides on an AI suggestion, or the consultant changes a rule, the Worker sends the change to the checks engine (`web/engine/`), a Python Worker that only the site can call. The engine runs the same checks as the laptop app (`app/review_core.py`), sends back the new review and keeps nothing; the Worker stores it. One step still starts on the laptop: a new package is read there, and `web/scripts/import_project.py` puts its files, readings and review online, while a later import keeps what was done online. Agents reach the same checks through the MCP server (`app/mcp_server.py`), which only reads, and our two models are kept in the private repository on Hugging Face.
 
 ## Parts, and when they came
 
@@ -149,6 +143,7 @@ The checks run on the laptop and online, from the same code (`app/review_core.py
 | The fit check in Revit | [`revit/`](revit/), [`checks/space/`](checks/space/) | 17 Nov 2026 |
 | RightFit online: accounts, roles, invitations, Management and the legal documents | https://rightfit.hackathon-team6-cubicasa-app.workers.dev | 20 Nov 2026 |
 | The project's data online, with the review of each read package and the rules | the same site, in a locked project | 21 Nov 2026 |
+| The checks engine online, and the review done online by the reviewers | the same site, [`web/engine/`](web/engine/) | 21 Nov 2026 |
 | Our two models on Hugging Face | a private repository | 21 Nov 2026 |
 
 ## The fit check in Revit
@@ -198,8 +193,8 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - 48 more packages from the same project are on our laptops, and since 21 Nov in RightFit online as well. The app lists them; none is read yet.
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
-- RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, with RightFit's review of the read packages and the rules, to read; see above.
-- 158 tests for the Python part (`pytest`) and 19 for RightFit online (`npm test` in `web/`) pass.
+- RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, and the reviewers do the review there: each change runs the checks again online, in a Python Worker; see above.
+- 164 tests for the Python part (`pytest`) and 20 for RightFit online (`npm test` in `web/`) pass.
 - Since 21 Nov our two scored models are in a private repository on Hugging Face, with a card for the whole project.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
