@@ -127,7 +127,19 @@ A package opens in the laptop's three steps (problems, readings, answer), with t
 | the rule tables of `data/maf` with this project's consultant's rules | R2, `tables.json`; a rule change reviews every read package again |
 | who changed what, without the values | the activity log in Management |
 
-Each tick and decision keeps the name of the person who made it and the day. An import from the laptop again keeps what is online: a package whose state is online, and the consultant's rules online, stay as they are; `--replace-online-work` writes the laptop's over them. Writing a rule in one's own words for the AI to turn into one stays on the laptop (it needs the AI key), as do the marks on the page, the comparison with the previous revision, another country or other dates, and the downloads.
+Each tick and decision keeps the name of the person who made it and the day. An import from the laptop again keeps what is online: a package whose state is online, and the consultant's rules online, stay as they are; `--replace-online-work` writes the laptop's over them.
+
+**One app (Luca, 21 Nov 2026: "trebuie sa fie acelasi lucru").** Everything a reviewer does is online, and the laptop app only adds and reads a new package:
+
+| What | How it is online |
+|---|---|
+| the pages beside the review, with the quoted lines marked | the import draws every page of a read package's attachments (`--pages`, or with the files) and finds each quoted line on its page, both with the laptop's own code; R2 `pages/` and `extra/<package>.json` |
+| what changed since the previous revision of the form | worked out at the import (`ingest/revisions.py`), in `extra/<package>.json` |
+| the review and delivery dates | a reviewer sets them per package; the engine runs the checks again with them |
+| the downloads (the draft, the confirmed values, what was marked not a problem) | made in the browser from the review |
+| booster sizing | a project tab; the engine runs `app/booster.py` with the catalogue bundled in it |
+
+Still on the laptop: adding and reading a new package (the AI, OCR, the page classifier), the standby test, which reads the curve of a package being added, and the BOQ files with their prices. Writing a rule in one's own words for the AI to turn into one is on the laptop too until RightFit online has its own key for the AI. The laptop app's review screens point to the same package online, with a link to its own copy only for when the site cannot be reached.
 
 The project is **locked**: besides being a member, a person needs the team password, which only the team knows and which is kept as a Cloudflare secret (`TEAM_PASSWORD`). The browser keeps a hash of it for 7 days, never the password. Five wrong tries in 15 minutes make a person wait, and every try goes in the activity log. Until forms have a branch (MAF-32), a subcontractor sees none of the imported packages or the BOQ.
 

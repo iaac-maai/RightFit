@@ -91,6 +91,7 @@ def projects():
     for f in sorted(PROJECTS.glob("*/project.json")) if PROJECTS.exists() else []:
         p = json.loads(f.read_text())
         out.append({"id": f.parent.name, "name": p["name"], "location": p.get("location", "RO"), "folder": f.parent,
+                    "online": p.get("online"),   # where the project is online, written by web/scripts/import_project.py
                     **{k: (f.parent / p.get(k, FOLDERS[k])).resolve() for k in FOLDERS}})
     return out
 
@@ -419,7 +420,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json([{"file": f.name, "lines": len(read_boq(f))} for f in boq_files(self.project()["boq"])])
         if url.path == "/api/projects":
             here = self.project()
-            return self.send_json({"current": here["id"], "name": here["name"],
+            return self.send_json({"current": here["id"], "name": here["name"], "online": here.get("online"),
                                    "projects": [{"id": p["id"], "name": p["name"], "location": p["location"]} for p in projects()]})
         if url.path == "/api/rules":
             location = parse_qs(url.query).get("location", ["RO"])[0]

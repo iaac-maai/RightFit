@@ -18,7 +18,7 @@ IAAC MaAI01 · Operable Futures · 2026–27
 
 RightFit checks a material approval form (MAF) for MEP equipment before the consultant signs it. It reads the documents attached to the form and checks them against the law in force, the project's bill of quantities (BOQ), a checklist built from past reviewers' comments and the consultant's own rules. Then it drafts the answer, with the page behind every finding. The reviewer decides and signs.
 
-**[Open RightFit online](https://rightfit.hackathon-team6-cubicasa-app.workers.dev)** · [run it on the laptop](#running-it) · [the tools for agents](#for-agents) · [the fit check in Revit](#the-fit-check-in-revit)
+**[Open RightFit online](https://rightfit.hackathon-team6-cubicasa-app.workers.dev)** · [add a package on the laptop](#running-it) · [the tools for agents](#for-agents) · [the fit check in Revit](#the-fit-check-in-revit)
 
 ![RightFit at work: a material approval form and its PDFs come in, a violet line reads the data sheet and marks the product number, the duty point and the BMS module, the findings appear one by one with their page, a red B stamp lands, approved as noted, and a person signs](docs/images/hero.svg)
 
@@ -63,11 +63,11 @@ flowchart LR
 
 ![The review in three steps. 01 The problems: a declaration page gets its product line marked in red, and the finding D2 beside it says the declaration names SL1 and SLV, none of the items submitted. 02 The readings: P01's duty point, 15 m3/h at 50 m, is violet and dashed until a person ticks it, then black and solid, while the maximum pressure, 10 bar, stays violet. 03 The answer: a red B stamp, approved as noted, four comments, a button to copy the answer, and a person signs](docs/images/steps.svg)
 
-The reviewer works in three steps. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read: violet with a dashed line is what the AI read, black with a solid line is what a person confirmed. Last, the answer, ready to copy. The same three steps open online, on every package RightFit has read.
+The reviewer works in three steps, in RightFit online, on every package RightFit has read. First the problems, each one beside its page with the quoted line marked. Then confirming what the AI read, one line or a whole page at a time: violet with a dashed line is what the AI read, black with a solid line is what a person confirmed. Last, the answer, ready to copy or to download, with the confirmed values and what was marked not a problem. The review and delivery dates can change, and the checks run again with them.
 
 ![RightFit in six screens: the problems of a pump package beside their pages, why the draft answer is B, confirming what the AI read, the answer ready to copy, an air handling unit at its fourth revision, and what changed since the third](docs/images/tour.gif)
 
-The same application keeps a project's rules and shows what changed between revisions. The pump tools from the midterm, booster sizing and the standby test, are screens of it too.
+The same site keeps the project's rules, shows what changed since the previous revision of a form, and has the booster sizing from the midterm's pump tools. The standby test, the other pump tool, runs when a pump package is added on the laptop.
 
 | What changed since the last revision | The consultant's own rules | Booster sizing |
 |---|---|---|
@@ -101,7 +101,7 @@ RightFit online is where the team works, at https://rightfit.hackathon-team6-cub
 
 ![Who invites whom: the consultant opens the project and invites the designer, the site supervisor and the client, who review, and the contractor, who invites two subcontractors. Each subcontractor sees its own branch and never the other's. An invitation is a link for one email, valid 14 days. A locked project opens its packages, files, review and BOQ only with the team password as well, and Management sees people and projects, never the packages](docs/images/chain.svg)
 
-Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's review of the packages already read, the rules the checks used, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. A package RightFit has read opens in the laptop's three steps, problems, readings and answer, with every check and what passed, and a Rules tab shows the law's rules, the reviewers' checklist and the consultant's own. Since the evening of 21 Nov the reviewers also work there: they tick what the AI read, keep a finding in the answer or mark it as not a problem with the reason, and decide on the AI's suggestions, while the consultant switches the consultant's rules on or off and writes new ones. Each change runs the checks again, in a Python Worker on Cloudflare that holds the laptop's own review code and answers only the site.
+Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's review of the packages already read, the rules the checks used, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. A package RightFit has read opens in the three steps, problems, readings and answer, with every check and what passed, its pages beside them with the quoted lines marked, and what changed since the previous revision. A Rules tab shows the law's rules, the reviewers' checklist and the consultant's own, and a Booster sizing tab sizes a building's booster set from the catalogue. Since the evening of 21 Nov the reviewers work there and only there: they tick what the AI read, keep a finding in the answer or mark it as not a problem with the reason, and decide on the AI's suggestions, while the consultant switches the consultant's rules on or off and writes new ones. Each change runs the checks again, in a Python Worker on Cloudflare that holds the laptop's own review code and answers only the site.
 
 ![How a person gets in, in four steps along a line: 01 your account, with Google or an email and a password; 02 the terms, which open the first time and again when they change, with a box ticked, I agree; 03 your role, from an invitation link for your email or a project you open; 04 the team password, for a locked project and its own data, as a field fills with dots and a lock opens](docs/images/way_in.svg)
 
@@ -109,7 +109,7 @@ A person gets in in four steps: an account, with Google or with an email and a p
 
 The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
 
-It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 20 tests; [`web/README.md`](web/README.md) has the steps.
+It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 21 tests; [`web/README.md`](web/README.md) has the steps.
 
 ## How it works
 
@@ -145,6 +145,7 @@ Everything a reviewer does happens online. The site's Worker checks the account,
 | The project's data online, with the review of each read package and the rules | the same site, in a locked project | 21 Nov 2026 |
 | The checks engine online, and the review done online by the reviewers | the same site, [`web/engine/`](web/engine/) | 21 Nov 2026 |
 | Our two models on Hugging Face | a private repository | 21 Nov 2026 |
+| One app: the pages with their marks, the revision comparison, the dates, the downloads and the booster sizing online; the laptop adds new packages | the same site, [`app/review/`](app/review/) | 21 Nov 2026 |
 
 ## The fit check in Revit
 
@@ -194,7 +195,8 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
 - RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, and the reviewers do the review there: each change runs the checks again online, in a Python Worker; see above.
-- 164 tests for the Python part (`pytest`) and 20 for RightFit online (`npm test` in `web/`) pass.
+- RightFit is one app since the night of 21 Nov: everything a reviewer does is online, and the app on the laptop adds a new package and sends it there. Its review screens now point to the same package online.
+- 166 tests for the Python part (`pytest`) and 21 for RightFit online (`npm test` in `web/`) pass.
 - Since 21 Nov our two scored models are in a private repository on Hugging Face, with a card for the whole project.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
@@ -208,14 +210,15 @@ Tested with Python 3.14 on macOS.
 pip install -r requirements.txt
 brew install tesseract           # OCR for scanned pages when a pump package is added (macOS)
 pytest
-python app/review_server.py      # the application: http://127.0.0.1:8520
+python app/review_server.py      # the laptop app, where a new package is added and read: http://127.0.0.1:8520
+python3 web/scripts/import_project.py --project-id <the project online> --remote   # puts it online
 python app/mcp_server.py         # the checks as MCP tools; an agent starts it from .mcp.json
 python -m ingest.rule_watch      # has the act behind each legal rule changed since it was read?
 ```
 
-The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`. Each person starts it with their own name, `python app/review_server.py --reviewer "Jeff"`, which is kept next to every confirmation and decision (Luca when no name is given). The app answers only its own page, so another site open in the same browser can neither read the packages nor confirm or decide anything.
+Reviewing happens in RightFit online. The laptop app adds a new package to a project, reads it with the AI and the standby test, and `web/scripts/import_project.py` puts it online; an import never overwrites what was confirmed or decided online, and the app's review screens open the same package online. The app works on one project at a time, picked in the left rail. Each project is a folder in `data/projects/` (not in Git): its packages, their original files and its BOQs. To share projects, point the app at a shared folder, for example on Google Drive: `python app/review_server.py --projects "<the shared folder>"`. With no project, the app shows P01 and P02 from `data/maf/extracted/`, which is in Git; their original PDFs and forms stay on our laptops in `data/raw/`. Each person starts it with their own name, `python app/review_server.py --reviewer "Jeff"`, which is kept next to every confirmation and decision (Luca when no name is given). The app answers only its own page, so another site open in the same browser can neither read the packages nor confirm or decide anything.
 
-The AI parts (a rule typed in words, what a BOQ line asks) use the Claude command line (`claude`) installed and signed in on the laptop.
+The AI parts on the laptop (reading a package, a rule typed in words, what a BOQ line asks) use the Claude command line (`claude`) installed and signed in there. Online, a consultant's rule is written by hand for now.
 
 ## For agents
 
@@ -243,7 +246,7 @@ flowchart LR
 
 | Folder | What is in it |
 |---|---|
-| [`app/`](app/) | the application the reviewer opens in the browser, and the same checks as tools for AI agents |
+| [`app/`](app/) | the laptop app that adds and reads new packages, the review code RightFit online runs as well (`review_core.py`, `engine.py`, `booster.py`), and the checks as tools for AI agents |
 | [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, the project's review and rules, edited by the reviewers, Management and the legal documents |
 | [`checks/`](checks/) | every check, in plain Python with no AI |
 | [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
