@@ -8,5 +8,7 @@
   "workers_dev": false,
   "preview_urls": false,
   "build": { "command": "python3 build.py" },
+  // the booster sizing reads its catalogue and rules as files next to its code
+  "rules": [{ "type": "Data", "globs": ["**/*.csv", "**/*.json"], "fallthrough": true }],
   "observability": { "enabled": true }
 }

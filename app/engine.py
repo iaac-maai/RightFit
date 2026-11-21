@@ -10,16 +10,43 @@ A change is one of:
   {"op": "decisions", "decisions": {key: ...}}         findings kept in the answer, or marked not a problem
   {"op": "new_rule", "rule": {...}}                    a consultant's rule written by hand on the Rules page
   {"op": "rule_active", "rule_id": ..., "active": b}   a consultant's rule switched on or off
+The review and delivery dates come with the request ("review", "delivery", as 2026-03-16); without them the review
+is dated as the form, as on the laptop.
+
+A request with "tool" instead runs one of the engineering tools that need no package: "booster_sets", the
+catalogue's booster sets, and "booster" with "args" (flats, floors, submitted, mains_m), the booster set sizing.
 """
+from datetime import date
+
 from app.review_core import confirm, decide, decide_findings, new_consultant_rule, review
 
 PACKAGE_CHANGES = {"confirm", "decide", "decisions"}
 RULE_CHANGES = {"new_rule", "rule_active"}
 
 
+def day(text):
+    try:
+        return date.fromisoformat(text) if text else None
+    except ValueError:
+        raise ValueError(f"a date is written like 2026-03-16, not {text!r}") from None
+
+
+def tool(body):
+    """The booster set sizing, the same as the laptop's Booster sizing screen."""
+    from app.booster import booster_sets, booster_view   # only here, so a review never loads the pump catalogue
+    if body["tool"] == "booster_sets":
+        return {"sets": booster_sets()}
+    if body["tool"] == "booster":
+        a = body.get("args") or {}
+        return booster_view(int(a["flats"]), int(a["floors"]), a.get("submitted") or None, float(a.get("mains_m") or 0))
+    raise ValueError(f"unknown tool {body['tool']!r}")
+
+
 def handle(body):
     """Apply the change, if any, then review the package, if one was sent. Raises KeyError, ValueError or
     StopIteration on a request that does not fit, and the site shows the message."""
+    if "tool" in body:
+        return tool(body)
     data = body["tables"]
     who = " ".join(str(body.get("reviewer") or "").split())[:80] or "a reviewer"
     change = body.get("change") or {}
@@ -46,5 +73,6 @@ def handle(body):
     elif op == "decisions":
         decide_findings(decisions, change["decisions"], who)
     dismissed = {k: d["reason"] for k, d in decisions.items() if d["decision"] == "dismissed"}
-    view = review(pkg, body.get("location") or "RO", None, None, dismissed, body.get("boq"), data)
+    view = review(pkg, body.get("location") or "RO", day(body.get("review")), day(body.get("delivery")), dismissed,
+                  body.get("boq"), data)
     return {**out, "pkg": pkg, "decisions": decisions, "view": {**view, "decisions": decisions}}

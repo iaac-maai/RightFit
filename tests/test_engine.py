@@ -68,3 +68,16 @@ def test_a_rule_written_by_hand_is_checked_and_numbered_after_the_others():
     with pytest.raises(ValueError, match="must be a number"):
         handle(copy.deepcopy({"tables": TABLES, "change": {"op": "new_rule", "rule": {
             "kind": "value", "field": "max_pressure", "operator": ">=", "value": "sixteen", "effect": "B", "text": "PN 16"}}}))
+
+
+def test_the_dates_sent_with_the_request_date_the_review():
+    out = handle(copy.deepcopy({"pkg": P01, "tables": TABLES, "review": "2026-12-01", "delivery": "2027-02-01"}))["view"]
+    assert (out["review"], out["delivery"]) == ("2026-12-01", "2027-02-01")
+    with pytest.raises(ValueError, match="2026-03-16"):
+        handle(copy.deepcopy({"pkg": P01, "tables": TABLES, "review": "1 Dec"}))
+
+
+def test_the_booster_sizing_is_the_laptops():
+    from app.booster import booster_view
+    assert handle({"tool": "booster", "args": {"flats": 40, "floors": 10, "submitted": "GHV20/5SV16"}}) == booster_view(40, 10, "GHV20/5SV16")
+    assert len(handle({"tool": "booster_sets"})["sets"]) > 100
