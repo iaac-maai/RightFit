@@ -141,8 +141,8 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - 48 more packages from the same project are on our laptops, and since 21 Nov in RightFit online as well. The app lists them; none is read yet.
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
-- RightFit online has been live since 20 Nov, with Google sign-in, and since 21 Nov it holds the project's own data in a locked project; see below.
-- The 157 tests of the Python part pass (`pytest`).
+- RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, with RightFit's review of the read packages and the rules, to read; see below.
+- 157 tests for the Python part (`pytest`) and 19 for RightFit online (`npm test` in `web/`) pass.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
 The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it to MAF review, and the hood version stays in the Git history.
@@ -151,11 +151,11 @@ The project started as a kitchen hood selector. On 5 Nov 2026 the team moved it 
 
 Since 20 Nov 2026 there is also a shared space around the review app (`web/`, spec `spec/features/rightfit_online.md`), online at https://rightfit.hackathon-team6-cubicasa-app.workers.dev. The consultant opens a project and invites the other reviewers, the client and the contractor, and the contractor invites its subcontractors. Each person signs in with Google or with an email and sees what their role lets them see; a subcontractor never sees another subcontractor's part. The team that runs it has a Management page and an activity log, and Management never opens a project's packages, files or BOQ.
 
-Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's draft review of the packages already read, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. Each package shows the draft RightFit made on the laptop, with its problems and the page behind each one.
+Since 21 Nov the project's own data is online too: the 51 packages with their original files, RightFit's review of the packages already read, the rules the checks used, and the BOQ lines, never the prices. It sits in a locked project, which opens only for its members and only with the team password as well, and the files are in a private bucket in Western Europe. A package RightFit has read opens in the laptop's three steps, problems, readings and answer, with every check and what passed, and a Rules tab shows the law's rules, the reviewers' checklist and the consultant's own. Online they can be read but not changed: confirming a reading, deciding on a finding or changing a rule runs the checks again, and the checks run only on the laptop until the engine runs online (MAF-33).
 
 The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
 
-It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its tests; [`web/README.md`](web/README.md) has the steps.
+It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 19 tests; [`web/README.md`](web/README.md) has the steps.
 
 ## How the repository is organised
 
@@ -180,7 +180,7 @@ flowchart LR
 | Folder | What is in it |
 |---|---|
 | [`app/`](app/) | the application the reviewer opens in the browser, and the same checks as tools for AI agents |
-| [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, Management and the legal documents |
+| [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, the project's review and rules to read, Management and the legal documents |
 | [`checks/`](checks/) | every check, in plain Python with no AI |
 | [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
 | [`data/`](data/) | the rules tables, and what the AI read from P01 and P02 |
