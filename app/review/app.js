@@ -13,7 +13,7 @@ const ROUTES = { packages, p: review, add, booster, standby, rules };
 const TITLES = { packages: 'Packages', p: 'Review', add: 'Add a package', booster: 'Booster sizing', standby: 'Standby test', rules: 'Rules' };
 let current = null;
 let site = null;   // where the project in use is online: {site, project}, from the last import (web/scripts/import_project.py)
-const ONLINE = new Set(['packages', 'p', 'rules', 'booster']);   // done in RightFit online; /here opens the laptop's copy
+const ONLINE = new Set(['p', 'rules', 'booster']);   // done in RightFit online; /here opens the laptop's copy
 
 function route() {
   const [name, ...args] = window.location.hash.replace(/^#\/?/, '').split('/');
@@ -41,7 +41,7 @@ async function projects() {
   try { list = await api('/api/projects'); } catch { pick.innerHTML = '<option>Server not answering</option>'; return; }
   site = list.online || null;
   $('#online-link').href = site?.project ? `${site.site}/p/${site.project}` : $('#online-link').href;
-  if (ONLINE.has(window.location.hash.replace(/^#\/?/, '').split('/')[0] || 'packages')) route();   // now with the project's address
+  if (ONLINE.has(window.location.hash.replace(/^#\/?/, '').split('/')[0])) route();   // now with the project's address
   const options = list.projects.length ? list.projects.map((p) => `<option value="${esc(p.id)}" ${p.id === list.current ? 'selected' : ''}>${esc(p.name)}</option>`).join('')
     : `<option value="" selected>${esc(list.name)}</option>`;
   pick.innerHTML = `${options}<option value="+new">+ New project…</option>`;

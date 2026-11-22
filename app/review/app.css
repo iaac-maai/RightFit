@@ -408,3 +408,9 @@ td a { font-weight: 600; }
 #new-project label { display: grid; gap: 4px; margin-top: 10px; font-size: 13px; color: var(--label); }
 #new-project input, #new-project select { padding: 9px 10px; border: 1px solid var(--rule); border-radius: 4px; font-size: 15px; color: var(--ink); }
 #new-project .btns { margin-top: 16px; }
+
+/* putting the project online, on the Packages screen */
+#online { margin-top: 26px; }
+.online-form { display: flex; flex-wrap: wrap; gap: 8px; }
+.online-form input { flex: 1; min-width: 260px; padding: 8px 10px; border: 1.5px solid var(--rule); border-radius: 4px; }
+.online-log { margin-top: 10px; padding: 10px 12px; background: var(--band); font: 12px/1.45 var(--type, monospace); white-space: pre-wrap; overflow-wrap: anywhere; }

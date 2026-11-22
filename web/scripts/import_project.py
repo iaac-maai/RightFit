@@ -137,7 +137,15 @@ def main():
             f"INSERT INTO event (at, actor, project_id, action, detail) VALUES ({sql(now)}, {sql(owner)}, {sql(pid)}, 'project.opened', "
             f"{sql(json.dumps({'dpa': DPA_VERSION, 'imported': True}))});",
         ]
-    statements += [f"DELETE FROM {t} WHERE project_id = {sql(pid)};" for t in ("package_file", "package", "boq_line")]
+    # A package added on the site (worker/upload.ts) stays as it is: an import replaces only what came from the laptop
+    added_online = {r["code"] for r in query(f"SELECT code FROM package WHERE project_id = {sql(pid)} AND uploaded_by IS NOT NULL",
+                                             where)} if args.project_id else set()
+    statements += [
+        f"DELETE FROM package_file WHERE project_id = {sql(pid)} AND code NOT IN "
+        f"(SELECT code FROM package WHERE project_id = {sql(pid)} AND uploaded_by IS NOT NULL);",
+        f"DELETE FROM package WHERE project_id = {sql(pid)} AND uploaded_by IS NULL;",
+        f"DELETE FROM boq_line WHERE project_id = {sql(pid)};",
+    ]
     statements.append(f"UPDATE project SET locked = 1 WHERE id = {sql(pid)};")
 
     # The rule tables the checks use (data/maf), with the consultant's own rules. Once the rules can change online, the
@@ -157,6 +165,9 @@ def main():
     # state is already online keeps it, unless --replace-online-work. BOQ lines are only those already read
     # (read=False): the import never asks the AI anything.
     packages = package_list(Path(project["packages"]), Path(project["originals"]), Path(project["boq"]), country)
+    if added_online & {p["id"] for p in packages}:
+        print(f"  left out, as packages added on the site have the same code: {', '.join(sorted(added_online & {p['id'] for p in packages}))}")
+        packages = [p for p in packages if p["id"] not in added_online]
     states, reviews, kept = {}, {}, []
     for p in packages:
         if p.get("letter"):
@@ -245,6 +256,13 @@ def main():
     try:
         if args.no_files:
             uploads = []   # the packages' files are already in the bucket
+        # The files and page images already sent online, by name and size, are not sent again (a record kept in the
+        # project folder, which Git never sees)
+        record_file = Path(project["folder"]) / "online_files.json" if where == "remote" and project.get("id") else None
+        sent = json.loads(record_file.read_text()) if record_file and record_file.exists() else {}
+        uploads = [(k, f) for k, f in uploads if sent.get(k) != f.stat().st_size]
+        images = [(k, pdf, page) for k, pdf, page in images if k not in sent]
+        once = {k: f.stat().st_size for k, f in uploads} | {k: 0 for k, _, _ in images}
         for key, value in [("tables.json", tables), *((f"reviews/{c}.json", v) for c, v in reviews.items()),
                            *((f"state/{c}.json", v) for c, v in states.items()), *((f"extra/{c}.json", v) for c, v in extras.items())]:
             path = work / key.replace("/", "-")
@@ -271,6 +289,8 @@ def main():
         rows = work / "import.sql"
         rows.write_text("\n".join(statements) + "\n")
         wrangler(["d1", "execute", "rightfit-db", "--file", str(rows), "--yes"], where)
+        if record_file:
+            record_file.write_text(json.dumps({**sent, **once}, indent=1))
     finally:
         for f in work.iterdir():
             f.unlink()

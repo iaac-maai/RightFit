@@ -1,12 +1,43 @@
 // Every package: the ones RightFit has read open for review, the others wait until the reader has been through them.
 import { $, api, esc, plural, toast } from '../lib.js';
 
+// Putting the project in use online: the packages, their files, the reviews already read and the BOQ lines (never the
+// prices) go to RightFit online, where the review is done. The server runs web/scripts/import_project.py.
+let watching = null;
+async function drawOnline() {
+  const box = $('#online');
+  if (!box?.isConnected) return;
+  const [list, run] = await Promise.all([api('/api/projects'), api('/api/online/status')]);
+  const site = list.online;
+  const link = site?.project ? `${site.site}/p/${site.project}` : null;
+  const log = run.lines.length ? `<pre class="online-log">${esc(run.lines.join('\n'))}</pre>` : '';
+  box.innerHTML = `<h2 class="section-h">RightFit online</h2>
+    ${!list.current ? '<p class="note">Make a project first, top left: the examples P01 and P02 stay on this laptop.</p>'
+    : run.running ? '<p class="note">Putting the project online… The files that are already there are not sent again.</p>'
+    : link ? `<p class="note">This project is online. After you add a package or a BOQ here, send the changes; what was ticked or decided online stays as it is.</p>
+        <p><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">Open it online</a> <button class="btn p" type="button" id="send">Send the changes online</button></p>`
+    : `<p class="note">Not online yet. Give the email you sign in with on RightFit online (the project opens under your account), or paste the link of a project you already made there.</p>
+        <p class="online-form"><input type="text" id="send-to" placeholder="you@example.com, or https://…/p/…" aria-label="Your email online, or the link of a project there" autocomplete="off">
+        <button class="btn p" type="button" id="send">Put it online</button></p>`}
+    ${run.done && !run.running ? `<p class="${run.ok ? 'note' : 'error'}" role="status">${run.ok ? 'Done: the project is online.' : 'It stopped; the last lines say why.'}</p>` : ''}${log}`;
+  $('#send')?.addEventListener('click', async () => {
+    try {
+      await api('/api/online/send', { target: $('#send-to')?.value || '' });
+      drawOnline();
+    } catch (e) { toast(e.message); }
+  });
+  clearTimeout(watching);
+  if (run.running) watching = setTimeout(drawOnline, 2000);   // the import prints as it goes
+}
+
+
 let all = [];
 const filter = { discipline: '', text: '' };
 
 const matches = (p) => (!filter.discipline || p.discipline === filter.discipline)
   && (!filter.text || `${p.id} ${p.form_no} ${p.items.join(' ')}`.toLowerCase().includes(filter.text));
 
+// A package RightFit has read opens online, where it is reviewed (app.js sends #/p/... there)
 function readRow(p) {
   return `<tr class="go" data-href="#/p/${esc(p.id)}"><td><a href="#/p/${esc(p.id)}">MAF ${esc(p.form_no)}</a></td><td class="typed">rev ${esc(p.revision)}</td>
     <td>${esc(p.items.join(', '))}</td><td>${esc(p.discipline)}</td><td class="num">${p.files}</td><td class="num">${p.pages}</td>
@@ -51,7 +82,7 @@ async function drawBoq(files) {
 export async function render(root) {
   root.innerHTML = `<div class="screen"><div class="screen-head"><h1>Packages</h1><a class="btn p" href="#/add">Add a package</a></div>
     <div class="tools"><input type="search" id="find" placeholder="Find a form or a product" aria-label="Find a form or a product" value="${esc(filter.text)}"><select id="discipline" aria-label="Discipline"></select></div>
-    <div id="tables"><p class="empty">Loading…</p></div><section id="boq"></section></div>`;
+    <div id="tables"><p class="empty">Loading…</p></div><section id="boq"></section><section id="online"></section></div>`;
   const el = root.firstElementChild;
   el.addEventListener('click', (ev) => {
     const tr = ev.target.closest('tr.go');
@@ -76,4 +107,5 @@ export async function render(root) {
   $('#discipline').innerHTML = `<option value="">All disciplines</option>${kinds.map((k) => `<option ${k === filter.discipline ? 'selected' : ''}>${esc(k)}</option>`).join('')}`;
   drawTables();
   api('/api/boq').then(drawBoq).catch(() => {});
+  drawOnline().catch(() => {});
 }

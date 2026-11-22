@@ -12,6 +12,7 @@ import csv
 import json
 import os
 import re
+import subprocess
 import sys
 import threading
 import traceback
@@ -295,6 +296,50 @@ def revisions(name, originals):
     return {"previous": before.name, "revision": form_of(before)[1], "attachments": compare(before, folder)}
 
 
+# Putting the project in use online, from the Packages screen: web/scripts/import_project.py, the same script as from a
+# terminal. One run at a time; what it prints goes to a log in the project folder, which the screen reads while it runs.
+SEND = {"proc": None, "log": None}
+IMPORT = ROOT / "web/scripts/import_project.py"
+EMAIL = re.compile(r"[^@\s]+@[^@\s]+\.[A-Za-z]{2,}")
+
+
+def send_online(project, target=None):
+    """Start the import of the project in use into RightFit online. target is the email the consultant signs in with
+    online (to open the project there) or the link of a project online; with neither, the project's own link is used.
+    Raises ValueError with what to do instead."""
+    if SEND["proc"] is not None and SEND["proc"].poll() is None:
+        raise ValueError("The project is already going online; wait until it finishes.")
+    if not project.get("id"):
+        raise ValueError("Make a project first, top left: the examples P01 and P02 stay on this laptop.")
+    # shortcut: the script reads the projects in data/projects; with --projects (a shared folder) the button says so
+    if Path(project["folder"]).resolve().parent != (ROOT / "data/projects").resolve():
+        raise ValueError("This project is in another folder (--projects): put it online from a terminal.")
+    target = " ".join(str(target or "").split())
+    linked = re.search(r"/p/([0-9a-f-]{36})", target)
+    if linked:
+        args = ["--project-id", linked.group(1)]
+    elif EMAIL.fullmatch(target):
+        args = ["--owner", target]
+    elif (project.get("online") or {}).get("project"):
+        args = ["--project-id", project["online"]["project"]]
+    else:
+        raise ValueError("Give the email you sign in with on RightFit online, or the link of a project there.")
+    log = Path(project["folder"]) / "online_send.log"   # in the project folder, which Git never sees
+    with open(log, "w") as out:
+        SEND.update(log=log, proc=subprocess.Popen([sys.executable, str(IMPORT), *args, "--remote"], cwd=ROOT,
+                                                   stdout=out, stderr=subprocess.STDOUT, text=True))
+    return send_status()
+
+
+def send_status():
+    """Whether the project is going online, and the last lines the import printed."""
+    proc, log = SEND["proc"], SEND["log"]
+    running = proc is not None and proc.poll() is None
+    lines = [x for x in log.read_text().splitlines() if x.strip()][-6:] if log and log.exists() else []
+    return {"running": running, "done": proc is not None and not running, "ok": proc is not None and proc.poll() == 0,
+            "lines": lines}
+
+
 def save_package(entries, originals, packages):
     """The files of an upload, kept in a new package folder of the project (P01, P02 ...). Returns its name."""
     taken = [int(p.stem[1:]) for p in packages.glob("P*.json") if p.stem[1:].isdigit()]
@@ -416,6 +461,8 @@ class Handler(SimpleHTTPRequestHandler):
         url = urlparse(self.path)
         if url.path == "/api/consultant-rules":
             return self.send_json(consultant_screen())
+        if url.path == "/api/online/status":
+            return self.send_json(send_status())
         if url.path == "/api/boq":
             return self.send_json([{"file": f.name, "lines": len(read_boq(f))} for f in boq_files(self.project()["boq"])])
         if url.path == "/api/projects":
@@ -455,6 +502,11 @@ class Handler(SimpleHTTPRequestHandler):
                     return self.send_json({"error": "This file could not be read as a BOQ."}, 400)
                 return self.send_json({"file": name, "lines": len(lines)})
             body = json.loads(raw or b"{}")
+            if self.path == "/api/online/send":   # put the project in use online, from the Packages screen
+                try:
+                    return self.send_json(send_online(self.project(), body.get("target")))
+                except ValueError as e:
+                    return self.send_json({"error": str(e)}, 400)
             if self.path == "/api/extract":   # read one page of an upload: its text, or OCR on a scan
                 text, how = pump_demo.read_page(body["token"], int(body["page"]))
                 return self.send_json({"chars": len(text), "read": how})
