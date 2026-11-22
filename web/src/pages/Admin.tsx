@@ -35,6 +35,7 @@ const ACTION: Record<string, (d: Record<string, unknown>) => string> = {
   "review.decided": (d) => `decided on findings in ${String(d.code ?? "a package")}`,
   "review.ai_decided": (d) => `decided on an AI suggestion in ${String(d.code ?? "a package")}: ${String(d.status ?? "")}`,
   "review.dated": (d) => `changed the review dates of ${String(d.code ?? "a package")}`,
+  "package.added": (d) => `added the package ${String(d.code ?? "")} on the site`,
   "rules.added": () => "added a consultant's rule",
   "rules.switched": (d) => `switched the consultant's rule ${String(d.rule ?? "")} ${d.active ? "on" : "off"}`,
 };

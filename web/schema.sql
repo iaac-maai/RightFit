@@ -89,6 +89,8 @@ create table if not exists package (
   readings integer,
   reviewed_at text,                  -- when that draft was made, on the laptop
   imported_at text not null,
+  uploaded_by text references "user" (id) on delete set null, -- added on the site, not imported from the laptop
+  uploaded_at text,
   primary key (project_id, code)
 );
 create table if not exists package_file (

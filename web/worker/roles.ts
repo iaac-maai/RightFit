@@ -13,6 +13,9 @@ export const REVIEWERS: readonly Role[] = ["consultant", "designer", "site_super
 // changes the consultant's own rules. The contractor and the subcontractors submit the forms, so they read the review.
 export const mayChangeReview = (role: Role) => REVIEWERS.includes(role);
 export const mayChangeRules = (role: Role) => role === "consultant";
+// Who adds a package on the site: the reviewers and the contractor, who see the project's forms (MAF-32 brings the
+// subcontractors in, each with its branch)
+export const mayAddPackage = (role: Role) => REVIEWERS.includes(role) || role === "contractor";
 
 export const ROLE_LABEL: Record<Role, string> = {
   consultant: "Consultant",

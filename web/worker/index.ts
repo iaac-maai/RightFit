@@ -5,6 +5,7 @@
 import { adminRoute } from "./admin";
 import { access, dataRoute } from "./project_data";
 import { editRoute } from "./review_edit";
+import { uploadRoute } from "./upload";
 import { googleOn, makeAuth } from "./auth";
 import {
   deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
@@ -87,6 +88,8 @@ async function route(request: Request, env: Env): Promise<Response> {
 
   const edit = await editRoute(request, env, user, path, method);
   if (edit) return edit;
+  const upload = await uploadRoute(request, env, user, path, method);
+  if (upload) return upload;
   const data = await dataRoute(request, env, user, path, method);
   if (data) return data;
   return json({ error: "No such endpoint." }, 404);

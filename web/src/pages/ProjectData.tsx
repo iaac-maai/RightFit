@@ -1,7 +1,8 @@
 // A project's own data: its MAF packages and the BOQ lines (a package's review is in Review.tsx, the rules in Rules.tsx).
 // Imported from the laptop (web/scripts/import_project.py); a locked project opens with the team password.
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { api, go, post } from "../api";
+import { api, go, navigate, post } from "../api";
+import { AddPackage } from "./AddPackage";
 import { plural } from "../format";
 import type { BoqLine, PackageRow } from "../types";
 
@@ -55,7 +56,8 @@ export function TeamLock({ name, onUnlocked }: { name: string; onUnlocked: () =>
 }
 
 export function Packages({ projectId }: { projectId: string }) {
-  const { data, error } = useData<{ packages: PackageRow[]; note?: string }>(`/api/projects/${projectId}/packages`);
+  const { data, error } = useData<{ packages: PackageRow[]; note?: string; mayAdd?: boolean }>(`/api/projects/${projectId}/packages`);
+  const [adding, setAdding] = useState(false);
   const [discipline, setDiscipline] = useState("");
   const [find, setFind] = useState("");
   const all = data?.packages ?? [];
@@ -71,7 +73,13 @@ export function Packages({ projectId }: { projectId: string }) {
       <div className="sheet-head">
         <span className="lab">The project's packages</span>
         <span className="count">{plural(all.length, "package", "packages")}, {read.length} read by RightFit</span>
+        {data.mayAdd && <button type="button" className="btn p small" onClick={() => setAdding(true)}>Add a package</button>}
       </div>
+      {all.some((p) => !p.letter) && (
+        <p className="sheet-note band">A package waits to be read until RightFit's reader has been through it: the AI reads every value with its page, then the checks run and the review appears here. For now the reader runs on the team's laptop.</p>
+      )}
+      <AddPackage projectId={projectId} open={adding} onClose={() => setAdding(false)}
+        onDone={(code) => { setAdding(false); navigate(`/p/${projectId}/packages/${code}`); }} />
       <div className="filters">
         <select aria-label="Discipline" value={discipline} onChange={(e) => setDiscipline(e.target.value)}>
           <option value="">All disciplines</option>

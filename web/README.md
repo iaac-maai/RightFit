@@ -15,6 +15,7 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `schema.sql` | the D1 tables: accounts, consent, projects (with the data processing agreement accepted), members, invitations, the activity log |
 | `legal/` | the Terms of Service, Privacy Policy, Data Processing Agreement, Cookie Policy and Legal Notice the app shows; `docs/legal/` has the operator's own records |
 | `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, the rules, BOQ lines) and the team password that opens a locked project |
+| `worker/upload.ts` | a package added on the site: its files into the private bucket, one at a time; the package waits to be read |
 | `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the review dates, the consultant's rules; each change goes to the engine; and the booster sizing |
 | `engine/` | the checks engine: a Python Worker with no address of its own that runs the laptop's review code (`app/engine.py`); `build.py` copies that code in before Wrangler bundles it |
 | `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices; an import again keeps what was confirmed or decided online, unless `--replace-online-work`; with the files or `--pages` it also draws every page of the read packages for the marks |

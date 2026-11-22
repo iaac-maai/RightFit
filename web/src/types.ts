@@ -66,7 +66,7 @@ export interface AdminProjectData {
 export interface PackageRow {
   code: string; formNo: string; revision: number; discipline: string; items: string[]; files: number; pages: number | null;
   letter: "A" | "B" | "C" | null; label: string | null; problems: number | null; questions: number | null;
-  toConfirm: number | null; readings: number | null; reviewedAt: string | null;
+  toConfirm: number | null; readings: number | null; reviewedAt: string | null; uploadedAt?: string | null;
 }
 export interface PackageFile { name: string; size: number; pages: number | null }
 // RightFit's review of one package, as the laptop's review page builds it (app/review_server.py, review())
@@ -107,7 +107,9 @@ export interface PackageExtra {
   revisions: { previous: string | null; revision?: number; attachments?: Revision[] };
   marks: Record<string, Record<string, Record<string, [number, number, number, number][]>>>;
 }
-export interface PackageData { package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean; extra?: PackageExtra | null }
+export interface PackageData {
+  package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean; extra?: PackageExtra | null; mayAdd?: boolean;
+}
 
 // The rules the checks used for the project's country (worker/project_data.ts, rules)
 export interface LawRule {

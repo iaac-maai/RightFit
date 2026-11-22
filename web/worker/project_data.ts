@@ -2,7 +2,7 @@
 // RightFit's draft review of the packages already read, and the BOQ lines, imported from the laptop by
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
 import { json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
-import { REVIEWERS, mayChangeReview, mayChangeRules } from "./roles";
+import { REVIEWERS, mayAddPackage, mayChangeReview, mayChangeRules } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
 
 const TYPES: Record<string, string> = {
@@ -87,17 +87,17 @@ async function packages(env: Env, projectId: string, me: MemberRow) {
   if (!seesForms(me)) return json({ packages: [], note: "Forms reach subcontractors once each has its branch." });
   const { results } = await env.DB.prepare(
     `SELECT code, form_no AS formNo, revision, discipline, items, files, pages, letter, label, problems, questions,
-            to_confirm AS toConfirm, readings, reviewed_at AS reviewedAt
+            to_confirm AS toConfirm, readings, reviewed_at AS reviewedAt, uploaded_at AS uploadedAt
        FROM package WHERE project_id = ? ORDER BY code`,
   ).bind(projectId).all<{ items: string }>();
-  return json({ packages: results.map((p) => ({ ...p, items: JSON.parse(p.items || "[]") as string[] })) });
+  return json({ packages: results.map((p) => ({ ...p, items: JSON.parse(p.items || "[]") as string[] })), mayAdd: mayAddPackage(me.role) });
 }
 
 async function onePackage(env: Env, projectId: string, code: string, me: MemberRow) {
   if (!seesForms(me)) return json({ error: "No such package." }, 404);
   const row = await env.DB.prepare(
     `SELECT code, form_no AS formNo, revision, discipline, items, files, pages, letter, label, problems, questions,
-            to_confirm AS toConfirm, readings, reviewed_at AS reviewedAt
+            to_confirm AS toConfirm, readings, reviewed_at AS reviewedAt, uploaded_at AS uploadedAt
        FROM package WHERE project_id = ? AND code = ?`,
   ).bind(projectId, code).first<{ items: string }>();
   if (!row) return json({ error: "No such package." }, 404);
@@ -110,7 +110,8 @@ async function onePackage(env: Env, projectId: string, code: string, me: MemberR
   const extra = more ? await more.json() : null;
   // the reviewers change a review once its readings are online (they come with an import from the laptop)
   const mayEdit = mayChangeReview(me.role) && Boolean(state);
-  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit, extra });
+  const mayAdd = mayAddPackage(me.role) && Boolean((row as { uploadedAt?: string | null }).uploadedAt) && !review;
+  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit, extra, mayAdd });
 }
 
 // One original file, from the private bucket, shown in the browser

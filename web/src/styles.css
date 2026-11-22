@@ -517,3 +517,7 @@ main { min-width: 0; }
 .m { position: absolute; display: block; background: rgba(74, 50, 184, .17); border-bottom: 2px dashed var(--carbon); }
 .m.ok { background: rgba(21, 25, 26, .06); border-bottom: 2px solid var(--ink); }
 .scan { margin: 8px 12px 0; padding: 8px 10px; font-size: 13px; color: #6B4E00; background: #FFF6DA; border: 1px solid #F1DEA0; }
+
+/* adding a package on the site */
+.btn.small { padding: 7px 11px; font-size: 13px; }
+.sheet-head .btn.small { margin-left: 8px; }

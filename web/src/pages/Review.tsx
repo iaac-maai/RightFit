@@ -10,6 +10,7 @@ import {
   type Quote, type Row,
 } from "../review";
 import type { AiFinding, CheckResult, Match, PackageData, PackageExtra, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
+import { AddPackage } from "./AddPackage";
 import { fileUrl, useData } from "./ProjectData";
 
 export type Step = "problems" | "readings" | "answer";
@@ -68,6 +69,7 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
   const [edited, setEdited] = useState<PackageReview | null>(null); // the review the last change brought back
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
+  const [adding, setAdding] = useState(false);
   if (error) return <p className="err" role="alert">{error}</p>;
   if (!data) return <span className="spinner" aria-label="Loading" />;
   const { package: p, files, mayEdit } = data;
@@ -78,7 +80,10 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
       <>
         {back}
         <p className="band-note">{v ? "This draft is being updated from the laptop: open it again in a minute."
-          : "RightFit has not read this package yet: its files are here, the draft comes once it is read."}</p>
+          : "RightFit has not read this package yet: its files are here, the review comes once RightFit's reader has read it."}</p>
+        {data.mayAdd && <p><button type="button" className="btn" onClick={() => setAdding(true)}>Add more files</button></p>}
+        <AddPackage projectId={projectId} code={code} open={adding} onClose={() => setAdding(false)}
+          onDone={() => { setAdding(false); window.location.reload(); }} />
         <Files projectId={projectId} code={code} files={files} docs={[]} />
       </>
     );

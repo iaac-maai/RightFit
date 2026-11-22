@@ -109,7 +109,7 @@ A person gets in in four steps: an account, with Google or with an email and a p
 
 The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
 
-It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 21 tests; [`web/README.md`](web/README.md) has the steps.
+It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 22 tests; [`web/README.md`](web/README.md) has the steps.
 
 ## How it works
 
@@ -128,7 +128,7 @@ flowchart LR
     class U person
 ```
 
-Everything a reviewer does happens online. The site's Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. When a reviewer ticks a reading, keeps or dismisses a finding or decides on an AI suggestion, or the consultant changes a rule, the Worker sends the change to the checks engine (`web/engine/`), a Python Worker that only the site can call. The engine runs the same checks as the laptop app (`app/review_core.py`), sends back the new review and keeps nothing; the Worker stores it. One step still starts on the laptop: a new package is read there, and `web/scripts/import_project.py` puts its files, readings and review online, while a later import keeps what was done online. Agents reach the same checks through the MCP server (`app/mcp_server.py`), which only reads, and our two models are kept in the private repository on Hugging Face.
+Everything a reviewer does happens online. The site's Worker checks the account, the role and, for a locked project, the team password before it reads D1 or R2. When a reviewer ticks a reading, keeps or dismisses a finding or decides on an AI suggestion, or the consultant changes a rule, the Worker sends the change to the checks engine (`web/engine/`), a Python Worker that only the site can call. The engine runs the same checks as the laptop app (`app/review_core.py`), sends back the new review and keeps nothing; the Worker stores it. A package can be added on the site too, its files going into the project's private storage, and waits there to be read. Reading it is the one step still done on the laptop: there a package is read, and the Packages and BOQs screen puts the project online with one button (`web/scripts/import_project.py`), sending only what is new and keeping what was done online. Agents reach the same checks through the MCP server (`app/mcp_server.py`), which only reads, and our two models are kept in the private repository on Hugging Face.
 
 ## Parts, and when they came
 
@@ -196,7 +196,7 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
 - RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, and the reviewers do the review there: each change runs the checks again online, in a Python Worker; see above.
 - RightFit is one app since the night of 21 Nov: everything a reviewer does is online, and the app on the laptop adds a new package and sends it there. Its review screens now point to the same package online.
-- 166 tests for the Python part (`pytest`) and 21 for RightFit online (`npm test` in `web/`) pass.
+- 166 tests for the Python part (`pytest`) and 22 for RightFit online (`npm test` in `web/`) pass.
 - Since 21 Nov our two scored models are in a private repository on Hugging Face, with a card for the whole project.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 

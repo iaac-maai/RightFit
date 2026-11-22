@@ -98,7 +98,7 @@ export function Project({ id, view, code, step, onLoaded }: {
       </header>
       {error && <p className="err" role="alert">{error}</p>}
 
-      {(project.packages > 0 || project.boqLines > 0) && (
+      {(
         <nav className="tabs" aria-label="The project">
           {([["team", "Team", `/p/${id}`], ["packages", `Packages (${project.packages})`, `/p/${id}/packages`],
              ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`], ["rules", "Rules", `/p/${id}/rules`],
