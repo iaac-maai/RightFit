@@ -10,8 +10,9 @@ import { PackageView, type Step } from "./Review";
 import { Rules } from "./Rules";
 import { Booster } from "./Booster";
 import { Products } from "./Products";
+import { FitCheck } from "./FitCheck";
 
-export type ProjectView = "team" | "packages" | "package" | "boq" | "rules" | "booster" | "products";
+export type ProjectView = "team" | "packages" | "package" | "boq" | "rules" | "booster" | "products" | "fitcheck";
 
 // The order of people under one inviter: reviewers first, then down the chain
 const TIER: Record<Role, number> = { consultant: 0, designer: 1, site_supervisor: 1, client: 1, contractor: 2, subcontractor: 3 };
@@ -103,8 +104,9 @@ export function Project({ id, view, code, step, onLoaded }: {
         <nav className="tabs" aria-label="The project">
           {([["team", "Team", `/p/${id}`], ["packages", `Packages (${project.packages})`, `/p/${id}/packages`],
              ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`], ["rules", "Rules", `/p/${id}/rules`],
-             ["booster", "Booster sizing", `/p/${id}/booster`], ["products", "Product lines", `/p/${id}/products`]] as const)
-            .filter(([key]) => key !== "products" || mayUseProducts(me.role)).map(([key, label, path]) => (
+             ["booster", "Booster sizing", `/p/${id}/booster`], ["fitcheck", "Fit check", `/p/${id}/fitcheck`],
+             ["products", "Product lines", `/p/${id}/products`]] as const)
+            .filter(([key]) => (key !== "products" || mayUseProducts(me.role)) && (key !== "fitcheck" || seesAll)).map(([key, label, path]) => (
             <a key={key} href={path} onClick={go(path)} aria-current={view === key || (key === "packages" && view === "package") ? "page" : undefined}>{label}</a>
           ))}
           {Boolean(project.locked) && <span className="lock-note">Locked: opened with the team password</span>}
@@ -117,6 +119,7 @@ export function Project({ id, view, code, step, onLoaded }: {
       {view === "rules" && <Rules projectId={id} />}
       {view === "booster" && <Booster projectId={id} />}
       {view === "products" && <Products projectId={id} />}
+      {view === "fitcheck" && <FitCheck projectId={id} />}
 
       {view === "team" && <div className="project-grid">
         <section className="sheet team" aria-label="The team">

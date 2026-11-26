@@ -6,6 +6,7 @@ import { Home } from "./pages/Home";
 import { Join } from "./pages/Join";
 import { LEGAL_PATHS, Legal, type LegalDoc } from "./pages/Legal";
 import { Project, type ProjectView } from "./pages/Project";
+import { RevitLink } from "./pages/RevitLink";
 import type { Step } from "./pages/Review";
 import { SignIn, TermsGate } from "./pages/SignIn";
 import { DeleteAccount } from "./ui";
@@ -16,17 +17,19 @@ type Route =
   | { page: "home" }
   | { page: "project"; id: string; view: ProjectView; code?: string; step?: Step }
   | { page: "join"; token: string }
+  | { page: "revit"; code: string }
   | { page: "admin"; tab: AdminTab }
   | { page: "admin-project"; id: string }
   | { page: "legal"; doc: LegalDoc };
 
 function parse(path: string): Route {
   const clean = path.replace(/\/+$/, "") || "/";
-  const project = clean.match(/^\/p\/([\w-]+)(?:\/(packages|boq|rules|booster|products))?(?:\/(P\d+)(?:\/(problems|readings|answer))?)?$/);
+  const project = clean.match(/^\/p\/([\w-]+)(?:\/(packages|boq|rules|booster|products|fitcheck))?(?:\/(P\d+)(?:\/(problems|readings|answer))?)?$/);
   if (project) {
     const [, id, part, code, step] = project;
-    return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | "rules" | "booster" | "products" | undefined) ?? "team"), code, step: step as Step | undefined };
+    return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | "rules" | "booster" | "products" | "fitcheck" | undefined) ?? "team"), code, step: step as Step | undefined };
   }
+  if (clean === "/revit") return { page: "revit", code: new URLSearchParams(window.location.search).get("code") ?? "" };
   const join = clean.match(/^\/join\/([\w-]+)$/);
   if (join) return { page: "join", token: join[1] };
   const adminProject = clean.match(/^\/admin\/p\/([\w-]+)$/);
@@ -79,6 +82,7 @@ export function App() {
         {route.page === "home" && <Home session={session} />}
         {route.page === "project" && <Project id={route.id} view={route.view} code={route.code} step={route.step} onLoaded={setProjectName} />}
         {route.page === "join" && <Join token={route.token} session={session} />}
+        {route.page === "revit" && <RevitLink code={route.code} />}
         {adminPage && !session.admin && (
           <div className="screen"><p className="err" role="alert">This page is for the people who run RightFit.</p></div>
         )}

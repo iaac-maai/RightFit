@@ -6,6 +6,7 @@ __title__ = "Swap"
 from pyrevit import forms, revit, script
 
 import rf_app
+import rf_online_pull
 import rf_setup
 
 doc, uidoc = revit.doc, revit.uidoc
@@ -40,3 +41,4 @@ if res is None:
     forms.alert(msg, exitscript=True)
 out = script.get_output()
 rf_app.report(out, g, res, u"Swapped to {} {}".format(s["maker"], s["model"]), u"RightFit " + msg + u".")
+rf_online_pull.send(out, doc, g, res, "swap")

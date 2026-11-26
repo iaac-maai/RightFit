@@ -142,6 +142,8 @@ async function deleteProject(request: Request, env: Env, admin: User, projectId:
   await env.DB.batch([
     env.DB.prepare("DELETE FROM invitation WHERE project_id = ?").bind(projectId),
     env.DB.prepare("DELETE FROM member WHERE project_id = ?").bind(projectId),
+    env.DB.prepare("DELETE FROM fit_run WHERE project_id = ?").bind(projectId),
+    env.DB.prepare("DELETE FROM fit_choice WHERE project_id = ?").bind(projectId),
     env.DB.prepare("DELETE FROM project WHERE id = ?").bind(projectId),
     logged(env, admin.id, "admin.project_deleted", null, { project: projectId, name: info.name }),
   ]);
