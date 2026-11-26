@@ -16,6 +16,7 @@ from System.Collections.Generic import List
 import rf_draw
 import rf_model
 import rf_project
+import rf_report
 import rf_setup
 from rf_model import eid
 from space_checks import fit, load_rules, swap as swap_checks, table
@@ -360,15 +361,12 @@ def report(out, g, res, title, note=None):
     s = res["set"]
     out.print_md(u"## {}".format(title))
     room = g["room"]
-    out.print_md(u"Room **{}** ({}) · height {:.0f} mm · {} door(s) · {} things in the room · {} pipe end(s) at "
-                 u"the pump · service space **{}**".format(room["name"], room["kind"], room["height"],
-                                                           len(room["doors"]), len(room["obstacles"]),
-                                                           len(room["pipes"]), g["service_name"]))
-    out.print_md(u"{:.0f} x {:.0f} x {:.0f} mm · {} kg · {} pumps · data from: {} ({})".format(
-        s["L"], s["W"], s["H"], s.get("kg", u"?"), s.get("pumps", u"?"), s.get("source", u"the model"),
-        s.get("status", "extracted")))
-    if s.get("shape"):
-        out.print_md(u"Shape in the model: *{}*".format(s["shape"]))
+    cat = [c for c in g["sets"] if s.get("id") is not None and c.get("id") == s.get("id")]
+    out.print_html(rf_report.summary_html(room, s))
+    out.print_md(u"## The room")
+    out.print_table(rf_report.room_rows(room, g["service_name"], g["service"], g.get("circuit")))
+    out.print_md(u"## The pump set")
+    out.print_table(rf_report.pump_rows(s, cat[0] if cat else None))
     if note:
         out.print_md(note)
     v = res["verdict"]
