@@ -84,6 +84,20 @@ def cache_dir(online_id, base=None):
     return os.path.join(base or home(), "online", online_id)
 
 
+# Sizes, weight and power are decimals in candidates.json (1210.0). The site's JSON writes a whole decimal without its
+# ".0" (1210), and Revit's Python 2.7 refuses to print a whole number with decimals ("{:.0f}"), so they are made
+# decimals again when the site's copy is kept.
+DECIMALS = ("L", "W", "H", "kg", "p2_each", "p2_needed")
+
+
+def as_decimals(candidates):
+    for s in (candidates or {}).get("sets") or []:
+        for k in DECIMALS:
+            if isinstance(s.get(k), int) and not isinstance(s.get(k), bool):
+                s[k] = float(s[k])
+    return candidates
+
+
 def save_cache(online_id, answer, base=None):
     """Keep what the site gave: the pump sets, the settings, the reviewers' choice. A file the site doesn't have yet is
     left out, so the project folder's own file is used for it."""
@@ -91,7 +105,7 @@ def save_cache(online_id, answer, base=None):
     for name, key in ((u"candidates.json", "candidates"), (u"project.json", "project")):
         path = os.path.join(d, name)
         if answer.get(key) is not None:
-            _write(path, answer[key])
+            _write(path, as_decimals(answer[key]) if key == "candidates" else answer[key])
         elif os.path.exists(path):
             os.remove(path)
     _write(os.path.join(d, u"chosen.json"), {"chosen": answer.get("chosen"), "sentAt": answer.get("sentAt"),
