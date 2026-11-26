@@ -147,6 +147,7 @@ def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=N
                      "listed_as": d["listed_as"], "covers": d["covers"], "issuer": d["issuer"],
                      "issue_date": d["issue_date"], "valid_until": d["valid_until"], "pages": d["pages"],
                      "method": d["method"], "languages": d["languages"], "status": d["status"], "notes": d["notes"],
+                     "checked_by": d.get("checked_by"), "confirmed_in": d.get("confirmed_in"),
                      "matches": [{"item": m["item"], "product": item_label.get(m["item"], m["item"]), "kind": m["kind"],
                                   "page": m["page"], "quote": m["quote"], "status": m["status"]}
                                  for m in d.get("matches", [])]})
@@ -202,10 +203,12 @@ def set_verified(entry, verified, reviewer):
     entry["status"] = "verified" if verified else ("extracted" if has_value else "unclear")
     entry["checked_by"] = reviewer if verified else None
     entry["verified_on"] = date.today().isoformat() if verified else None
+    entry.pop("confirmed_in", None)
 
 
 def confirm(pkg, targets, reviewer):
-    """Apply the reviewer's ticks. Each target names a value (item, key), a document (file) or a match (file, item)."""
+    """Apply the reviewer's ticks. Each target names a value (item, key), a document (file) or a match (file, item).
+    A target with from was confirmed first on the same file in another package (MAF-36b): the reading keeps where."""
     docs = {d["file"]: d for d in pkg["documents"]}
     items = {i["id"]: i for i in pkg["items"]}
     for t in targets:
@@ -218,6 +221,8 @@ def confirm(pkg, targets, reviewer):
         else:
             raise ValueError(f"unknown kind {t['kind']!r}")
         set_verified(entry, bool(t["verified"]), reviewer)
+        if t.get("from") and entry["status"] == "verified":
+            entry["confirmed_in"] = str(t["from"])[:200]
 
 
 def decide(pkg, finding_id, status, note, reviewer):

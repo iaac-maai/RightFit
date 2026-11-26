@@ -38,6 +38,16 @@ def test_a_tick_confirms_one_reading_under_the_reviewers_name():
     assert out["view"]["counts"]["to_confirm"] == before - 1
 
 
+def test_a_reading_confirmed_from_another_package_keeps_where_and_loses_it_when_unticked():
+    doc = next(d for d in P01["documents"] if d["status"] != "verified")
+    where = "this project, P09 (MAF IS 015 rev 0), confirmed by Ana on 2026-11-11"
+    out = ask({"op": "confirm", "targets": [{"kind": "document", "file": doc["file"], "verified": True, "from": where}]})
+    shown = next(d for d in out["view"]["documents"] if d["file"] == doc["file"])
+    assert (shown["status"], shown["checked_by"], shown["confirmed_in"]) == ("verified", "Ana Test", where)
+    again = ask({"op": "confirm", "targets": [{"kind": "document", "file": doc["file"], "verified": False}]}, pkg=out["pkg"])
+    assert next(d for d in again["pkg"]["documents"] if d["file"] == doc["file"]).get("confirmed_in") is None
+
+
 def test_a_finding_marked_not_a_problem_leaves_the_answer():
     first = next(r for r in ask()["view"]["results"] if r["verdict"] == "flag")
     out = ask({"op": "decisions", "decisions": {first["key"]: {"decision": "dismissed", "reason": "agreed on site"}}})

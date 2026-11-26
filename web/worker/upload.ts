@@ -62,10 +62,14 @@ async function putFile(request: Request, env: Env, projectId: string, code: stri
   if (body.byteLength > MAX) return json({ error: "A file is at most 60 MB." }, 413);
   await env.BUCKET.put(`projects/${projectId}/packages/${code}/${name}`, body, { httpMetadata: { contentType: TYPES[ext] } });
   await env.DB.batch([
-    env.DB.prepare("INSERT OR REPLACE INTO package_file (project_id, code, name, size, pages) VALUES (?, ?, ?, ?, NULL)")
-      .bind(projectId, code, name, body.byteLength),
+    env.DB.prepare("INSERT OR REPLACE INTO package_file (project_id, code, name, size, pages, sha) VALUES (?, ?, ?, ?, NULL, ?)")
+      .bind(projectId, code, name, body.byteLength, await fingerprint(body)),
     env.DB.prepare("UPDATE package SET files = (SELECT COUNT(*) FROM package_file WHERE project_id = ? AND code = ?) WHERE project_id = ? AND code = ?")
       .bind(projectId, code, projectId, code),
   ]);
   return json({ name, size: body.byteLength });
 }
+
+// The first 16 characters of the file's SHA-256, as ingest/graph.py makes it on the laptop: the same file in two packages
+const fingerprint = async (body: ArrayBuffer) =>
+  [...new Uint8Array(await crypto.subtle.digest("SHA-256", body))].slice(0, 8).map((b) => b.toString(16).padStart(2, "0")).join("");

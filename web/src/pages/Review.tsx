@@ -2,14 +2,15 @@
 // what the AI read page by page, and the draft answer; the document opens beside them. Every result comes from the
 // laptop's checks, run by the engine (web/engine/). A reviewer ticks readings and decides on findings and AI
 // suggestions here; each change goes to the engine, which runs the checks again (spec/features/rightfit_online.md, 11).
-import { createContext, useContext, useId, useState, type MouseEvent, type SyntheticEvent } from "react";
-import { go, post } from "../api";
+import { createContext, useContext, useEffect, useId, useState, type MouseEvent, type SyntheticEvent } from "react";
+import { api, go, post } from "../api";
 import { day, plural } from "../format";
 import {
   RULE_STATUS, STATUS_RULE, confirmedValues, groups, notAProblem, passed, placeOf, plainReason, quotesOf, readingPages, shown, why, type Place,
   type Quote, type Row,
 } from "../review";
 import type { AiFinding, CheckResult, Match, PackageData, PackageExtra, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
+import type { Offer } from "../../worker/reuse";
 import { AddPackage } from "./AddPackage";
 import { fileUrl, useData } from "./ProjectData";
 
@@ -176,7 +177,7 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
       <div className="review-work">
         <div className="review-list">
           {step === "problems" && <Problems v={v} />}
-          {step === "readings" && <Readings v={v} />}
+          {step === "readings" && <Readings v={v} projectId={projectId} code={code} />}
           {step === "answer" && <Answer v={v} projectId={projectId} code={code} />}
         </div>
         {open && <Document v={v} step={step} place={open} url={url} extra={data.extra ?? null} onPlace={setPlace}
@@ -365,7 +366,7 @@ function AiActions({ f }: { f: AiFinding }) {
 }
 
 // ------------------------------------------------------------------ step 2, what the AI read, page by page
-function Readings({ v }: { v: PackageReview }) {
+function Readings({ v, projectId, code }: { v: PackageReview; projectId: string; code: string }) {
   const pane = useContext(Pane);
   const edit = useContext(Edit);
   const { docs, form, missing } = readingPages(v);
@@ -374,7 +375,8 @@ function Readings({ v }: { v: PackageReview }) {
       <Tick target={{ kind: "value", item: x.item, key: x.key }} ok={x.status === "verified"} by={x.checked_by} label={`${x.what} is correct`} />
       <span>{x.what}<small>{x.product}</small></span>
       <span><Typed value={x.value} unit={x.unit} ok={x.status === "verified"} />
-        {x.status === "verified" && <span className="by">{x.checked_by || "reviewer"}{x.verified_on ? `, ${day(x.verified_on)}` : ""}</span>}</span>
+        {x.status === "verified" && <span className="by">{x.checked_by || "reviewer"}{x.verified_on ? `, ${day(x.verified_on)}` : ""}</span>}
+        {x.status === "verified" && x.confirmed_in && <span className="by">first in {x.confirmed_in}</span>}</span>
     </div>
   );
   const matchLine = (d: ReviewDoc, m: Match) => (
@@ -388,13 +390,15 @@ function Readings({ v }: { v: PackageReview }) {
     <section className="sheet readings" aria-label="What the AI read">
       <p className="hold">{edit.may ? "Check each line against the page and tick it. Unticked lines stay as the AI read them, and every check that rests on them stays a question."
         : "Each line is what the AI read, with the page it came from. Until a reviewer ticks it, every check that rests on it stays a question."}</p>
+      <Reuse v={v} projectId={projectId} code={code} />
       {docs.map(({ d, pages, loose }) => (
         <div key={d.file}>
           <div className="dg"><b>{pad(d.no)} · {d.file}</b><span>{d.type} · {plural(d.pages, "page", "pages")}</span></div>
           <div className="v">
             <Tick target={{ kind: "document", file: d.file }} ok={d.status === "verified"} label={`${d.file} is what it says`} />
             <span>What this document is<small>Listed in the form as {d.listed_as || "not listed"}</small></span>
-            <span className="typed"><span className={d.status === "verified" ? "co" : "un"}>{d.type}</span></span>
+            <span className="typed"><span className={d.status === "verified" ? "co" : "un"}>{d.type}</span>
+              {d.status === "verified" && d.confirmed_in && <span className="by">first in {d.confirmed_in}</span>}</span>
           </div>
           {loose.matches.map((m) => matchLine(d, m))}
           {loose.values.map(valueLine)}
@@ -432,6 +436,42 @@ function Readings({ v }: { v: PackageReview }) {
         </>
       )}
     </section>
+  );
+}
+
+// The same file in another package (MAF-36b): what a person confirmed there, offered here for one click, and what was
+// read differently, for a person to look at. Recognised by the file's fingerprint, whatever the file is called.
+function Reuse({ v, projectId, code }: { v: PackageReview; projectId: string; code: string }) {
+  const edit = useContext(Edit);
+  const [list, setList] = useState<Offer[]>([]);
+  useEffect(() => {
+    if (edit.may) api<{ offers: Offer[] }>(`/api/projects/${projectId}/packages/${code}/reuse`).then((r) => setList(r.offers), () => setList([]));
+  }, [projectId, code, v, edit.may]);
+  if (!list.length) return null;
+  const name = (item: string, key: string) => v.items.find((i) => i.id === item)?.values.find((x) => x.key === key)?.what ?? key;
+  const what = (t: Offer["targets"][number]) => (t.kind === "document" ? "what this document is" : name(t.item, t.key));
+  return (
+    <div className="reuse" role="group" aria-label="The same file in another package">
+      <span className="lab">The same file in another package</span>
+      {list.map((o) => (
+        <div key={`${o.file}|${o.where}|${o.code}`} className="reuse-one">
+          <p><b>{o.file}</b> is the same file as {o.there === o.file ? "the one" : <b>{o.there}</b>} in {o.code}, {o.form}, {o.where}.</p>
+          {o.targets.length > 0 && (
+            <p>
+              Confirmed there and read the same here: {o.targets.map(what).join("; ")}.{" "}
+              <button type="button" className="btn" disabled={edit.busy}
+                onClick={() => void edit.change({ op: "confirm", targets: o.targets.map((t) => ({ ...t, verified: true })) })}>
+                Confirm {o.targets.length === 1 ? "it" : `these ${o.targets.length}`} here
+              </button>
+            </p>
+          )}
+          {o.differ.length > 0 && (
+            <ul>{o.differ.map((d) => <li key={d.what}>{d.item && d.key ? `${name(d.item, d.key)}, ${v.items.find((i) => i.id === d.item)?.name}` : d.what}: read here as <span className="typed">{d.here}</span>, confirmed there as <span className="typed">{d.there}</span></li>)}</ul>
+          )}
+        </div>
+      ))}
+      <p className="fine">A reading confirmed on the same file holds here too; the checks still judge the documents' dates for this review and delivery.</p>
+    </div>
   );
 }
 

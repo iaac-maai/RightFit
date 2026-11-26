@@ -74,6 +74,7 @@ export type Value = string | number | boolean | null;
 export interface Reading {
   key: string; what: string; value: Value; unit: string | null; source: string; page: number | string | null; quote: string | null;
   status: string; checked_by?: string | null; verified_on?: string | null; item: string; product?: string;
+  confirmed_in?: string | null; // confirmed first on the same file in another package (MAF-36b)
 }
 export interface RuleUsed { id: string; status: string; text: string; source: string; url: string }
 export interface CheckResult {
@@ -84,6 +85,7 @@ export interface CheckResult {
 export interface Match { item: string | null; product: string; kind: string; page: number | string | null; quote: string | null; status: string }
 export interface ReviewDoc {
   no: number; file: string; type: string; listed_as: string | null; covers: string[]; pages: number; status: string; matches: Match[];
+  checked_by?: string | null; confirmed_in?: string | null;
 }
 export interface AiFinding {
   id: string; title: string; finding: string; suggested_comment: string; status: "suggested" | "accepted" | "rejected";

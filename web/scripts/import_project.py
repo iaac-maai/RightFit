@@ -225,7 +225,7 @@ def main():
 
     # The knowledge graph (MAF-36): the product lines that come back from one project to the next, from the forms, the
     # register of the previous project (on this laptop only) and the BOQ; no AI. Admins who are members see it drawn.
-    from ingest.graph import build as build_graph
+    from ingest.graph import build as build_graph, fingerprint
     graph = build_graph(project["originals"], ROOT / "data/raw/register/register.xlsx", boq_files(Path(project["boq"])))
 
     # The original files of each package (reading a file brings it back from iCloud first)
@@ -238,9 +238,9 @@ def main():
             if not f.is_file() or f.name.startswith(".") or "/" in f.name or ".." in f.name:
                 continue
             f.read_bytes()
-            statements.append(
-                "INSERT INTO package_file (project_id, code, name, size, pages) VALUES ("
-                + ", ".join(sql(v) for v in (pid, p["id"], f.name, f.stat().st_size, page_count(f))) + ");")
+            statements.append(   # the fingerprint recognises the same file in two packages (MAF-36b)
+                "INSERT INTO package_file (project_id, code, name, size, pages, sha) VALUES ("
+                + ", ".join(sql(v) for v in (pid, p["id"], f.name, f.stat().st_size, page_count(f), fingerprint(f))) + ");")
             uploads.append((f"projects/{pid}/packages/{p['id']}/{f.name}", f))
 
     # The BOQ lines, never the prices: read_boq takes only the text, unit, quantity, producer and standards

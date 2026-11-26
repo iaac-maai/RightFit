@@ -643,3 +643,10 @@ main { min-width: 0; }
 .fit-code .field { flex: 1; }
 .fit-code input { font: 600 18px/1.2 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; }
 .sheet-note.band .btn.small { margin-left: 10px; }
+
+/* The same file in another package (MAF-36b), on the Readings step */
+.reuse { border: 1px solid var(--line); border-left: 3px solid var(--ink); padding: 10px 14px; margin: 0 0 14px; overflow-wrap: anywhere; }
+.reuse p { margin: 6px 0; }
+.reuse ul { margin: 4px 0 8px; padding-left: 18px; }
+.reuse-one + .reuse-one { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 4px; }
+.reuse .btn { margin-left: 6px; }

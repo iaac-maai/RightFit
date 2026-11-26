@@ -3,6 +3,7 @@
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
 import { DPA_VERSION, json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
 import { ACROSS_PROJECTS_FROM, together, type Graph } from "./products";
+import { offers, type Elsewhere, type Pkg } from "./reuse";
 import { REVIEWERS, isAdmin, mayAddPackage, mayChangeReview, mayChangeRules, mayUseProducts } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
 
@@ -65,6 +66,7 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   if (me instanceof Response) return me;
   if (what === "packages" && !code) return packages(env, projectId, me);
   if (what === "packages" && code && !name) return onePackage(env, projectId, code, me);
+  if (what === "packages" && code && name === "reuse") return reuse(request, env, projectId, code, user, me);
   if (what === "files" && code && name) return file(env, projectId, code, name, me);
   if (what === "boq" && !code) return boq(env, projectId, me);
   if (what === "rules" && !code) return rules(env, projectId, me);
@@ -159,13 +161,9 @@ async function products(request: Request, env: Env, projectId: string, user: Use
   if (!mayUseProducts(me.role)) return json({ error: "The products that come back are for the consultant's people." }, 403);
   const project = await env.DB.prepare("SELECT name, dpa_version FROM project WHERE id = ?").bind(projectId)
     .first<{ name: string; dpa_version: string }>();
-  const { results: mine } = await env.DB.prepare(
-    "SELECT p.id, p.name, p.locked, p.dpa_version FROM member m JOIN project p ON p.id = m.project_id WHERE m.user_id = ? AND m.role = 'consultant' AND p.id <> ?",
-  ).bind(user.id, projectId).all<{ id: string; name: string; locked: number; dpa_version: string }>();
-  const unlocked = await teamUnlocked(request.headers.get("Cookie"), env.TEAM_PASSWORD);
+  const { mine, open } = await across(request, env, user, projectId);
   const read = async (id: string) => (await env.BUCKET.get(`projects/${id}/graph.json`))?.json<Graph>() ?? null;
-  const others = (await Promise.all(mine.filter((p) => p.dpa_version >= ACROSS_PROJECTS_FROM && (!p.locked || unlocked))
-    .map(async (p) => ({ id: p.id, name: p.name, graph: await read(p.id) }))))
+  const others = (await Promise.all(open.map(async (p) => ({ id: p.id, name: p.name, graph: await read(p.id) }))))
     .filter((p): p is { id: string; name: string; graph: Graph } => p.graph !== null);
   const own = await read(projectId);
   const name = project?.name ?? "This project";
@@ -176,6 +174,46 @@ async function products(request: Request, env: Env, projectId: string, user: Use
     waiting: mine.filter((p) => p.dpa_version < ACROSS_PROJECTS_FROM).length,
     dpa: { accepted: project?.dpa_version ?? "", current: DPA_VERSION, across: (project?.dpa_version ?? "") >= ACROSS_PROJECTS_FROM },
   });
+}
+
+// The viewer's other projects as a consultant (mine), and those whose data counts across projects for them (open): a
+// consultant of it accepted the agreement with clause 1.4, and a locked one only with the team password
+async function across(request: Request, env: Env, user: User, projectId: string) {
+  const { results: mine } = await env.DB.prepare(
+    "SELECT p.id, p.name, p.locked, p.dpa_version FROM member m JOIN project p ON p.id = m.project_id WHERE m.user_id = ? AND m.role = 'consultant' AND p.id <> ?",
+  ).bind(user.id, projectId).all<{ id: string; name: string; locked: number; dpa_version: string }>();
+  const unlocked = await teamUnlocked(request.headers.get("Cookie"), env.TEAM_PASSWORD);
+  return { mine, open: mine.filter((p) => p.dpa_version >= ACROSS_PROJECTS_FROM && (!p.locked || unlocked)) };
+}
+
+// GET /api/projects/:id/packages/:code/reuse: readings a person confirmed on the same file in another package of this
+// project or, for the consultant's people, of their other projects (MAF-36b). Only offered: a reviewer confirms each.
+async function reuse(request: Request, env: Env, projectId: string, code: string, user: User, me: MemberRow) {
+  if (!mayChangeReview(me.role)) return json({ offers: [] });
+  const state = await env.BUCKET.get(keys(projectId, code).state);
+  const { results: mine } = await env.DB.prepare("SELECT name, sha FROM package_file WHERE project_id = ? AND code = ? AND sha IS NOT NULL")
+    .bind(projectId, code).all<{ name: string; sha: string }>();
+  if (!state || !mine.length) return json({ offers: [] });
+  const projects = new Map([[projectId, "this project"]]);
+  if (mayUseProducts(me.role)) for (const p of (await across(request, env, user, projectId)).open) projects.set(p.id, p.name);
+  const shas = [...new Set(mine.map((f) => f.sha))];
+  // shortcut: one query with every fingerprint of the package, fine for a package's few dozen files; batch when larger
+  const { results: twins } = await env.DB.prepare(
+    `SELECT project_id AS projectId, code, name, sha FROM package_file WHERE sha IN (${shas.map(() => "?").join(", ")})
+       AND NOT (project_id = ? AND code = ?)`,
+  ).bind(...shas, projectId, code).all<{ projectId: string; code: string; name: string; sha: string }>();
+  const where = new Map<string, Record<string, string>>();
+  for (const t of twins.filter((t) => projects.has(t.projectId))) {
+    const k = `${t.projectId}|${t.code}`;
+    where.set(k, { ...(where.get(k) ?? {}), [t.name]: t.sha });
+  }
+  const elsewhere = (await Promise.all([...where].map(async ([k, files]): Promise<Elsewhere | null> => {
+    const [pid, pcode] = k.split("|");
+    const stored = await env.BUCKET.get(keys(pid, pcode).state);
+    return stored ? { where: projects.get(pid)!, code: pcode, pkg: (await stored.json<{ pkg: Pkg }>()).pkg, files } : null;
+  }))).filter((e): e is Elsewhere => e !== null);
+  const here = (await state.json<{ pkg: Pkg }>()).pkg;
+  return json({ offers: offers(here, Object.fromEntries(mine.map((f) => [f.name, f.sha])), elsewhere) });
 }
 
 // POST /api/projects/:id/dpa {version}: a consultant accepts the current data processing agreement for the organisation

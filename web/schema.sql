@@ -99,8 +99,10 @@ create table if not exists package_file (
   name text not null,
   size integer not null,
   pages integer,
+  sha text,                          -- the first 16 characters of the file's SHA-256: the same file in two packages
   primary key (project_id, code, name)
 );
+create index if not exists package_file_sha_idx on package_file (sha);
 create table if not exists boq_line (
   project_id text not null references project (id) on delete cascade,
   file text not null,
