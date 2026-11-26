@@ -201,3 +201,12 @@ create table if not exists revit_command (
   message text not null default ''   -- Revit's answer, or why it could not
 );
 create index if not exists revit_command_user_idx on revit_command (user_id, state, created_at);
+
+-- One anonymous answer: the day it was sent (not the time), the survey's version, the answers as JSON. Nothing about
+-- the person, their browser or their address.
+create table if not exists survey_response (
+  id text primary key,
+  day text not null,
+  version text not null,
+  answers text not null
+);

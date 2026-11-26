@@ -7,6 +7,7 @@ import { Join } from "./pages/Join";
 import { LEGAL_PATHS, Legal, type LegalDoc } from "./pages/Legal";
 import { Project, type ProjectView } from "./pages/Project";
 import { RevitLink } from "./pages/RevitLink";
+import { Survey, SurveyResults } from "./pages/Survey";
 import type { Step } from "./pages/Review";
 import { SignIn, TermsGate } from "./pages/SignIn";
 import { DeleteAccount } from "./ui";
@@ -18,6 +19,8 @@ type Route =
   | { page: "project"; id: string; view: ProjectView; code?: string; step?: Step }
   | { page: "join"; token: string }
   | { page: "revit"; code: string }
+  | { page: "survey" }
+  | { page: "survey-results" }
   | { page: "admin"; tab: AdminTab }
   | { page: "admin-project"; id: string }
   | { page: "legal"; doc: LegalDoc };
@@ -29,6 +32,8 @@ function parse(path: string): Route {
     const [, id, part, code, step] = project;
     return { page: "project", id, view: code ? "package" : ((part as "packages" | "boq" | "rules" | "booster" | "products" | "fitcheck" | undefined) ?? "team"), code, step: step as Step | undefined };
   }
+  if (clean === "/survey") return { page: "survey" };
+  if (clean === "/survey/results") return { page: "survey-results" };
   if (clean === "/revit") return { page: "revit", code: new URLSearchParams(window.location.search).get("code") ?? "" };
   const join = clean.match(/^\/join\/([\w-]+)$/);
   if (join) return { page: "join", token: join[1] };
@@ -70,6 +75,7 @@ export function App() {
   }, [route, openProject]);
 
   if (route.page === "legal") return <Legal doc={route.doc} signedIn={Boolean(session)} />;
+  if (route.page === "survey") return <Survey />; // public: no account needed
   if (session === undefined) return <Splash />;
   if (session === null) return <SignIn google={google} joinToken={route.page === "join" ? route.token : undefined} onSignedIn={load} />;
   if (!session.termsAccepted) return <TermsGate session={session} onAccepted={load} />;
@@ -83,6 +89,7 @@ export function App() {
         {route.page === "project" && <Project id={route.id} view={route.view} code={route.code} step={route.step} onLoaded={setProjectName} />}
         {route.page === "join" && <Join token={route.token} session={session} />}
         {route.page === "revit" && <RevitLink code={route.code} />}
+        {route.page === "survey-results" && <SurveyResults />}
         {adminPage && !session.admin && (
           <div className="screen"><p className="err" role="alert">This page is for the people who run RightFit.</p></div>
         )}
@@ -110,6 +117,7 @@ function Rail({ session, route, project }: { session: Session; route: Route; pro
       <a className="brand" href="/" onClick={go("/")}>RightFit<span className="brand-tag">online</span></a>
       <div className="rail-links">
         <a href="/" onClick={go("/")} aria-current={route.page === "home" ? "page" : undefined}>Projects</a>
+        <a href="/survey/results" onClick={go("/survey/results")} aria-current={route.page === "survey-results" ? "page" : undefined}>Survey</a>
         {project && route.page === "project" && (
           <a className="rail-project" href={`/p/${project.id}`} onClick={go(`/p/${project.id}`)} aria-current="page">{project.name}</a>
         )}

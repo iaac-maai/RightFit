@@ -6,6 +6,7 @@ import { adminRoute } from "./admin";
 import { access, dataRoute } from "./project_data";
 import { editRoute } from "./review_edit";
 import { revitOpenRoute, revitSessionRoute } from "./revit";
+import { surveyOpenRoute, surveyRoute } from "./survey";
 import { uploadRoute } from "./upload";
 import { googleOn, makeAuth } from "./auth";
 import {
@@ -54,6 +55,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   const revit = await revitOpenRoute(request, env, path, method, url.origin, (userId) => accepted(env, userId));
   if (revit) return revit;
 
+  // The practice survey is answered without an account (survey.ts)
+  const survey = await surveyOpenRoute(request, env, path, method);
+  if (survey) return survey;
+
   // An invitation can be read before signing in: the link itself is the secret
   const joinLink = path.match(/^\/api\/join\/([\w-]+)$/);
   if (joinLink && method === "GET") return readInvitation(env, joinLink[1]);
@@ -78,6 +83,8 @@ async function route(request: Request, env: Env): Promise<Response> {
     // Management answers "not found" to everyone else, so it doesn't show it exists
     return admin ? adminRoute(request, env, user, path, method) : json({ error: "No such endpoint." }, 404);
   }
+  const results = await surveyRoute(env, path, method, admin);
+  if (results) return results;
   if (path === "/api/home" && method === "GET") return home(env, user);
   if (path === "/api/projects" && method === "POST") return createProject(request, env, user);
   if (joinLink && method === "POST") return joinByLink(env, joinLink[1], user);
