@@ -78,3 +78,12 @@ def test_the_report_names_the_reviewers_choice():
     assert core.chosen_text(None) is None
     line = core.chosen_text({"setLabel": "DAB KVC", "chosenBy": "Luca", "chosenAt": "2026-11-26T12:00:00Z", "note": "fits"})
     assert "DAB KVC" in line and "Luca" in line and "2026-11-26" in line and '"fits"' in line
+
+
+def test_sizes_from_the_site_are_decimals_again(tmp_path):
+    """The site writes 1210.0 as 1210; Revit's Python 2.7 can't print a whole number with "{:.0f}"."""
+    base = str(tmp_path)
+    core.save_cache("abc", {"candidates": {"sets": [{"id": "a", "L": 1210, "kg": 149, "pumps": 2, "dn_in": 80, "submitted": True}]}}, base)
+    s = core.cached("abc", "candidates.json", base)["sets"][0]
+    assert isinstance(s["L"], float) and isinstance(s["kg"], float)
+    assert s["pumps"] == 2 and isinstance(s["pumps"], int) and isinstance(s["dn_in"], int) and s["submitted"] is True
