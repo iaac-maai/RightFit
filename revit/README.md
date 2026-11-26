@@ -54,7 +54,7 @@ Then in Revit: RightFit > Settings > Project, and pick it.
 
 Colours: green would pass, amber flag, red FAIL. The service space is translucent teal, and clashes are red
 when they block and amber when they need a look. Until a person confirms the data sheet values, a verdict is
-what the check would say. Rules marked `to_confirm` wait for Luca.
+what the check would say. Luca approved the fit check's rules on 26 Nov 2026; a rule added later is marked `to_confirm` until he does.
 
 ## Not checked yet
 
