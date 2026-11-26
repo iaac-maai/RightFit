@@ -48,7 +48,8 @@ export function logged(env: Env, actor: string | null, action: string, projectId
     .bind(now(), actor, projectId, action, JSON.stringify(detail));
 }
 
-// Delete an account: the person, their sessions, sign-in links, consent and memberships. A project they run alone with
+// Delete an account: the person, their sessions, sign-in links, consent, memberships and linked Revit computers;
+// the fit checks they sent stay with the project, without their name. A project they run alone with
 // other people in it must go to another consultant first; a project with nobody else in it goes too.
 // Returns the names of the projects to hand over first, or null once the account is gone.
 export async function deleteAccount(env: Env, userId: string, by: string, action: string): Promise<string[] | null> {
@@ -66,9 +67,15 @@ export async function deleteAccount(env: Env, userId: string, by: string, action
     ...alone.flatMap((id) => [
       env.DB.prepare("DELETE FROM invitation WHERE project_id = ?").bind(id),
       env.DB.prepare("DELETE FROM member WHERE project_id = ?").bind(id),
+      env.DB.prepare("DELETE FROM fit_run WHERE project_id = ?").bind(id),
+      env.DB.prepare("DELETE FROM fit_choice WHERE project_id = ?").bind(id),
       env.DB.prepare("DELETE FROM project WHERE id = ?").bind(id),
     ]),
     env.DB.prepare("UPDATE invitation SET state = 'withdrawn' WHERE state = 'pending' AND invited_by IN (SELECT id FROM member WHERE user_id = ?)").bind(userId),
+    env.DB.prepare("DELETE FROM revit_token WHERE user_id = ?").bind(userId),
+    env.DB.prepare("DELETE FROM revit_link WHERE user_id = ?").bind(userId),
+    env.DB.prepare("UPDATE fit_run SET user_id = NULL WHERE user_id = ?").bind(userId),
+    env.DB.prepare("UPDATE fit_choice SET chosen_by = NULL WHERE chosen_by = ?").bind(userId),
     env.DB.prepare("DELETE FROM member WHERE user_id = ?").bind(userId),
     env.DB.prepare('DELETE FROM consent WHERE "userId" = ?').bind(userId),
     env.DB.prepare('DELETE FROM session WHERE "userId" = ?').bind(userId),

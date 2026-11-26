@@ -5,6 +5,7 @@
 import { adminRoute } from "./admin";
 import { access, dataRoute } from "./project_data";
 import { editRoute } from "./review_edit";
+import { revitOpenRoute, revitSessionRoute } from "./revit";
 import { uploadRoute } from "./upload";
 import { googleOn, makeAuth } from "./auth";
 import {
@@ -49,6 +50,10 @@ async function route(request: Request, env: Env): Promise<Response> {
   const auth = makeAuth(env, url.origin);
   if (path.startsWith("/api/auth/")) return auth.handler(request);
 
+  // Revit, with no session: starting a link, asking whether it was approved, and its token's own requests (revit.ts)
+  const revit = await revitOpenRoute(request, env, path, method, url.origin, (userId) => accepted(env, userId));
+  if (revit) return revit;
+
   // An invitation can be read before signing in: the link itself is the secret
   const joinLink = path.match(/^\/api\/join\/([\w-]+)$/);
   if (joinLink && method === "GET") return readInvitation(env, joinLink[1]);
@@ -86,6 +91,8 @@ async function route(request: Request, env: Env): Promise<Response> {
   m = path.match(/^\/api\/projects\/([\w-]+)\/members\/([\w-]+)\/remove$/);
   if (m && method === "POST") return removeMember(env, m[1], m[2], user);
 
+  const linked = await revitSessionRoute(request, env, user, path, method);
+  if (linked) return linked;
   const edit = await editRoute(request, env, user, path, method);
   if (edit) return edit;
   const upload = await uploadRoute(request, env, user, path, method);

@@ -5,6 +5,7 @@ __title__ = "Next\nOption"
 from pyrevit import forms, revit, script
 
 import rf_app
+import rf_online_pull
 import rf_setup
 
 doc, uidoc = revit.doc, revit.uidoc
@@ -29,3 +30,4 @@ st["index"] = index
 rf_setup.save_state(st)
 rf_app.report(script.get_output(), g, res, u"Option {} of {}: {} {}{}".format(
     index + 1, len(g["sets"]), s["maker"], s["model"], u" (submitted)" if s.get("submitted") else u""))
+rf_online_pull.send(script.get_output(), doc, g, res, "preview")

@@ -5,12 +5,14 @@ __title__ = "Check\nPump"
 from pyrevit import forms, revit, script
 
 import rf_app
+import rf_online_pull
 import rf_project
 import rf_setup
 
 doc, uidoc = revit.doc, revit.uidoc
 if not rf_setup.settings().get("project"):
     forms.alert("Pick the project first (RightFit > Settings).", exitscript=True)
+pulled = rf_online_pull.refresh()  # the project's pump sets from RightFit online, when this project is linked
 rf_app.clear_drawing(doc)  # show the real pump again before asking for it
 if not rf_app.pumps_in(doc):
     forms.alert("RightFit found no pump set in this model: no Mechanical Equipment, Plumbing, Generic Model "
@@ -39,7 +41,10 @@ res = rf_app.preview(doc, uidoc, g, g["current"])
 out = script.get_output()
 rf_app.report(out, g, res, u"The set in the model: " + (u"{} {}".format(g["current"].get("maker", u""),
                                                                          g["current"].get("model", u""))).strip())
+if pulled:
+    out.print_md(u"*" + pulled + u"*")
 if g["sets"]:
     rf_app.candidates_table(out, g)
 else:
     out.print_md(u"*No candidates.json in this project's revit folder, so there are no alternatives to compare.*")
+rf_online_pull.send(out, doc, g, res, "check")

@@ -12,6 +12,7 @@ import io
 import json
 import os
 
+import rf_online_core
 import rf_setup
 
 
@@ -32,6 +33,13 @@ def projects(s=None):
 
 
 def _json(name, default):
+    """A project file: the site's last copy when this project folder is linked to RightFit online (rf_online_core),
+    otherwise the project folder's own."""
+    online = rf_online_core.linked_project(rf_setup.settings())
+    if online and online.get("id"):
+        copy = rf_online_core.cached(online["id"], name)
+        if copy is not None:
+            return copy
     f = folder()
     path = os.path.join(f, name) if f else None
     if not path or not os.path.exists(path):
