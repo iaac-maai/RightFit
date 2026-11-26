@@ -2,7 +2,7 @@
 // RightFit's draft review of the packages already read, and the BOQ lines, imported from the laptop by
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
 import { json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
-import { REVIEWERS, mayAddPackage, mayChangeReview, mayChangeRules } from "./roles";
+import { REVIEWERS, isAdmin, mayAddPackage, mayChangeReview, mayChangeRules } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
 
 const TYPES: Record<string, string> = {
@@ -55,7 +55,7 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
     if (me instanceof Response) return me;
     return pageImage(env, pg[1], pg[2], pg[3], pg[4], me);
   }
-  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules)(?:\/(P\d+))?(?:\/([^/]+))?$/);
+  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules|graph)(?:\/(P\d+))?(?:\/([^/]+))?$/);
   if (!m || method !== "GET") return null;
   const [, projectId, what, code, name] = m;
   const me = await access(request, env, projectId, user);
@@ -65,6 +65,7 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   if (what === "files" && code && name) return file(env, projectId, code, name, me);
   if (what === "boq" && !code) return boq(env, projectId, me);
   if (what === "rules" && !code) return rules(env, projectId, me);
+  if (what === "graph" && !code) return graph(env, projectId, user);
   return json({ error: "No such endpoint." }, 404);
 }
 
@@ -136,6 +137,14 @@ async function file(env: Env, projectId: string, code: string, encoded: string, 
       "X-Content-Type-Options": "nosniff",
     },
   });
+}
+
+// The knowledge graph of the project (spec/features/knowledge_graph.md): for the Inside RightFit page, which is for
+// admins only; and like every other part of a project, only for an admin who is a member (access() above)
+async function graph(env: Env, projectId: string, user: User) {
+  if (!isAdmin(user, env.ADMIN_EMAILS)) return json({ error: "No such endpoint." }, 404);
+  const stored = await env.BUCKET.get(`projects/${projectId}/graph.json`);
+  return stored ? json(await stored.json()) : json({ error: "The graph comes with the next import from the laptop." }, 404);
 }
 
 // One page of an attachment as an image, drawn on the laptop at the import, for the marks on the quoted lines

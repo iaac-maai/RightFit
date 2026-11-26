@@ -1,12 +1,12 @@
 # Feature spec: the knowledge graph of products that come back (MAF-36)
 
-Status: draft, 26 Nov 2026. Luca asked for it the same day; the open questions in section 9 wait for him.
+Status: 26 Nov 2026. Luca asked for it and answered the questions the same day (section 10). First kinds: cables, pipes, valves and boilers. The first part of MAF-36a is built: the product lines read from the forms, the register of the previous project and the BOQ (`ingest/products.py`, `ingest/graph.py`, with tests), drawn for admins on the Inside RightFit page (section 7). The page for the consultant comes next.
 
 ## 1. What it does
 
 Some products come back from one project to the next: pipes and fittings, cables, insulation, valves, cable trays and conduits, radiators, perhaps boilers. For those, RightFit keeps what it learned in one project for the next: which product line was submitted, by which producer, in which form, with which documents, what the answer was, and which lines of the BOQ it covered. When the same product line comes back, the consultant sees that history beside the new package.
 
-Pumps and air handling units are left out. The same unit with the same duty point almost never comes back in another project, so there is little to reuse (Luca, 26 Nov 2026).
+Pumps and air handling units are left out. The same unit with the same duty point almost never comes back in another project, so there is little to reuse (Luca, 26 Nov 2026). Boilers and valves are in (Luca, the same day).
 
 ## 2. Why
 
@@ -35,6 +35,19 @@ A product line is the node everything hangs on. It is a producer, a kind (pipe, 
 | BOQ line asks for product line | same kind and designation, size within the range |
 | form revises form | the chain of revisions |
 
+What makes two descriptions the same product line, by kind (Luca, 26 Nov 2026):
+
+| Kind | Same product line when these agree | Range |
+|---|---|---|
+| pipe | producer, material, pressure class, standard, and the use: drinking water or not; the series only when given | the diameters: a pipe data sheet usually lists many |
+| cable | producer, type designation (NHXH, JE-H(St)H ...), fire behaviour (E30, E90, PH30, PH120, FE180), CPR reaction class, standard | the cross-sections or pairs: a catalogue page or data sheet usually lists many (NHXH in P20 lists about 24); some producers add one sheet per construction (P19), and a data cable has one construction (P23) |
+| valve | producer, type (ball, gate, check, balancing ...), connection (thread, union, flange), pressure class, use | the nominal diameters |
+| boiler | producer, series and fuel | the output powers of the series |
+
+A part that a description does not give stays unknown, and two lines that differ only by an unknown part are a near match, shown as a question. A product line whose main part (a pipe's material, a cable's type, a valve's type, a boiler's series) is not given is never linked to anything.
+
+An air damper (clapetă) is not a valve: a clapetă counts as a valve only when it holds water back (de reținere, de sens). PE written alone is the material only in capitals, since a lower-case "pe" is the Romanian "on"; a black pipe (țeavă neagră) is steel, and Zn is galvanised steel.
+
 The graph is kept as tables in D1, next to the project's data. No graph database is needed: the nodes and edges are rows.
 
 ## 4. How it is filled, with no AI and no cost
@@ -47,15 +60,26 @@ The graph is kept as tables in D1, next to the project's data. No graph database
 
 ## 5. Who sees it
 
-What the graph holds is the consultant's knowledge, not a project's. It is shown to the consultant's own people across their projects, never to a contractor or subcontractor of another project. A document stays in its project: the graph keeps its fingerprint and what was decided, and opens the document only for a member of that project. A manufacturer's declaration of performance, which the CPR obliges it to publish, can be linked from its public source. The data processing agreement says a project's data is processed for that project, so using it across the consultant's projects needs a line in the agreement and in the privacy policy [O].
+What the graph holds is the consultant's knowledge, not a project's. It is shown to the consultant's own people across their projects, never to a contractor or subcontractor of another project. A document stays in its project: the graph keeps its fingerprint and what was decided, and opens the document only for a member of that project. A manufacturer's declaration of performance, which the CPR obliges it to publish, can be linked from its public source. Version 2026-11-26 of the data processing agreement (clause 1.4), of the privacy policy and of the terms says so (Luca, 26 Nov 2026). A project counts across projects only once a consultant of it has accepted that version or a later one; a project opened before keeps the version it accepted until then.
 
 ## 6. What it shows
 
-- on a package: this product line was answered B in another project, form IS 013 rev 1, on a date; its declaration of performance is the same file (same fingerprint) and still in date at delivery; the readings confirmed then are offered for reuse, and a person confirms them;
+- on a package: this product line was answered B in another project, form IS 013 rev 1, on a date; its declaration of performance is the same file (same fingerprint) and still in date at delivery;
+- an earlier approval lowers what is checked again (Luca, 26 Nov 2026): the readings confirmed on the same file in an approved form count as confirmed here, marked with where they were confirmed, while the documents are still checked for the new review and delivery dates;
 - in the BOQ register (MAF-34): for each chapter, the BOQ lines covered by a product line already approved, by kind, designation and size range, and the lines still without a form;
 - per producer: forms, returns and their causes, from the register and from the reviews online.
 
-## 7. Phases
+## 7. The page for admins: inside RightFit
+
+Luca asked on 26 Nov 2026 for a page, for admins only, that shows how RightFit and all its tools work, the way the hackathon app's Look inside explained its network with the network's own numbers. It sits in Management:
+
+- the path of a package, step by step (files, pages, readings, checks, draft answer, the reviewer, the answer), with the real numbers of a package the admin picks;
+- the tools: the checks engine, the checks with their rules, our two models with their scores, booster sizing, the revision comparison, the rule watch, the tools for agents;
+- the knowledge graph drawn: product lines in the middle, the forms of each project around them, the BOQ lines they cover, the documents that support them.
+
+Management itself still never opens a project's data: the page shows a project only to an admin who is a member of it, with the team password for a locked project, exactly as the project's own pages do.
+
+## 8. Phases
 
 | ID | What | Done when |
 |---|---|---|
@@ -63,17 +87,16 @@ What the graph holds is the consultant's knowledge, not a project's. It is shown
 | MAF-36b | Documents by fingerprint across projects, and confirmed readings offered for reuse | the same file in two packages is recognised, and a reuse needs a person's confirmation |
 | MAF-36c | The BOQ register (MAF-34) on top of the graph | each BOQ line shows the approved product line that covers it, or none |
 
-Boilers come in if Luca says so.
 
-## 8. Tests
+## 9. Tests
 
 The normalisers on made-up descriptions (never a real company or project name), the matching rules, and who sees what: a consultant sees the graph across their own projects; a contractor or subcontractor never sees another project's history.
 
-## 9. Open questions [O]
+## 10. Questions, answered by Luca on 26 Nov 2026
 
-1. Pipes: what makes two pipes the same product line? Producer, material and series or pressure class, and the standard? Are the diameters one range?
-2. Cables: producer and designation, with the fire class (E30, PH30) and the CPR reaction class? Are the cross-sections one range?
-3. Does an earlier approval only show as a hint, or may it lower what has to be checked again?
-4. Boilers: in or out?
-5. A line in the data processing agreement and the privacy policy for using a project's data across the consultant's projects.
-6. Which kinds first: cables and pipes?
+1. Pipes: producer, material, pressure class, standard and use (drinking water or not), the series not necessarily; a data sheet usually lists many diameters.
+2. Cables: studied on our own sheets; the proposal in section 3 waits for his check.
+3. An earlier approval may lower what is checked again.
+4. Boilers are in; valves too.
+5. Yes: clause 1.4 of the data processing agreement, with the privacy policy and the terms, all version 2026-11-26.
+6. Yes: cables and pipes first, with valves and boilers.

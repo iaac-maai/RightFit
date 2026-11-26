@@ -15,8 +15,8 @@ import {
 } from "./roles";
 
 // The versions of the documents a person accepts (web/legal/ carries the same dates: change them together)
-const TERMS_VERSION = "2026-11-20"; // the terms of service, read with the privacy policy
-const DPA_VERSION = "2026-11-20"; // the data processing agreement a consultant accepts for their organisation
+const TERMS_VERSION = "2026-11-26"; // the terms of service, read with the privacy policy
+const DPA_VERSION = "2026-11-26"; // the data processing agreement a consultant accepts for their organisation
 const INVITATION_DAYS = 14;
 
 interface InvitationRow {

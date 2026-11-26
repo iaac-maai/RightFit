@@ -11,7 +11,7 @@ import { SignIn, TermsGate } from "./pages/SignIn";
 import { DeleteAccount } from "./ui";
 import type { Session } from "./types";
 
-type AdminTab = "overview" | "people" | "projects" | "activity";
+type AdminTab = "overview" | "people" | "projects" | "activity" | "inside";
 type Route =
   | { page: "home" }
   | { page: "project"; id: string; view: ProjectView; code?: string; step?: Step }
@@ -31,7 +31,7 @@ function parse(path: string): Route {
   if (join) return { page: "join", token: join[1] };
   const adminProject = clean.match(/^\/admin\/p\/([\w-]+)$/);
   if (adminProject) return { page: "admin-project", id: adminProject[1] };
-  const admin = clean.match(/^\/admin(?:\/(people|projects|activity))?$/);
+  const admin = clean.match(/^\/admin(?:\/(people|projects|activity|inside))?$/);
   if (admin) return { page: "admin", tab: (admin[1] as AdminTab | undefined) ?? "overview" };
   const doc = (Object.keys(LEGAL_PATHS) as LegalDoc[]).find((d) => LEGAL_PATHS[d] === clean);
   if (doc) return { page: "legal", doc };

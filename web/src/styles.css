@@ -521,3 +521,76 @@ main { min-width: 0; }
 /* adding a package on the site */
 .btn.small { padding: 7px 11px; font-size: 13px; }
 .sheet-head .btn.small { margin-left: 8px; }
+
+/* ------------------------------------------------------------------ Inside RightFit (Management, admins only): how the
+   tools work, on a project's own numbers. Violet is AI (dashed, as an AI reading until a person ticks it), green is rules,
+   ink is a person. */
+.inside { display: grid; gap: 18px; }
+.inside, .inside > * { min-width: 0; }   /* lets the wide drawing scroll inside its sheet instead of widening the page */
+.inside-intro { display: grid; gap: 12px; max-width: 760px; }
+.inside-intro p { color: var(--ink-2); }
+.field.inline { grid-template-columns: auto minmax(0, 340px); align-items: center; gap: 10px; }
+.small-select { margin-left: auto; padding: 5px 8px; max-width: 100%; }
+.who-chip { justify-self: start; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; font-weight: 600; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--ink-2); color: var(--ink-2); background: var(--sheet); }
+.who-chip.ai { color: var(--carbon); background: var(--carbon-wash); border: 1px dashed var(--carbon); }
+.who-chip.rules { color: var(--green); background: var(--pale); border-color: var(--green); }
+.path { padding: 14px; display: grid; gap: 10px; }
+.stations { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+.stations li { display: flex; animation: rise .45s var(--ease) both; animation-delay: calc(var(--i) * 55ms); }
+.station { width: 100%; display: grid; gap: 3px; align-content: start; justify-items: start; text-align: left; padding: 10px; border: 1px solid var(--line); border-top: 3px solid var(--ink-2); background: var(--sheet); cursor: pointer; transition: background .12s; }
+.station.ai { border-top: 3px dashed var(--carbon); }
+.station.rules { border-top-color: var(--green); }
+.station:hover { background: var(--pale); }
+.station[aria-pressed="true"] { background: var(--pale); box-shadow: inset 0 0 0 1.5px var(--green); }
+.station-n { font: 700 11px var(--type); color: var(--label); }
+.station-name { font-weight: 600; font-size: 13px; }
+.station-figure { font-size: 21px; line-height: 1.15; overflow-wrap: anywhere; }
+.station.ai .station-figure { color: var(--carbon); }
+.station .letter { margin: 2px 0; }
+.station-caption { font-size: 12px; line-height: 1.3; color: var(--ink-2); }
+.travel { height: 3px; background: var(--line-soft); }
+.travel i { display: block; height: 100%; background: var(--green); transition: width .45s var(--ease); }
+.station-more { display: grid; gap: 6px; padding: 12px 14px; border: 1px solid var(--line); border-left: 3px solid var(--ink-2); background: var(--pale); animation: rise .35s var(--ease) both; }
+.station-more.ai { border-left: 3px dashed var(--carbon); background: var(--carbon-wash); }
+.station-more.rules { border-left-color: var(--green); }
+.station-more h3 { font-size: 17px; }
+.station-more p { color: var(--ink-2); max-width: 780px; }
+.station-more code, .tool-code { font: 12px var(--type); color: var(--label); overflow-wrap: anywhere; }
+.tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.tool { display: grid; gap: 6px; grid-template-rows: auto auto 1fr auto auto; padding: 14px; border-top: 3px solid var(--ink-2); border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+.tool.ai { border-top: 3px dashed var(--carbon); }
+.tool.rules { border-top-color: var(--green); }
+.tool h3 { font-size: 15px; }
+.tool p { font-size: 13px; color: var(--ink-2); }
+.tool-figure { font-size: 15px; }
+.tool.ai .tool-figure { color: var(--carbon); }
+.graph-wrap { overflow-x: auto; padding: 4px 0 10px; }
+.graph { display: block; width: 100%; min-width: 760px; height: auto; font-family: var(--sans); }
+.g-head { font-size: 11px; letter-spacing: .07em; text-transform: uppercase; fill: var(--label); font-weight: 600; }
+.g-edge { fill: none; stroke: var(--rule); stroke-width: 1.2; transition: opacity .2s; }
+.g-edge.covers { stroke: var(--green); stroke-width: 1.6; }
+.g-edge.near { stroke: var(--carbon); stroke-dasharray: 4 3; }
+.g-edge.dim, .g-node.dim { opacity: .14; }
+.g-node { cursor: pointer; transition: opacity .2s; }
+.g-node rect { fill: var(--sheet); stroke: var(--rule); }
+.g-node.form rect { stroke: var(--ink-2); }
+.g-node.product_line rect { fill: var(--pale); stroke: var(--green); }
+.g-node text { fill: var(--ink); font-size: 11px; }
+.g-node.product_line text { font-family: var(--type); font-weight: 700; }
+.g-node:hover rect, .g-node.picked rect { stroke-width: 2; }
+.g-node.picked rect { fill: var(--band); }
+.g-node:focus { outline: none; }
+.g-node:focus-visible rect { stroke: var(--carbon); stroke-width: 2; }
+.g-tally { cursor: pointer; transition: opacity .2s; }
+.g-tally.dim { opacity: .14; }
+.g-tally text { font-size: 11px; fill: var(--ink-2); }
+.g-covers { fill: var(--green); font-weight: 600; }
+.g-near { fill: var(--carbon); }
+.g-details { padding: 12px 14px; border-top: 1px solid var(--line-soft); display: grid; gap: 6px; animation: rise .3s var(--ease) both; }
+.g-details h3 { font-size: 16px; }
+.g-parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 14px; margin: 2px 0; }
+.g-parts dt { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--label); }
+.g-parts dd { font-size: 13px; overflow-wrap: anywhere; }
+.g-parts dd.unknown { color: var(--label); font-style: italic; }
+@media (max-width: 1180px) { .stations { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 720px) { .field.inline { grid-template-columns: 1fr; } .small-select { margin-left: 0; } .stations { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WEB = ROOT / "web"
 sys.path.insert(0, str(ROOT))
 
-DPA_VERSION = "2026-11-20"  # the data processing agreement in web/legal/, as in web/worker/index.ts
+DPA_VERSION = "2026-11-26"  # the data processing agreement in web/legal/, as in web/worker/index.ts
 BUCKET = "rightfit-files"
 SITE = "https://rightfit.hackathon-team6-cubicasa-app.workers.dev"   # RightFit online, where the laptop's app links
 TYPES = {"pdf": "application/pdf", "xls": "application/vnd.ms-excel", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
@@ -223,6 +223,11 @@ def main():
                 images += [(f"projects/{pid}/pages/{p['id']}/{n}/{page}.png", path, page) for page in range(1, d["pages"] + 1)]
         extras[p["id"]] = {"revisions": revisions(p["id"], project["originals"]), "marks": marks}
 
+    # The knowledge graph (MAF-36): the product lines that come back from one project to the next, from the forms, the
+    # register of the previous project (on this laptop only) and the BOQ; no AI. Admins who are members see it drawn.
+    from ingest.graph import build as build_graph
+    graph = build_graph(project["originals"], ROOT / "data/raw/register/register.xlsx", boq_files(Path(project["boq"])))
+
     # The original files of each package (reading a file brings it back from iCloud first)
     uploads = []
     for p in packages:
@@ -263,7 +268,7 @@ def main():
         uploads = [(k, f) for k, f in uploads if sent.get(k) != f.stat().st_size]
         images = [(k, pdf, page) for k, pdf, page in images if k not in sent]
         once = {k: f.stat().st_size for k, f in uploads} | {k: 0 for k, _, _ in images}
-        for key, value in [("tables.json", tables), *((f"reviews/{c}.json", v) for c, v in reviews.items()),
+        for key, value in [("tables.json", tables), ("graph.json", graph), *((f"reviews/{c}.json", v) for c, v in reviews.items()),
                            *((f"state/{c}.json", v) for c, v in states.items()), *((f"extra/{c}.json", v) for c, v in extras.items())]:
             path = work / key.replace("/", "-")
             path.write_text(json.dumps(value, ensure_ascii=False))
@@ -301,7 +306,8 @@ def main():
         settings.write_text(json.dumps({**kept_settings, "online": {"site": SITE, "project": pid}}, indent=2) + "\n")
     print(f"Imported into project {pid} ({where}): {len(packages)} packages, {len(reviews)} reviews from the laptop"
           + (f", {len(kept)} kept as changed online ({', '.join(kept)})" if kept else "")
-          + f", {len(images)} page images, {len(uploads)} files, {lines} BOQ lines. The project is locked: it opens with the team password.")
+          + f", {len(images)} page images, {len(uploads)} files, {lines} BOQ lines, a graph of "
+          + f"{sum(graph['summary']['product_lines'].values())} product lines. The project is locked: it opens with the team password.")
 
 
 if __name__ == "__main__":

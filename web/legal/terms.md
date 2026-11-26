@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Version 2026-11-20.** These Terms apply from that date. Earlier versions are kept in the RightFit repository.
+**Version 2026-11-26.** These Terms apply from that date. Earlier versions are kept in the RightFit repository.
 
 ## 1. Who we are, and what these Terms are
 
@@ -60,7 +60,7 @@ In these Terms:
 
 6.1. **Ownership.** As between you and us, the Customer and the Members keep all rights in Customer Content. We claim no ownership of it.
 
-6.2. **Licence to us.** You grant the Provider a non-exclusive, worldwide, royalty-free licence, for the term of your use of the Service, to host, copy, process, transmit and display Customer Content, solely to provide, secure and maintain the Service for you and as the Data Processing Agreement allows. We do not use Customer Content to train artificial intelligence models, and we do not sell it or use it for advertising.
+6.2. **Licence to us.** You grant the Provider a non-exclusive, worldwide, royalty-free licence, for the term of your use of the Service, to host, copy, process, transmit and display Customer Content, solely to provide, secure and maintain the Service for you and as the Data Processing Agreement allows, including the record of products that come back across the Customer's projects (clause 1.4 of that Agreement). We do not use Customer Content to train artificial intelligence models, and we do not sell it or use it for advertising.
 
 6.3. **Your promises.** You confirm that you have every right, licence and permission needed to put Customer Content into a Project and to share it with that Project's Members; that doing so does not breach any confidentiality obligation, contract or law; and that Customer Content does not infringe anyone's intellectual property or other rights.
 

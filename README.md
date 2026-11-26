@@ -107,6 +107,8 @@ Since 21 Nov the project's own data is online too: the 51 packages with their or
 
 A person gets in in four steps: an account, with Google or with an email and a password; the terms, which open the first time and again when they change; a role in the project, from an invitation for their email or from a project they open; and, for a locked project, the team password as well. The person who invites sends the link in their own email, because RightFit online sends no email.
 
+Since 26 Nov RightFit keeps a knowledge graph of the products that come back from one project to the next: pipes, cables, valves and boilers. Pumps and air handling units stay out, because the same unit with the same duty point almost never comes back. Fixed rules read each product line (producer, type, sizes) out of the forms, the register of the previous project and the BOQ lines, with no AI and no cost (`ingest/products.py`, `ingest/graph.py`, spec `spec/features/knowledge_graph.md`), and the import puts the graph online. Management has a page for RightFit's own team, Inside RightFit, that shows how a package goes through RightFit with that package's own numbers, every tool with who does the work (AI, rules or a person) and its score, and the graph drawn. It opens a project only for an admin who is a member of it.
+
 The terms, privacy policy, data processing agreement, cookie policy and legal notice are in `web/legal/`. They are drafts: the operator's details and a lawyer's review are still missing.
 
 It is built like the AI Methods hackathon app, a Cloudflare Worker with a React page, Better Auth and D1, on Luca's Cloudflare account. On the laptop it runs with `npm run dev` in `web/`, and `npm test` there runs its 22 tests; [`web/README.md`](web/README.md) has the steps.
@@ -146,6 +148,7 @@ Everything a reviewer does happens online. The site's Worker checks the account,
 | The checks engine online, and the review done online by the reviewers | the same site, [`web/engine/`](web/engine/) | 21 Nov 2026 |
 | Our two models on Hugging Face | a private repository | 21 Nov 2026 |
 | One app: the pages with their marks, the revision comparison, the dates, the downloads and the booster sizing online; the laptop adds new packages | the same site, [`app/review/`](app/review/) | 21 Nov 2026 |
+| The knowledge graph of products that come back across projects, and Inside RightFit for the team | [`ingest/`](ingest/), the same site | 26 Nov 2026 |
 
 ## The fit check in Revit
 
@@ -196,7 +199,7 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.
 - RightFit online has been live since 20 Nov, with Google sign-in. Since 21 Nov it holds the project's own data in a locked project, and the reviewers do the review there: each change runs the checks again online, in a Python Worker; see above.
 - RightFit is one app since the night of 21 Nov: everything a reviewer does is online, and the app on the laptop adds a new package and sends it there. Its review screens now point to the same package online.
-- 166 tests for the Python part (`pytest`) and 22 for RightFit online (`npm test` in `web/`) pass.
+- 178 tests for the Python part (`pytest`) and 22 for RightFit online (`npm test` in `web/`) pass.
 - Since 21 Nov our two scored models are in a private repository on Hugging Face, with a card for the whole project.
 - All the packages come from one project, so for now the results are a demonstration, not an evaluation.
 
@@ -249,7 +252,7 @@ flowchart LR
 | [`app/`](app/) | the laptop app that adds and reads new packages, the review code RightFit online runs as well (`review_core.py`, `engine.py`, `booster.py`), and the checks as tools for AI agents |
 | [`web/`](web/) | RightFit online: the project space where the consultant, the contractor and the subcontractors meet, with Google sign-in, roles, invitations, the project's review and rules, edited by the reviewers, Management and the legal documents |
 | [`checks/`](checks/) | every check, in plain Python with no AI |
-| [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions |
+| [`ingest/`](ingest/) | reading the forms, the BOQs, the official sources of the rules and the revisions, and the product lines of the knowledge graph |
 | [`data/`](data/) | the rules tables, and what the AI read from P01 and P02 |
 | [`model/`](model/) | our own models |
 | [`eval/`](eval/) | every comparison with the plain way |

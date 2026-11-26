@@ -1,6 +1,6 @@
 # Data Processing Agreement
 
-**Version 2026-11-20.** This agreement meets Article 28(3) of Regulation (EU) 2016/679 (the **GDPR**).
+**Version 2026-11-26.** This agreement meets Article 28(3) of Regulation (EU) 2016/679 (the **GDPR**).
 
 ## Parties
 
@@ -13,11 +13,13 @@ The consultant accepts this Agreement on the Customer's behalf when opening a pr
 
 ## 1. Subject matter and duration
 
-1.1. The Provider processes personal data contained in Customer Content (the **Customer Personal Data**) on behalf of the Customer, solely to provide the Service for the Customer's project.
+1.1. The Provider processes personal data contained in Customer Content (the **Customer Personal Data**) on behalf of the Customer, solely to provide the Service for the Customer's projects as this Agreement describes.
 
 1.2. This Agreement applies for as long as the Provider processes Customer Personal Data, and ends when that data has been deleted under clause 10.
 
 1.3. Annex I describes the processing: its nature and purpose, the types of personal data and the categories of data subjects.
+
+1.4. **Products that come back across the Customer's projects.** The Customer instructs the Provider to keep a record of the products submitted in its projects that come back from one project to the next, such as pipes, cables, valves and boilers: the producer, type and sizes of each product line, the forms that submitted it and the answers they received, a fingerprint of each document that came with it, and the lines of the bill of quantities it covers. The Provider shows this record to the Members who act for the Customer, in the Customer's other projects, so that a product line already answered need not be checked from nothing. A document stays in its project and opens only for a Member of that project, and a Member who does not act for the Customer, such as a contractor or subcontractor, never sees the record of another project. The record is built by fixed rules, without artificial intelligence, and is deleted with the projects it comes from, under clause 10.
 
 ## 2. The Customer's instructions
 
@@ -97,7 +99,7 @@ Each party's liability under this Agreement is subject to Article 82 GDPR and to
 |---|---|
 | Subject matter | hosting and processing the content of a construction project's material approval workflow |
 | Nature | collection through upload, storage, organisation, retrieval, consultation, automated analysis by deterministic checks and, where indicated, artificial intelligence, display to authorised Members, erasure |
-| Purpose | enabling the parties of a construction project to prepare, check, circulate and answer material approval forms |
+| Purpose | enabling the parties of a construction project to prepare, check, circulate and answer material approval forms; and keeping, for the Members who act for the Customer, the record of products that come back across the Customer's projects (clause 1.4) |
 | Categories of data subjects | staff and representatives of the project's parties (client, consultants, designers, site supervisors, contractors, subcontractors), staff of manufacturers and suppliers named in documents, and other persons named in documents |
 | Types of personal data | names, job titles, company names, business contact details, signatures and stamps on documents, and any other personal data contained in the documents and comments the Customer's Members put in |
 | Special categories | none; the Customer must not put special categories of personal data or criminal-offence data into a project |

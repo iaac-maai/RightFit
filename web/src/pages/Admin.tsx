@@ -5,9 +5,10 @@ import { ROLES, ROLE_LABEL, type Role } from "../../worker/roles";
 import { api, go, navigate, post } from "../api";
 import { country, day, plural } from "../format";
 import { Modal } from "../ui";
+import { Inside } from "./Inside";
 import type { AdminEvent, AdminMember, AdminOverview, AdminPerson, AdminProjectData, AdminProjectRow } from "../types";
 
-type Tab = "overview" | "people" | "projects" | "activity";
+type Tab = "overview" | "people" | "projects" | "activity" | "inside";
 
 // How each logged action reads, from the details it carries (role names come as labels, for example "Subcontractor")
 const a = (label: unknown) => (typeof label === "string" ? `${/^[aeiou]/i.test(label) ? "an" : "a"} ${label.toLowerCase()}` : "someone");
@@ -66,7 +67,7 @@ function EventRows({ events, showProject }: { events: AdminEvent[]; showProject:
 }
 
 export function Admin({ tab }: { tab: Tab }) {
-  const tabs: [Tab, string][] = [["overview", "Overview"], ["people", "People"], ["projects", "Projects"], ["activity", "Activity"]];
+  const tabs: [Tab, string][] = [["overview", "Overview"], ["people", "People"], ["projects", "Projects"], ["activity", "Activity"], ["inside", "Inside RightFit"]];
   return (
     <div className="screen">
       <header className="screen-head">
@@ -83,6 +84,7 @@ export function Admin({ tab }: { tab: Tab }) {
       {tab === "people" && <People />}
       {tab === "projects" && <Projects />}
       {tab === "activity" && <Activity />}
+      {tab === "inside" && <Inside />}
     </div>
   );
 }

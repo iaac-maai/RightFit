@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Version 2026-11-20.** This policy explains how RightFit online handles personal data, as Articles 13 and 14 of Regulation (EU) 2016/679 (the **GDPR**) require. It is written to be read in full; the tables summarise it.
+**Version 2026-11-26.** This policy explains how RightFit online handles personal data, as Articles 13 and 14 of Regulation (EU) 2016/679 (the **GDPR**) require. It is written to be read in full; the tables summarise it.
 
 ## 1. Who is responsible
 
@@ -12,7 +12,7 @@
 
 2.1. **As controller**, we process the data needed to run the Service itself: your account, your sign-in, your place in each project, invitations, the record of the terms you accepted, and the activity log. Sections 3 to 9 describe this processing.
 
-2.2. **As processor**, we host and process the content of each project (material approval forms, attached documents, comments and decisions, and any personal data in them, such as the names and signatures of the people who prepared or signed a document) on behalf of the organisation that opened the project (the **Customer**). The Customer is the controller of that content and decides why it is processed; our [Data Processing Agreement](/data-processing) governs it. If you want to exercise your rights over such content, contact the Customer; we will help them answer you.
+2.2. **As processor**, we host and process the content of each project (material approval forms, attached documents, comments and decisions, and any personal data in them, such as the names and signatures of the people who prepared or signed a document) on behalf of the organisation that opened the project (the **Customer**). The Customer is the controller of that content and decides why it is processed; our [Data Processing Agreement](/data-processing) governs it. On the Customer's instruction, we also keep a record of the products that come back from one of its projects to the next (the product line, the forms that submitted it, the answers they received and a fingerprint of each document) and show it to the people who act for the Customer in its other projects; a document never leaves its project ([Data Processing Agreement](/data-processing), clause 1.4). If you want to exercise your rights over such content, contact the Customer; we will help them answer you.
 
 ## 3. The personal data we process
 
