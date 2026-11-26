@@ -140,7 +140,7 @@ def add_boq(g, boq_files):
             asked = describe(str(ln["text"]), str(ln["producer"] or ""))
             if asked["kind"] not in SCOPE or not any(asked.get(p) for p in IDENTITY[asked["kind"]] if p != "producer"):
                 continue
-            bid = g.node(f"boq:{n}:{ln['sheet']}:{ln['row']}", type="boq_line", kind=asked["kind"], sheet=ln["sheet"],
+            bid = g.node(f"boq:{n}:{ln['sheet']}:{ln['row']}", type="boq_line", kind=asked["kind"], file=ln["file"], sheet=ln["sheet"],
                          row=ln["row"], sizes=asked["sizes"], label=_short(" ".join(str(ln["text"]).split()), 180))
             for lid, known in g.lines.items():
                 hit = covers(known, asked)

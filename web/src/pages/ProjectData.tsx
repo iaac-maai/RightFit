@@ -5,6 +5,7 @@ import { api, go, navigate, post } from "../api";
 import { AddPackage } from "./AddPackage";
 import { plural } from "../format";
 import type { BoqLine, PackageRow } from "../types";
+import { key, type Entry, type Status } from "../../worker/register";
 
 export const fileUrl = (projectId: string, code: string, name: string, page?: number) =>
   `/api/projects/${projectId}/files/${code}/${encodeURIComponent(name)}${page ? `#page=${page}` : ""}`;
@@ -116,10 +117,22 @@ export function Packages({ projectId }: { projectId: string }) {
   );
 }
 
+// Where a BOQ line stands (MAF-36c), from the forms that reach it; the order is the order of the filters
+const STATUS: [Status, string, string][] = [
+  ["approved", "Approved", "a form of this project covers it and got A or B"],
+  ["submitted", "Submitted", "a form of this project covers it and waits for its answer"],
+  ["returned", "Returned", "the forms that cover it got C"],
+  ["approved_before", "Approved before", "not submitted here; the same product line got A or B in your earlier project"],
+  ["might", "Perhaps covered", "a form might cover it, a part is not given on one side: you decide"],
+  ["none", "No form", "RightFit reads this kind of line and found no form for it"],
+  ["unread", "Not matched yet", "RightFit does not match this kind of line to forms yet"],
+];
+
 export function Boq({ projectId }: { projectId: string }) {
-  const { data, error } = useData<{ lines: BoqLine[]; note?: string }>(`/api/projects/${projectId}/boq`);
+  const { data, error } = useData<{ lines: BoqLine[]; note?: string; register?: Record<string, Entry>; graph?: boolean; earlier?: boolean }>(`/api/projects/${projectId}/boq`);
   const [sheet, setSheet] = useState("");
   const [find, setFind] = useState("");
+  const [only, setOnly] = useState<Status | "">("");
   const lines = data?.lines ?? [];
   const sheets = useMemo(() => {
     const counts = new Map<string, number>();
@@ -129,37 +142,72 @@ export function Boq({ projectId }: { projectId: string }) {
   if (error) return <p className="err" role="alert">{error}</p>;
   if (!data) return <span className="spinner" aria-label="Loading" />;
   if (data.note) return <p className="sheet-note">{data.note}</p>;
-  const shown = lines.filter((l) => (!sheet || l.sheet === sheet) && (!find || `${l.nr ?? ""} ${l.text} ${l.producer ?? ""}`.toLowerCase().includes(find.toLowerCase())));
+  const entry = (l: BoqLine): Entry => data.register?.[key(l)] ?? { status: "unread", forms: [] };
+  const inSheet = lines.filter((l) => (!sheet || l.sheet === sheet) && (!find || `${l.nr ?? ""} ${l.text} ${l.producer ?? ""}`.toLowerCase().includes(find.toLowerCase())));
+  const counts = new Map<Status, number>();
+  for (const l of inSheet) counts.set(entry(l).status, (counts.get(entry(l).status) ?? 0) + 1);
+  const shown = inSheet.filter((l) => !only || entry(l).status === only);
+  const statuses = STATUS.filter(([s]) => s !== "approved_before" || data.earlier);
   return (
     <section className="sheet" aria-label="The BOQ">
       <div className="sheet-head">
         <span className="lab">The bill of quantities</span>
         <span className="count">{plural(lines.length, "line", "lines")} in {plural(sheets.length, "chapter", "chapters")}; prices stay on the laptop</span>
       </div>
+      <p className="sheet-note band">
+        Each line shows whether a form covers it, and the answer that form got. RightFit finds the forms with fixed rules, no AI:
+        cables, pipes, valves and boilers by their product line, and the products of the packages it has read by their BOQ line.
+        A reviewer records a form's answer on its package; until then the line shows as submitted.
+        {!data.graph && " This project's product lines come with the next import from the laptop."}
+      </p>
       <div className="chapters" role="group" aria-label="Chapters">
         <button type="button" className={`chapter${sheet ? "" : " on"}`} onClick={() => setSheet("")}>All</button>
         {sheets.map(([s, n]) => (
           <button key={s} type="button" className={`chapter${sheet === s ? " on" : ""}`} onClick={() => setSheet(s)}>{s} <span>{n}</span></button>
         ))}
       </div>
+      <div className="chapters reg-filters" role="group" aria-label="Where the lines stand">
+        <button type="button" className={`chapter${only ? "" : " on"}`} onClick={() => setOnly("")}>Every line<span>{inSheet.length}</span></button>
+        {statuses.map(([s, label, hint]) => (
+          <button key={s} type="button" className={`chapter reg-${s}${only === s ? " on" : ""}`} title={hint} aria-pressed={only === s}
+            onClick={() => setOnly(only === s ? "" : s)}><i className="reg-dot" aria-hidden="true" />{label}<span>{counts.get(s) ?? 0}</span></button>
+        ))}
+      </div>
       <div className="filters">
         <input type="search" aria-label="Find a line" placeholder="Find a line, a product or a code" value={find} onChange={(e) => setFind(e.target.value)} />
       </div>
       <div className="table-wrap">
-        <table className="table">
-          <thead><tr><th>Chapter</th><th>Row</th><th>No.</th><th>What the line asks</th><th>Unit</th><th>Quantity</th><th>Producer</th></tr></thead>
+        <table className="table reg-table">
+          <thead><tr><th>Where it stands</th><th>Chapter</th><th>Row</th><th>No.</th><th>What the line asks</th><th>Unit</th><th>Quantity</th><th>Producer</th><th>Forms</th></tr></thead>
           <tbody>
-            {shown.map((l) => (
-              <tr key={`${l.file}-${l.sheet}-${l.row}`}>
-                <td className="nowrap">{l.sheet}</td>
-                <td>{l.row}</td>
-                <td className="typed small">{l.nr ?? ""}</td>
-                <td className="wrap">{l.text}</td>
-                <td>{l.unit ?? ""}</td>
-                <td className="typed small">{l.qty ?? ""}</td>
-                <td>{l.producer ?? ""}</td>
-              </tr>
-            ))}
+            {shown.map((l) => {
+              const e = entry(l);
+              const [, label, hint] = STATUS.find(([s]) => s === e.status)!;
+              return (
+                <tr key={`${l.file}-${l.sheet}-${l.row}`} className={`reg-${e.status}`}>
+                  <td className="nowrap"><span className="reg-chip" title={hint}><i className="reg-dot" aria-hidden="true" />{label}</span></td>
+                  <td className="nowrap">{l.sheet}</td>
+                  <td>{l.row}</td>
+                  <td className="typed small">{l.nr ?? ""}</td>
+                  <td className="wrap">{l.text}</td>
+                  <td>{l.unit ?? ""}</td>
+                  <td className="typed small">{l.qty ?? ""}</td>
+                  <td>{l.producer ?? ""}</td>
+                  <td className="reg-forms">
+                    {e.forms.map((f) => {
+                      const name = <>{f.form}{f.answer ? <i className={`letter sm ${f.answer}`} aria-label={`answered ${f.answer}`}>{f.answer}</i> : <em> waiting</em>}</>;
+                      const path = f.code ? `/p/${projectId}/packages/${f.code}` : "";
+                      return (
+                        <span key={`${f.form}|${f.how}`} className={`reg-form${f.how === "might" ? " might" : ""}`}
+                          title={f.earlier ? "earlier project" : f.how === "might" ? "might cover it" : f.how === "read" ? "matched on the read package" : "covers it"}>
+                          {path ? <a href={path} onClick={go(path)}>{name}</a> : name}{f.earlier && <em> earlier project</em>}
+                        </span>
+                      );
+                    })}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

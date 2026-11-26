@@ -9,7 +9,7 @@ export const ACROSS_PROJECTS_FROM = "2026-11-26";
 export interface GraphNode {
   id: string; type: "product_line" | "form" | "document" | "boq_line"; label: string; kind?: string;
   project?: string; projectId?: string; package?: string; answer?: string | null;
-  parts?: Record<string, string | null>; sizes?: string[]; projects?: string[]; sheet?: string; row?: number;
+  parts?: Record<string, string | null>; sizes?: string[]; projects?: string[]; file?: string; sheet?: string; row?: number;
 }
 export interface GraphEdge { from: string; to: string; type: "submits" | "in" | "supports" | "covers" | "near"; sizes?: string[] }
 export interface Graph { nodes: GraphNode[]; edges: GraphEdge[] }

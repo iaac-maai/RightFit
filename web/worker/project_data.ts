@@ -3,6 +3,7 @@
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
 import { DPA_VERSION, json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
 import { ACROSS_PROJECTS_FROM, together, type Graph } from "./products";
+import { register, type Line, type Link } from "./register";
 import { offers, type Elsewhere, type Pkg } from "./reuse";
 import { REVIEWERS, isAdmin, mayAddPackage, mayChangeReview, mayChangeRules, mayUseProducts } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
@@ -53,6 +54,8 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   if (path === "/api/team/unlock" && method === "POST") return unlock(request, env, user);
   const dpa = path.match(/^\/api\/projects\/([\w-]+)\/dpa$/);
   if (dpa && method === "POST") return acceptDpa(request, env, dpa[1], user);
+  const answer = path.match(/^\/api\/projects\/([\w-]+)\/packages\/(P\d+)\/answer$/);
+  if (answer && method === "POST") return recordAnswer(request, env, answer[1], answer[2], user);
   const pg = path.match(/^\/api\/projects\/([\w-]+)\/pages\/(P\d+)\/(\d{1,3})\/(\d{1,4})\.png$/);
   if (pg && method === "GET") {
     const me = await access(request, env, pg[1], user);
@@ -112,13 +115,16 @@ async function onePackage(env: Env, projectId: string, code: string, me: MemberR
     "SELECT name, size, pages FROM package_file WHERE project_id = ? AND code = ? ORDER BY name",
   ).bind(projectId, code).all();
   const k = keys(projectId, code);
-  const [stored, state, more] = await Promise.all([env.BUCKET.get(k.view), env.BUCKET.head(k.state), env.BUCKET.get(k.extra)]);
+  const [stored, state, more, answer] = await Promise.all([env.BUCKET.get(k.view), env.BUCKET.head(k.state), env.BUCKET.get(k.extra),
+    env.DB.prepare(`SELECT a.answer, a.answered_at AS answeredAt, u.name AS answeredBy FROM form_answer a LEFT JOIN "user" u ON u.id = a.answered_by
+      WHERE a.project_id = ? AND a.code = ?`).bind(projectId, code).first()]);
   const review = stored ? await stored.json() : null;
   const extra = more ? await more.json() : null;
   // the reviewers change a review once its readings are online (they come with an import from the laptop)
   const mayEdit = mayChangeReview(me.role) && Boolean(state);
   const mayAdd = mayAddPackage(me.role) && Boolean((row as { uploadedAt?: string | null }).uploadedAt) && !review;
-  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit, extra, mayAdd });
+  return json({ package: { ...row, items: JSON.parse(row.items || "[]") }, files, review, mayEdit, extra, mayAdd, answer,
+    mayAnswer: mayChangeReview(me.role) });
 }
 
 // One original file, from the private bucket, shown in the browser
@@ -243,8 +249,48 @@ async function boq(env: Env, projectId: string, me: MemberRow) {
   if (!seesForms(me)) return json({ lines: [], note: "The BOQ reaches subcontractors once forms have their branch." });
   const { results } = await env.DB.prepare(
     "SELECT file, sheet, row, nr, text, unit, qty, producer, standards FROM boq_line WHERE project_id = ? ORDER BY file, sheet, row",
-  ).bind(projectId).all();
-  return json({ lines: results });
+  ).bind(projectId).all<Line>();
+  // The register (MAF-36c): the forms that reach each line and where it stands
+  const [stored, answered, read] = await Promise.all([
+    env.BUCKET.get(`projects/${projectId}/graph.json`),
+    env.DB.prepare("SELECT code, answer FROM form_answer WHERE project_id = ?").bind(projectId).all<{ code: string; answer: string }>(),
+    env.DB.prepare("SELECT code, form_no AS formNo, revision FROM package WHERE project_id = ? AND letter IS NOT NULL")
+      .bind(projectId).all<{ code: string; formNo: string; revision: number }>(),
+  ]);
+  const graph = stored ? await stored.json<Graph>() : { nodes: [], edges: [] };
+  // the BOQ line RightFit found for each product of a read package (shortcut: one read per read package, a few today)
+  const links = (await Promise.all(read.results.map(async (p) => {
+    const st = await env.BUCKET.get(keys(projectId, p.code).state);
+    const found = st ? Object.values((await st.json<{ boq?: Record<string, Line | null> }>()).boq ?? {}) : [];
+    return found.filter((l): l is Line => Boolean(l?.file)).map((l): Link => ({ file: l.file, sheet: l.sheet, row: l.row, code: p.code, form: `${p.formNo} rev ${p.revision}` }));
+  }))).flat();
+  const earlier = mayUseProducts(me.role);
+  return json({
+    lines: results,
+    register: register(results, graph, Object.fromEntries(answered.results.map((a) => [a.code, a.answer])), links, earlier),
+    graph: stored !== null, earlier,
+  });
+}
+
+// POST /api/projects/:id/packages/:code/answer {answer}: the answer the form got (A, B or C, or null to clear it), as a
+// reviewer records it; RightFit's draft letter stays as it is (MAF-36c)
+async function recordAnswer(request: Request, env: Env, projectId: string, code: string, user: User) {
+  const me = await access(request, env, projectId, user);
+  if (me instanceof Response) return me;
+  if (!mayChangeReview(me.role)) return json({ error: "Only the reviewers record a form's answer." }, 403);
+  const answer = (await readBody(request)).answer ?? null;
+  if (answer !== null && !["A", "B", "C"].includes(String(answer))) return json({ error: "An answer is A, B or C." }, 400);
+  const known = await env.DB.prepare("SELECT 1 AS yes FROM package WHERE project_id = ? AND code = ?").bind(projectId, code).first();
+  if (!known) return json({ error: "No such package." }, 404);
+  const at = now();
+  await env.DB.batch([
+    answer === null
+      ? env.DB.prepare("DELETE FROM form_answer WHERE project_id = ? AND code = ?").bind(projectId, code)
+      : env.DB.prepare("INSERT OR REPLACE INTO form_answer (project_id, code, answer, answered_by, answered_at) VALUES (?, ?, ?, ?, ?)")
+        .bind(projectId, code, answer, user.id, at),
+    logged(env, user.id, "package.answered", projectId, { code, answer }),
+  ]);
+  return json({ answer: answer === null ? null : { answer, answeredAt: at, answeredBy: user.name } });
 }
 
 // POST /api/team/unlock {password}: the team password, checked on the server; five wrong tries in 15 minutes wait

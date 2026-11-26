@@ -9,7 +9,7 @@ import {
   RULE_STATUS, STATUS_RULE, confirmedValues, groups, notAProblem, passed, placeOf, plainReason, quotesOf, readingPages, shown, why, type Place,
   type Quote, type Row,
 } from "../review";
-import type { AiFinding, CheckResult, Match, PackageData, PackageExtra, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
+import type { AiFinding, CheckResult, FormAnswer, Match, PackageData, PackageExtra, PackageFile, PackageReview, Reading, ReviewDoc } from "../types";
 import type { Offer } from "../../worker/reuse";
 import { AddPackage } from "./AddPackage";
 import { fileUrl, useData } from "./ProjectData";
@@ -151,6 +151,7 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
             </span>
           </div>
         </div>
+        <Answered projectId={projectId} code={code} answer={data.answer ?? null} may={Boolean(data.mayAnswer)} />
         <Since extra={data.extra ?? null} />
         <details className="why-b">
           <summary>Why {v.status.letter}?</summary>
@@ -187,6 +188,46 @@ export function PackageView({ projectId, code, step }: { projectId: string; code
       <Files projectId={projectId} code={code} files={files} docs={v.documents} />
     </Edit.Provider>
     </Pane.Provider>
+  );
+}
+
+// The answer the form got, recorded by a reviewer once it is signed (MAF-36c): the BOQ register shows it on the lines
+// the form covers. RightFit's draft letter above stays as it is.
+const ANSWERS: [FormAnswer["answer"], string][] = [["A", "Approved"], ["B", "Approved with comments"], ["C", "Revise and resubmit"]];
+function Answered({ projectId, code, answer, may }: { projectId: string; code: string; answer: FormAnswer | null; may: boolean }) {
+  const [now, setNow] = useState(answer);
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState("");
+  const set = async (value: FormAnswer["answer"] | null) => {
+    setBusy(true);
+    setProblem("");
+    try {
+      setNow((await post<{ answer: FormAnswer | null }>(`/api/projects/${projectId}/packages/${code}/answer`, { answer: value })).answer);
+    } catch (err) {
+      setProblem((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  if (!may && !now) return null;
+  return (
+    <div className="answered">
+      <span className="lab">The answer the form got</span>
+      {now ? (
+        <span><i className={`letter sm ${now.answer}`}>{now.answer}</i> {ANSWERS.find(([a]) => a === now.answer)?.[1]}
+          <span className="meta"> · recorded by {now.answeredBy ?? "a reviewer"}, {day(now.answeredAt)}</span></span>
+      ) : <span className="meta">Not recorded yet: record it once the form is signed, and the BOQ shows it on the lines the form covers.</span>}
+      {may && (
+        <span className="answer-btns" role="group" aria-label="Record the answer">
+          {ANSWERS.map(([a, label]) => (
+            <button key={a} type="button" className={`btn small${now?.answer === a ? " on" : ""}`} disabled={busy} title={label}
+              aria-pressed={now?.answer === a} onClick={() => void set(a)}>{a}</button>
+          ))}
+          {now && <button type="button" className="link" disabled={busy} onClick={() => void set(null)}>Clear</button>}
+        </span>
+      )}
+      {problem && <p className="err" role="alert">{problem}</p>}
+    </div>
   );
 }
 

@@ -103,6 +103,16 @@ create table if not exists package_file (
   primary key (project_id, code, name)
 );
 create index if not exists package_file_sha_idx on package_file (sha);
+-- The answer a form got, as a reviewer records it (MAF-36c), apart from RightFit's draft letter; kept apart from
+-- package, so an import from the laptop never loses it
+create table if not exists form_answer (
+  project_id text not null references project (id) on delete cascade,
+  code text not null,
+  answer text not null check (answer in ('A', 'B', 'C')),
+  answered_by text references "user" ("id") on delete set null,
+  answered_at text not null,
+  primary key (project_id, code)
+);
 create table if not exists boq_line (
   project_id text not null references project (id) on delete cascade,
   file text not null,

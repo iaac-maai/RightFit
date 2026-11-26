@@ -111,7 +111,10 @@ export interface PackageExtra {
 }
 export interface PackageData {
   package: PackageRow; files: PackageFile[]; review: PackageReview | null; mayEdit?: boolean; extra?: PackageExtra | null; mayAdd?: boolean;
+  answer?: FormAnswer | null; mayAnswer?: boolean;
 }
+// The answer the form got, as a reviewer recorded it (MAF-36c), apart from RightFit's draft letter
+export interface FormAnswer { answer: "A" | "B" | "C"; answeredAt: string; answeredBy: string | null }
 
 // The rules the checks used for the project's country (worker/project_data.ts, rules)
 export interface LawRule {

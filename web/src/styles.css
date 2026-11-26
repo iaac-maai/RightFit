@@ -650,3 +650,34 @@ main { min-width: 0; }
 .reuse ul { margin: 4px 0 8px; padding-left: 18px; }
 .reuse-one + .reuse-one { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 4px; }
 .reuse .btn { margin-left: 6px; }
+
+/* The BOQ register (MAF-36c): where each line stands, a colour per status, always with its word */
+:root { --amber: #9a5b00; --amber-wash: #fdf0dc; }
+.reg-approved { --reg: var(--green); --reg-wash: #E3F0E7; }
+.reg-submitted { --reg: var(--ink-2); --reg-wash: var(--pale); }
+.reg-returned { --reg: var(--red); --reg-wash: var(--red-wash); }
+.reg-approved_before { --reg: var(--green-2); --reg-wash: transparent; }
+.reg-might { --reg: var(--amber); --reg-wash: transparent; }
+.reg-none { --reg: var(--amber); --reg-wash: var(--amber-wash); }
+.reg-unread { --reg: var(--rule); --reg-wash: transparent; }
+.reg-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--reg); margin-right: 6px; vertical-align: 0; }
+.reg-approved_before .reg-dot, .reg-might .reg-dot { background: transparent; box-shadow: inset 0 0 0 2px var(--reg); }
+.reg-might .reg-dot { box-shadow: none; border: 2px dashed var(--reg); width: 10px; height: 10px; }
+.reg-table tbody tr { background: var(--reg-wash); }
+.reg-table tbody tr td:first-child { box-shadow: inset 3px 0 0 var(--reg); }
+.reg-chip { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.reg-unread .reg-chip { color: var(--label); font-weight: 500; }
+.reg-forms { min-width: 150px; }
+.reg-form { display: block; white-space: nowrap; font-size: 12.5px; }
+.reg-form .letter.sm { font-size: 11px; line-height: 16px; width: 16px; margin-left: 5px; }
+.reg-form em { font-style: normal; color: var(--label); }
+.reg-form.might { opacity: .8; }
+.reg-filters { border-bottom: 0; padding-bottom: 0; }
+.answered { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 10px 0 0; margin-top: 10px; border-top: 1px solid var(--line-soft); }
+.answered .lab { flex-basis: 100%; }
+.answered .letter.sm { margin-right: 4px; vertical-align: middle; }
+.answer-btns { display: inline-flex; gap: 6px; align-items: center; margin-left: auto; }
+.answer-btns .btn.on { border-color: var(--green); color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+
+/* a wide table scrolls inside its sheet, never the page */
+.screen > * { min-width: 0; }

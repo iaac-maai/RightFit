@@ -19,6 +19,7 @@ const ACTION: Record<string, (d: Record<string, unknown>) => string> = {
   "terms.accepted": (d) => `accepted the terms of ${String(d.version ?? "")}`,
   "project.opened": () => "opened the project and accepted the data processing agreement",
   "project.dpa_accepted": (d) => `accepted the data processing agreement of ${String(d.version ?? "")} for the project`,
+  "package.answered": (d) => (d.answer ? `recorded answer ${String(d.answer)} for ${String(d.code ?? "")}` : `cleared the answer of ${String(d.code ?? "")}`),
   "invitation.sent": (d) => `invited ${a(d.role)}`,
   "invitation.withdrawn": () => "withdrew an invitation",
   "invitation.declined": () => "declined an invitation",

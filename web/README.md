@@ -24,6 +24,7 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `engine/` | the checks engine: a Python Worker with no address of its own that runs the laptop's review code (`app/engine.py`); `build.py` copies that code in before Wrangler bundles it |
 | `scripts/import_project.py` | puts the project the review app has open online: files in the private bucket, rows in D1, the BOQ without prices; an import again keeps what was confirmed or decided online, unless `--replace-online-work`; with the files or `--pages` it also draws every page of the read packages for the marks |
 | `worker/reuse.ts` | The same file in another package (MAF-36b): readings a person confirmed on a file with the same fingerprint, offered on the Readings step for a reviewer to confirm; `worker/reuse.test.ts` tests it |
+| `worker/register.ts` | The BOQ register (MAF-36c): where each BOQ line stands, from the knowledge graph, the read packages' BOQ matches and the answers recorded on packages; shown on the BOQ page; `worker/register.test.ts` tests it |
 | `migrations/` | changes for a database made before them; a new database gets everything from `schema.sql` |
 | `src/` | the page: sign-in, the terms, the projects, a project's team and the invitations, a package's review in three steps with its pages and their marks (`src/review.ts` arranges it, with its tests), the rules and booster sizing (`src/chart.tsx` draws the curves) |
 | `wrangler.jsonc` | the Worker and its database on Cloudflare |
