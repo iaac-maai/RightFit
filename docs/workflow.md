@@ -36,7 +36,7 @@ The board is private to the team. Its columns are Backlog, Ready, In progress, W
 ## 4. Sessions
 
 - **The control session** keeps the backlog. Every day it gives a short triage: what finished, what waits on Luca, what starts today and how much capacity is left. Luca says yes or no to the list.
-- **One session per issue.** On Luca's yes, the control session starts a session for each Ready issue, named `#<issue> <short title>` and grouped in the sidebar by milestone. For now at most two sessions write code at the same time.
+- **One session per issue.** On Luca's yes, the control session starts a session for each Ready issue, named `#<issue> P<priority> · <short title>`. For now at most two sessions write code at the same time.
 - **Each session works in its own copy** of the repository (a git worktree) on a branch `issue-<number>-<slug>`. Sessions never write in each other's copy or in the main folder.
 - **The brief comes from the issue**: goal, done when, files, plus `AGENTS.md`.
 
