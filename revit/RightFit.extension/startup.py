@@ -13,4 +13,13 @@ try:
     import rf_listen
     rf_listen.start()
 except Exception:
-    pass
+    try:  # say why in %APPDATA%\RightFit\listen.log
+        import io
+        import traceback
+        folder = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "RightFit")
+        if not os.path.isdir(folder):
+            os.makedirs(folder)
+        with io.open(os.path.join(folder, "listen.log"), "a", encoding="utf-8") as f:
+            f.write(u"startup could not start the listener:\n" + traceback.format_exc() + u"\n")
+    except Exception:
+        pass

@@ -21,6 +21,26 @@ import rf_setup
 SLOT = "RightFit.listener.stop"  # where the running thread's stop signal is kept, across pyRevit reloads
 
 
+def _log(text):
+    """One line in %APPDATA%\\RightFit\\listen.log, to see what the listener did; kept short (last 200 lines)."""
+    try:
+        import datetime
+        import io
+        import os
+        path = os.path.join(core.home(), "listen.log")
+        lines = []
+        if os.path.exists(path):
+            with io.open(path, encoding="utf-8") as f:
+                lines = f.read().splitlines()[-199:]
+        lines.append(u"{} {}".format(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), text))
+        if not os.path.isdir(core.home()):
+            os.makedirs(core.home())
+        with io.open(path, "w", encoding="utf-8") as f:
+            f.write(u"\n".join(lines) + u"\n")
+    except Exception:
+        pass
+
+
 class _Quiet(object):
     """A report that prints nothing: a message from the site has no pyRevit window to print into."""
     def print_html(self, *a, **k):
@@ -92,10 +112,14 @@ class _Handler(IExternalEventHandler):
                 command = self.waiting.pop(0) if self.waiting else None
             if command is None:
                 return
+            _log(u"running message {} ({})".format(command.get("id"), command.get("setLabel")))
             try:
                 ok, message = _preview(uiapp, command)
             except Exception as e:
+                import traceback
+                _log(u"preview failed: {}".format(traceback.format_exc()))
                 ok, message = False, u"Revit could not draw it: {}".format(e)
+            _log(u"answer: {} {}".format(ok, message))
             _answer(command, ok, message)
 
     def GetName(self):
@@ -104,22 +128,36 @@ class _Handler(IExternalEventHandler):
 
 def _listen(stop, handler, event):
     """The background thread: ask the site for a message, hand it to Revit, wait, again."""
-    import rf_online
+    _log(u"listening")
+    last = [None]
+
+    def note(text):  # log a state once, not every 4 seconds
+        if text != last[0]:
+            last[0] = text
+            _log(text)
+
     wait_s = 4
     while not stop.WaitOne(int(wait_s * 1000)):
         try:
+            import rf_online
             if not core.link().get("token") or not core.linked_project(rf_setup.settings()):
+                note(u"not linked: waiting")
                 wait_s = 10  # not linked: look again later, in case it gets linked
                 continue
             status, a = rf_online.call("GET", "/api/revit/commands", token=rf_online.token(), timeout_s=8)
+            note(u"site answers {}{}".format(status, u"" if status == 200 else u": {}".format(a.get("error"))))
             wait_s = a.get("interval", 4) if status == 200 else 30
             if status == 200 and a.get("command"):
+                _log(u"message {} for {}".format(a["command"].get("id"), a["command"].get("setLabel")))
                 handler.put(a["command"])
                 event.Raise()
-        except BaseException:
+        except BaseException as e:
+            note(u"error: {}".format(e))
             wait_s = 15  # offline, or anything else: never let it reach Revit
         except:  # noqa: E722  (.NET exceptions)
+            note(u"error (.NET)")
             wait_s = 15
+    _log(u"stopped")
 
 
 def start():
@@ -136,6 +174,9 @@ def start():
         t.daemon = True
         t.start()
         AppDomain.CurrentDomain.SetData(SLOT, stop)
+        _log(u"started")
         return True
     except Exception:
+        import traceback
+        _log(u"could not start: {}".format(traceback.format_exc()))
         return False
