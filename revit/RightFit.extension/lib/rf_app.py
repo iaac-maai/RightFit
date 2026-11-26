@@ -28,16 +28,34 @@ COLOUR_MD = {"FAIL": "red", "flag": "darkorange", "unclear": "gray", "info": "gr
 # ---------------------------------------------------------------- picking the pump
 
 class PumpFilter(ISelectionFilter):
+    """Lets the architect click only pump sets: an element in a pump category whose names say it is a
+    pump (rf_project.is_pump). Anything else, such as a tank, a pit or a vessel, can't be clicked."""
+
+    def __init__(self, doc=None):
+        self.doc = doc
+        self.sets = rf_project.candidates()
+
     def AllowElement(self, el):
         try:
-            if rf_model.name_of(el).startswith(u"RF "):
-                return False  # RightFit's own preview drawing, not a pump
-            return el.Category is not None and eid(el.Category.Id) in [int(c) for c in rf_model.PUMP_CATEGORIES]
+            if el.Category is None or eid(el.Category.Id) not in [int(c) for c in rf_model.PUMP_CATEGORIES]:
+                return False
+            return rf_project.is_pump(rf_model.names_of(el, self.doc or el.Document), self.sets)
         except Exception:
             return False
 
     def AllowReference(self, ref, point):
         return False
+
+
+def pumps_in(doc):
+    """The pump sets in the model, as PumpFilter sees them."""
+    f = PumpFilter(doc)
+    cats = List[BuiltInCategory]()
+    for c in rf_model.PUMP_CATEGORIES:
+        cats.Add(c)
+    from Autodesk.Revit.DB import ElementMulticategoryFilter
+    els = FilteredElementCollector(doc).WherePasses(ElementMulticategoryFilter(cats)).WhereElementIsNotElementType()
+    return [el for el in els if f.AllowElement(el)]
 
 
 def clear_drawing(doc):
@@ -54,11 +72,13 @@ def clear_drawing(doc):
 def pick_pump(uidoc):
     """The selected pump, or ask the architect to click one."""
     doc = uidoc.Document
+    f = PumpFilter(doc)
     for i in uidoc.Selection.GetElementIds():
         el = doc.GetElement(i)
-        if PumpFilter().AllowElement(el):
+        if f.AllowElement(el):
             return el
-    ref = uidoc.Selection.PickObject(ObjectType.Element, PumpFilter(), "RightFit: click the pump set")
+    ref = uidoc.Selection.PickObject(ObjectType.Element, f,
+                                     "RightFit: click the pump set (only pump sets can be picked; Esc to cancel)")
     return doc.GetElement(ref.ElementId)
 
 

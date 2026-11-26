@@ -63,7 +63,7 @@ The verdict of a set is the worst of its results: FAIL when something blocks it 
 ## 5. In Revit
 A RightFit tab with six buttons:
 
-1. **Check pump**: click the pump in the model; RightFit reads its room and checks the set in it, and the candidates one by one, without changing the model.
+1. **Check pump**: click the pump in the model (only an element whose names say it is a pump, or that matches a candidate, can be clicked); RightFit reads its room and checks the set in it, and the candidates one by one, without changing the model.
 2. **Next option**: shows the next candidate in the pump's place, as a preview.
 3. **Swap**: puts the chosen candidate in the pump's place: the maker's family when it is in `families/`, or a type of the same family that names the model. It keeps the mark and comments, writes RightFit's verdict into the element, and draws what the swap changes (pipe ends that no longer meet it, the circuit, the weight). One Undo in Revit puts everything back.
 4. **Clear**: removes what RightFit drew.

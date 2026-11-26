@@ -12,6 +12,10 @@ doc, uidoc = revit.doc, revit.uidoc
 if not rf_setup.settings().get("project"):
     forms.alert("Pick the project first (RightFit > Settings).", exitscript=True)
 rf_app.clear_drawing(doc)  # show the real pump again before asking for it
+if not rf_app.pumps_in(doc):
+    forms.alert("RightFit found no pump set in this model: no Mechanical Equipment, Plumbing, Generic Model "
+                "or Specialty Equipment element whose name says it is a pump or matches a set in "
+                "candidates.json. Place the pump set (or click Test Room) and try again.", exitscript=True)
 try:
     pump = rf_app.pick_pump(uidoc)
 except Exception:
