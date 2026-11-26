@@ -72,6 +72,7 @@ The full principles are in `spec/constitution/mission.md` §5.
 6. If an engineering question is unclear, stop and flag it for Luca instead of assuming.
 7. Record shared decisions in repository files, not only in chat.
 8. Before raising a question, read this file, `spec/constitution/`, the spec in `spec/features/` for the area, `docs/decisions.md` and the files the question touches. Answer from the repository first and cite the file. Bring to Luca only what the repository does not settle and what is his to decide, grouped in one message, each question with a proposed answer.
+9. The backlog, the board, which agent does what and how work reaches `main` are in `docs/workflow.md`.
 
 The repository structure is in `spec/constitution/tech_stack.md` §5.
 

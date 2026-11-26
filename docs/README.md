@@ -3,6 +3,7 @@
 | File | What it is |
 |---|---|
 | `decisions.md` | every decision, with its date, its reason and who took it |
+| `workflow.md` | how we plan and build: issues, milestones, which agent for which task, and the checks before `main` |
 | `problem_segmentation.md` | the problem tree, from the reviewer's need down to each part (IAAC deliverable) |
 | `data_map.md` | every data set we have or need, where it is and how much of it is confirmed |
 | `maf_rules.md` | the rules and the official texts they come from |

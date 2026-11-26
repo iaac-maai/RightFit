@@ -94,7 +94,7 @@ RightFit/
 |-- spec/
 |   |-- constitution/      mission, roadmap, tech stack
 |   `-- features/          maf_checker.md
-|-- docs/                  problem tree, data map, decisions, register findings, rules
+|-- docs/                  problem tree, data map, decisions, workflow, register findings, rules
 |-- data/
 |   |-- raw/               original packages, BOQ and register (git-ignored)
 |   |-- projects/          one folder per project: packages, originals, BOQs (git-ignored)
