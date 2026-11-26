@@ -82,6 +82,35 @@ def _norm(text):
     return u"".join(ch for ch in (text or u"").lower() if ch.isalnum())
 
 
+# Words that say an element is a pump, in the languages of the makers' files and the projects
+# (English, Spanish, Romanian, German, French, Italian), and the makers' own names for booster sets.
+PUMP_WORDS = (u"pump", u"booster", u"bomba", u"pompa", u"pumpe", u"pompe", u"hydromulti", u"siboost",
+              u"esybox")
+
+
+def is_pump(names, sets=None):
+    """True when an element's names (family, type, Model, comments) say it is a pump set, so Check Pump
+    only lets the architect click a pump. Three ways to tell, all from the names alone:
+    - RightFit's own drawings ("RF ...") are never a pump; of the test room's elements ("RFT ..."),
+      only the one built as the pump ("RFT pump ...") is;
+    - the names hold a candidate's model code (for example "CME 15-2"), so the set is one we know;
+    - the names hold a pump word ("pump", "bomba", "booster"...).
+    A tank, a pit or a vessel has none of these, so it can't be picked."""
+    names = [n for n in names if n]
+    if not names:
+        return False
+    first = names[0].strip()
+    if first.startswith(u"RF "):
+        return False  # a preview, service space or clash box RightFit drew
+    if any(n.strip().startswith(u"RFT") for n in names):
+        return any(n.strip().startswith(u"RFT pump") for n in names)  # the test room: only its pump
+    joined = _norm(u" ".join(names))
+    sets = sets if sets is not None else candidates()
+    if any(_norm(s.get("model")) and _norm(s.get("model")) in joined for s in sets):
+        return True
+    return any(w in joined for w in PUMP_WORDS)
+
+
 def match(names, sets=None):
     """The candidate a model element is: the first set whose model code appears in the element's names
     (family, type, Model parameter, comments)."""
