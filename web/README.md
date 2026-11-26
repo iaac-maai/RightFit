@@ -18,6 +18,7 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `src/pages/Inside.tsx` | Inside RightFit, in Management: how a package goes through RightFit with its own numbers, the tools, and the knowledge graph drawn; a project opens only for an admin who is a member of it |
 | `src/pages/Products.tsx`, `worker/products.ts` | Product lines, for the consultant's people: the products that come back, with their forms, answers, documents and the BOQ lines they cover, from this project and the consultant's other projects that accepted the agreement of 26 Nov 2026; `worker/products.test.ts` tests putting the projects together |
 | `worker/revit.ts`, `worker/revit_link.ts` | the Revit link (`spec/features/revit_link.md`): a computer with Revit linked by a code approved on the site, the project's pump sets for Revit, the checks Revit sends, the chosen set; `worker/revit_link.test.ts` tests its rules |
+| `migrations/0006_revit_command.sql` | Preview in Revit: a message from the Fit check page for the person's own linked Revit (`spec/features/revit_link.md` §9) |
 | `src/pages/FitCheck.tsx`, `src/pages/RevitLink.tsx` | the project's Fit check page, and the page that approves a computer with Revit (`/revit?code=...`) |
 | `worker/upload.ts` | a package added on the site: its files into the private bucket, one at a time; the package waits to be read |
 | `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the review dates, the consultant's rules; each change goes to the engine; and the booster sizing |
@@ -58,6 +59,8 @@ npx wrangler secret put TEAM_PASSWORD  # opens a locked project's data, besides 
 npx wrangler r2 bucket create rightfit-files --location weur
 # a database made before 26 Nov 2026 also needs the Revit link's tables, once:
 # npx wrangler d1 execute rightfit-db --remote --file=migrations/0003_revit_link.sql
+# and, for Preview in Revit (26 Nov 2026), once:
+# npx wrangler d1 execute rightfit-db --remote --file=migrations/0006_revit_command.sql
 (cd engine && npx wrangler deploy -c wrangler.jsonc)   # the checks engine first: the site's Worker calls it by name
 npm run deploy
 # the project the review app has open, with its packages, files, reviews and BOQ lines (no prices):

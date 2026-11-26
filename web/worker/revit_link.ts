@@ -126,3 +126,26 @@ export function setsView(candidates: { sets?: unknown[] } | null) {
     L: num(s.L), W: num(s.W), H: num(s.H), kg: num(s.kg), pumps: num(s.pumps),
   }));
 }
+
+// ---- From the site to Revit (spec/features/revit_link.md §9) ----------------------------------------------------------
+
+export const COMMAND_SECONDS = 120; // a message waits this long for Revit
+export const LISTEN_SECONDS = 4; // how often Revit asks for a message
+
+// Whether a message sent at createdAt still waits at now (both ISO times)
+export function commandFresh(createdAt: string, now: string) {
+  return new Date(now).getTime() - new Date(createdAt).getTime() < COMMAND_SECONDS * 1000;
+}
+
+// Who may send a message to their own Revit: anyone who sees the fit check (it moves only their own Revit, and only
+// draws a preview there)
+export const mayAskRevit = maySeeFitCheck;
+
+// What the page shows for a message's state
+export function commandText(state: string, message: string) {
+  if (state === "waiting") return "Waiting for your Revit…";
+  if (state === "taken") return "Revit is drawing it…";
+  if (state === "done") return message || "Shown in Revit.";
+  if (state === "failed") return message || "Revit could not show it.";
+  return "Revit did not answer: is it open, linked (RightFit › Online), with this project's folder linked?";
+}

@@ -87,3 +87,23 @@ def test_sizes_from_the_site_are_decimals_again(tmp_path):
     s = core.cached("abc", "candidates.json", base)["sets"][0]
     assert isinstance(s["L"], float) and isinstance(s["kg"], float)
     assert s["pumps"] == 2 and isinstance(s["pumps"], int) and isinstance(s["dn_in"], int) and s["submitted"] is True
+
+
+def test_a_message_runs_only_on_the_linked_project():
+    s = {"project": "IS015"}
+    cmd = {"projectId": "abc", "setId": "a"}
+    assert "No model" in core.why_not(s, cmd, have_model=False)
+    assert "no project folder linked" in core.why_not(s, cmd)
+    core.set_linked_project(s, "xyz", "Other project")
+    assert "another project" in core.why_not(s, cmd)
+    core.set_linked_project(s, "abc", "Sala Nadia")
+    assert core.why_not(s, cmd) is None
+
+
+def test_revit_answers_with_the_set_and_its_results():
+    assert core.find_set([{"id": "a"}, {"id": "b", "model": "X"}], "b") == {"id": "b", "model": "X"}
+    assert core.find_set([{"id": "a"}], "z") is None
+    text = core.shown_text("Maker Booster XB", RES)
+    assert text == "Revit shows Maker Booster XB: flag (1 flag, 1 pass)."
+    unsure = dict(RES, verdict={"verdict": "flag", "confirmed": False})
+    assert "flag (would be)" in core.shown_text("X", unsure)

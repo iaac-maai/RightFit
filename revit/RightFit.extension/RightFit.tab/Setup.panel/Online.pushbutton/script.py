@@ -56,6 +56,9 @@ if choice == "Connect this computer":
                 u"this code and this computer ({}), and click Approve.\n\nThen click OK here.".format(a["userCode"], rf_online.computer()),
                 title="RightFit: link this computer")
     state, msg = rf_online.finish_link(a["deviceCode"], wait_s=30, interval_s=a.get("interval", 3))
+    if state == "approved":
+        import rf_listen
+        rf_listen.start()  # Preview in Revit works now, without reloading pyRevit
     forms.alert(msg + (u"\n\nNow: RightFit › Online › Link this project folder." if state == "approved" else u""))
 
 elif choice == "Link this project folder":
@@ -75,6 +78,8 @@ elif choice == "Link this project folder":
     p = projects[names.index(pick)] if pick != u"Not linked" else None
     core.set_linked_project(s, p["id"] if p else None, p["name"] if p else None)
     rf_setup.save_settings(s)
+    import rf_listen
+    rf_listen.start()
     if p:
         try:
             a = rf_online.get_data(p["id"])

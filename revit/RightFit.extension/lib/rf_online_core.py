@@ -201,3 +201,38 @@ def chosen_text(chosen):
     when = (chosen.get("chosenAt") or u"")[:10]
     note = u': "{}"'.format(chosen["note"]) if chosen.get("note") else u""
     return u"The reviewers chose <b>{}</b> ({}, {}){}".format(chosen["setLabel"], who, when, note)
+
+
+# ---------------------------------------------------------------- messages from the site (spec/features/revit_link.md §9)
+
+def why_not(settings, command, have_model=True):
+    """Why Revit can't run a message from the site, or None when it can. The message must be for the online project
+    linked to the project folder open in Settings, so a click on one project never draws in another."""
+    if not have_model:
+        return u"No model is open in Revit."
+    online = linked_project(settings)
+    if not online:
+        return u"Revit has no project folder linked to RightFit online (RightFit › Online › Link this project folder)."
+    if online.get("id") != (command or {}).get("projectId"):
+        return u"Revit has another project open: {} is linked to {}.".format(settings.get("project") or u"its folder",
+                                                                            online.get("name") or u"another project")
+    return None
+
+
+def find_set(sets, set_id):
+    """The pump set with this id, or None."""
+    for s in sets or []:
+        if s.get("id") == set_id:
+            return s
+    return None
+
+
+def shown_text(set_label, res):
+    """Revit's answer to the site after a preview: the set, its verdict and how many results of each kind."""
+    counts = {}
+    for r in res.get("results") or []:
+        counts[r["result"]] = counts.get(r["result"], 0) + 1
+    v = res["verdict"]
+    verdict = v["verdict"] if v.get("confirmed") or v["verdict"] == "unclear" else v["verdict"] + u" (would be)"
+    return u"Revit shows {}: {} ({}).".format(set_label, verdict, u", ".join(
+        u"{} {}".format(n, k) for k, n in sorted(counts.items())))

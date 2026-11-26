@@ -681,3 +681,6 @@ main { min-width: 0; }
 
 /* a wide table scrolls inside its sheet, never the page */
 .screen > * { min-width: 0; }
+.revit-status { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; background: #fff8e6; }
+.revit-status.final { background: #edf7ee; }
+.fit-run-revit { padding: 0 18px; }

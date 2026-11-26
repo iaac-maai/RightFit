@@ -59,3 +59,16 @@ Unchanged: the checks stay in Revit and in `checks/space/`, deterministic, with 
 
 ## 8. Tests
 `web/worker/revit_link.test.ts`: codes, tokens, the bearer header, who may send data, runs and choose, what a run may hold. `tests/test_revit_online.py`: the check the add-in sends, the outbox, the project link in the settings.
+
+## 9. From the site to Revit (MAF-37b)
+Built by Jeff on 26 Nov 2026. A person on the Fit check page clicks **Preview in Revit** next to a pump set, and their own Revit, open and linked, shows that set in the pump's place within a few seconds, as Next Option does, and sends that check back to the page.
+
+How the message travels: the site keeps it, and Revit picks it up. While a linked project folder is open, the add-in asks the site every 4 seconds, from a background thread, whether a message waits for its person; the site gives it once, to one of that person's linked computers, and Revit runs it through Revit's external event, the only safe way into the model from outside a button. Revit answers whether it worked, and the page shows the answer.
+
+Why this and not a server inside Revit: pyRevit's Routes server listens on the whole network, not only on the computer, and does not pass the calling page's address to the add-in, and the browsers now ask the person before a site reaches their computer. The site already knows the person and their linked computers, so a message through it reaches only their own Revit, from any device (a phone, a Mac in the studio), with no new permission.
+
+- A message is for its person's own linked computers only; another member's click never moves someone else's Revit.
+- It waits 2 minutes; after that it expires, and the page says Revit did not answer (closed, not linked, or no project folder linked).
+- Revit does only what Next Option does: a preview, drawn by RightFit and cleared by Clear, never a change to the project's own elements. It runs only on the online project linked to the open project folder, and only when the pump set was picked with Check Pump (or there is one pump set in the model).
+- D1: `revit_command` (`web/migrations/0006_revit_command.sql`). Requests: `POST /api/projects/<id>/fitcheck/revit {setId}` and `GET /api/projects/<id>/fitcheck/revit/<message>` on the page; `GET /api/revit/commands` and `POST /api/revit/commands/<message>` with the token.
+- Tests: `web/worker/revit_link.test.ts` (when a message expires, what it may ask), `tests/test_revit_online.py` (how Revit reads a message).

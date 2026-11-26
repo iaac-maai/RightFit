@@ -1,7 +1,7 @@
 // The project's Fit check (spec/features/revit_link.md): the checks sent from the fit check in Revit, the pump sets
 // with the status of their values, the set the reviewers choose, and this person's linked computers. The checks run in
 // Revit; this page shows what they found and never changes it.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, post } from "../api";
 import { day, plural } from "../format";
 import { Modal } from "../ui";
@@ -31,6 +31,27 @@ export function FitCheck({ projectId }: { projectId: string }) {
   const [links, setLinks] = useState<LinkRow[]>([]);
   const [error, setError] = useState("");
   const [open, setOpen] = useState<FitRun | null>(null);
+  // a Preview in Revit message and where it stands (spec/features/revit_link.md §9)
+  const [revit, setRevit] = useState<{ label: string; text: string; final: boolean } | null>(null);
+  const watching = useRef(0);
+  useEffect(() => () => { watching.current++; }, []);
+  const askRevit = async (setId: string, label: string) => {
+    const turn = ++watching.current;
+    setRevit({ label, text: "Sending…", final: false });
+    try {
+      const sent = await post<{ id: string; text: string }>(`/api/projects/${projectId}/fitcheck/revit`, { setId });
+      setRevit({ label, text: sent.text, final: false });
+      for (let i = 0; i < 80 && turn === watching.current; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        if (turn !== watching.current) return;
+        const st = await api<{ text: string; final: boolean; state: string }>(`/api/projects/${projectId}/fitcheck/revit/${sent.id}`);
+        setRevit({ label, text: st.text, final: st.final });
+        if (st.final) { if (st.state === "done") setTimeout(load, 4000); return; } // the check Revit sends arrives just after
+      }
+    } catch (e) {
+      if (turn === watching.current) setRevit({ label, text: (e as Error).message, final: true });
+    }
+  };
   const load = useCallback(() => {
     api<FitData>(`/api/projects/${projectId}/fitcheck`).then(setData, (e: Error) => setError(e.message));
     api<{ links: LinkRow[] }>("/api/revit/links").then((l) => setLinks(l.links), () => undefined);
@@ -77,10 +98,17 @@ export function FitCheck({ projectId }: { projectId: string }) {
             {data.sentAt ? `${plural(data.sets.length, "set", "sets")}, sent from Revit by ${data.sentBy ?? "a former member"} on ${when(data.sentAt)}` : "none sent yet"}
           </span>
         </div>
+        {revit && (
+          <p className={`sheet-note band revit-status${revit.final ? " final" : ""}`} role="status">
+            <b>Preview in Revit: {revit.label}.</b> {revit.text}
+            {revit.final && <button type="button" className="btn small" onClick={() => setRevit(null)}>OK</button>}
+          </p>
+        )}
         {data.sets.length ? (
           <div className="table-wrap">
             <table className="table">
-              <thead><tr><th>Set</th><th>Size (L × W × H)</th><th>Weight</th><th>Values</th><th>Last check in the model</th>{data.mayChoose && <th />}</tr></thead>
+              <thead><tr><th>Set</th><th>Size (L × W × H)</th><th>Weight</th><th>Values</th><th>Last check in the model</th>
+                {links.length > 0 && <th>In Revit</th>}{data.mayChoose && <th />}</tr></thead>
               <tbody>
                 {data.sets.map((s) => {
                   const r = last.get(s.id);
@@ -94,6 +122,10 @@ export function FitCheck({ projectId }: { projectId: string }) {
                         {s.verifiedBy && <span className="meta"> {s.verifiedBy}, {s.verifiedOn}</span>}
                       </td>
                       <td>{r ? <button type="button" className="linkish" onClick={() => setOpen(r)}><Verdict run={r} /> {day(r.at)}</button> : <span className="meta">not checked yet</span>}</td>
+                      {links.length > 0 && (
+                        <td><button type="button" className="btn small" disabled={Boolean(revit && !revit.final)}
+                          onClick={() => void askRevit(s.id, `${s.maker} ${s.model}`.trim())}>Preview in Revit</button></td>
+                      )}
                       {data.mayChoose && (
                         <td>{data.chosen?.setId === s.id ? <span className="chip ok">chosen</span>
                           : <button type="button" className="btn small" onClick={() => void choose(s.id)}>Choose</button>}</td>
@@ -147,7 +179,8 @@ export function FitCheck({ projectId }: { projectId: string }) {
         <p className="sheet-note band">
           In Revit: RightFit › Online › Connect this computer. Revit shows a code and opens this site to approve it; it never sees your
           password. Unlink a computer you no longer use. To open a locked project from Revit, approve the link from a browser where the
-          project is open with the team password.
+          project is open with the team password. Once linked, <b>Preview in Revit</b> next to a pump set draws it in your open Revit, from
+          this page on any device.
         </p>
         {links.length ? (
           <ul className="fit-links">
@@ -163,7 +196,18 @@ export function FitCheck({ projectId }: { projectId: string }) {
       </section>
 
       <Modal open={Boolean(open)} onClose={() => setOpen(null)} title={open ? `${ACTION[open.action]}: ${open.setLabel}` : ""}>
-        {open && <RunDetail projectId={projectId} run={open} />}
+        {open && (
+          <>
+            {links.length > 0 && open.setId && (
+              <p className="sheet-note fit-run-revit">
+                <button type="button" className="btn small" disabled={Boolean(revit && !revit.final)}
+                  onClick={() => { const r = open; setOpen(null); void askRevit(r.setId, r.setLabel); }}>Show in Revit</button>
+                <span className="meta"> Your linked Revit draws this set in the pump's place and sends the check here again.</span>
+              </p>
+            )}
+            <RunDetail projectId={projectId} run={open} />
+          </>
+        )}
       </Modal>
     </>
   );
