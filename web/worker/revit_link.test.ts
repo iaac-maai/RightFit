@@ -2,8 +2,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  bearer, checkData, cleanUserCode, computerName, mayChoose, maySeeFitCheck, maySendData, maySendRun, newSecret, newUserCode,
-  pngBytes, setsView, summariseRun, TOKEN_PREFIX,
+  bearer, checkData, cleanUserCode, commandFresh, commandText, computerName, mayAskRevit, mayChoose, maySeeFitCheck, maySendData,
+  maySendRun, newSecret, newUserCode, pngBytes, setsView, summariseRun, TOKEN_PREFIX,
 } from "./revit_link.ts";
 import { REVIEWERS, ROLES } from "./roles.ts";
 
@@ -95,4 +95,20 @@ test("the page lists each set with the status of its values, extracted when not 
   assert.equal(sets[1].status, "extracted");
   assert.equal(sets[1].kg, null);
   assert.deepEqual(setsView(null), []);
+});
+
+test("a message for Revit waits 2 minutes, then expires", () => {
+  assert.ok(commandFresh("2026-11-26T15:00:00Z", "2026-11-26T15:01:59Z"));
+  assert.ok(!commandFresh("2026-11-26T15:00:00Z", "2026-11-26T15:02:00Z"));
+});
+
+test("anyone who sees the fit check may send a message to their own Revit", () => {
+  for (const role of ROLES) assert.equal(mayAskRevit(role), maySeeFitCheck(role), role);
+});
+
+test("the page says where a message stands, and what to check when Revit did not answer", () => {
+  assert.match(commandText("waiting", ""), /Waiting/);
+  assert.equal(commandText("done", "Revit shows DAB KVC: flag"), "Revit shows DAB KVC: flag");
+  assert.match(commandText("failed", ""), /could not/);
+  assert.match(commandText("expired", ""), /linked/);
 });

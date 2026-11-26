@@ -2,8 +2,9 @@
 // and sends with that link's token, and the project's Fit check page. The rules are in revit_link.ts.
 import { json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User } from "./data";
 import {
-  LINK_MINUTES, MAX_DATA_BYTES, MAX_RUN_BYTES, POLL_SECONDS, TOKEN_PREFIX, bearer, checkData, cleanUserCode, computerName,
-  mayChoose, maySeeFitCheck, maySendData, maySendRun, newSecret, newUserCode, pngBytes, setsView, summariseRun,
+  LINK_MINUTES, LISTEN_SECONDS, MAX_DATA_BYTES, MAX_RUN_BYTES, POLL_SECONDS, TOKEN_PREFIX, bearer, checkData, cleanUserCode,
+  commandFresh, commandText, computerName, mayAskRevit, mayChoose, maySeeFitCheck, maySendData, maySendRun, newSecret,
+  newUserCode, pngBytes, setsView, summariseRun,
 } from "./revit_link";
 import { access } from "./project_data";
 import { sameText, teamToken, teamUnlocked } from "./team";
@@ -80,6 +81,9 @@ async function tokenRoute(
   if (!(await termsAccepted(user.id))) return json({ error: "Accept RightFit's new terms on the site first.", need: "terms" }, 403);
 
   if (path === "/api/revit/me" && method === "GET") return me(env, user);
+  if (path === "/api/revit/commands" && method === "GET") return nextCommand(env, user.id, row);
+  const done = path.match(/^\/api\/revit\/commands\/([\w-]+)$/);
+  if (done && method === "POST") return answerCommand(request, env, user.id, row, done[1]);
   const m = path.match(/^\/api\/revit\/projects\/([\w-]+)\/(fitcheck|fitcheck\/data|runs)$/);
   if (!m) return json({ error: "No such endpoint." }, 404);
   const [, projectId, what] = m;
@@ -189,15 +193,17 @@ export async function revitSessionRoute(request: Request, env: Env, user: User, 
   m = path.match(/^\/api\/revit\/links\/([\w-]+)\/unlink$/);
   if (m && method === "POST") return unlink(env, user, m[1]);
 
-  m = path.match(/^\/api\/projects\/([\w-]+)\/fitcheck(?:\/(choose)|\/runs\/([\w-]+?)(\.png)?)?$/);
+  m = path.match(/^\/api\/projects\/([\w-]+)\/fitcheck(?:\/(choose)|\/runs\/([\w-]+?)(\.png)?|\/(revit)(?:\/([\w-]+))?)?$/);
   if (!m) return null;
-  const [, projectId, choose, run, png] = m;
+  const [, projectId, choose, run, png, revit, command] = m;
   const me = await access(request, env, projectId, user);
   if (me instanceof Response) return me;
   if (!maySeeFitCheck(me.role)) return json({ error: "The fit check reaches subcontractors once forms have their branch." }, 404);
+  if (revit && !command && method === "POST") return askRevit(request, env, projectId, me, user);
+  if (revit && command && method === "GET") return commandState(env, projectId, user, command);
   if (choose && method === "POST") return choose_(request, env, projectId, me, user);
   if (run && method === "GET") return oneRun(env, projectId, run, Boolean(png));
-  if (!choose && !run && method === "GET") return fitPage(env, projectId, me);
+  if (!choose && !run && !revit && method === "GET") return fitPage(env, projectId, me);
   return json({ error: "No such endpoint." }, 404);
 }
 
@@ -302,4 +308,76 @@ async function choose_(request: Request, env: Env, projectId: string, me: Member
     logged(env, user.id, "fitcheck.chosen", projectId, { set: setId }),
   ]);
   return json({ chosen: await chosen(env, projectId) });
+}
+
+// ---- From the site to Revit (spec/features/revit_link.md §9) ----------------------------------------------------------
+
+// POST /api/projects/<id>/fitcheck/revit {setId}: a message for this person's own linked Revit to preview that set
+async function askRevit(request: Request, env: Env, projectId: string, me: MemberRow, user: User) {
+  if (!mayAskRevit(me.role)) return json({ error: "Your role does not use the fit check." }, 403);
+  const linked = await env.DB.prepare("SELECT COUNT(*) AS n FROM revit_token WHERE user_id = ? AND revoked_at IS NULL").bind(user.id).first<{ n: number }>();
+  if (!linked?.n) return json({ error: "No computer with Revit is linked to your account yet: in Revit, RightFit › Online › Connect this computer.", need: "link" }, 409);
+  const body = await readBody(request);
+  const setId = text(body.setId, 200);
+  const stored = await env.BUCKET.get(fitKeys(projectId).data);
+  const set = setsView(stored ? (await stored.json<{ candidates: { sets?: unknown[] } }>()).candidates : null).find((s) => s.id === setId);
+  if (!set) return json({ error: "No such pump set in this project's data." }, 404);
+  const id = newId();
+  const at = now();
+  await env.DB.batch([
+    // a newer message replaces the ones still waiting: only the last click counts
+    env.DB.prepare("UPDATE revit_command SET state = 'expired' WHERE user_id = ? AND state = 'waiting'").bind(user.id),
+    env.DB.prepare("INSERT INTO revit_command (id, user_id, project_id, kind, set_id, set_label, created_at) VALUES (?, ?, ?, 'preview', ?, ?, ?)")
+      .bind(id, user.id, projectId, setId, `${set.maker} ${set.model}`.trim(), at),
+  ]);
+  return json({ id, state: "waiting", text: commandText("waiting", "") }, 201);
+}
+
+// GET /api/projects/<id>/fitcheck/revit/<message>: where the message stands, for the page
+async function commandState(env: Env, projectId: string, user: User, id: string) {
+  const c = await env.DB.prepare("SELECT state, created_at, message FROM revit_command WHERE id = ? AND project_id = ? AND user_id = ?")
+    .bind(id, projectId, user.id).first<{ state: string; created_at: string; message: string }>();
+  if (!c) return json({ error: "No such message." }, 404);
+  let state = c.state;
+  if (state === "waiting" && !commandFresh(c.created_at, now())) {
+    await env.DB.prepare("UPDATE revit_command SET state = 'expired' WHERE id = ? AND state = 'waiting'").bind(id).run();
+    state = "expired";
+  }
+  return json({ state, text: commandText(state, c.message), final: !["waiting", "taken"].includes(state) });
+}
+
+// GET /api/revit/commands: the oldest message still waiting for this computer's person, given to this computer once
+async function nextCommand(env: Env, userId: string, row: TokenRow) {
+  const at = now();
+  const { results } = await env.DB.prepare(
+    "SELECT id, project_id, kind, set_id, set_label, created_at FROM revit_command WHERE user_id = ? AND state = 'waiting' ORDER BY created_at LIMIT 5",
+  ).bind(userId).all<{ id: string; project_id: string; kind: string; set_id: string; set_label: string; created_at: string }>();
+  for (const c of results) {
+    if (!commandFresh(c.created_at, at)) {
+      await env.DB.prepare("UPDATE revit_command SET state = 'expired' WHERE id = ? AND state = 'waiting'").bind(c.id).run();
+      continue;
+    }
+    // the project must still open for this token (membership, locked projects)
+    const member = await tokenAccess(env, c.project_id, row);
+    if (member instanceof Response) {
+      await env.DB.prepare("UPDATE revit_command SET state = 'failed', message = ? WHERE id = ? AND state = 'waiting'")
+        .bind("This computer can't open the project (locked, or not a member).", c.id).run();
+      continue;
+    }
+    const took = await env.DB.prepare("UPDATE revit_command SET state = 'taken', taken_by = ?, taken_at = ? WHERE id = ? AND state = 'waiting'")
+      .bind(row.id, at, c.id).run();
+    if (!took.meta.changes) continue; // another of this person's computers took it first
+    return json({ command: { id: c.id, projectId: c.project_id, kind: c.kind, setId: c.set_id, setLabel: c.set_label }, interval: LISTEN_SECONDS });
+  }
+  return json({ command: null, interval: LISTEN_SECONDS });
+}
+
+// POST /api/revit/commands/<message> {ok, message}: Revit's answer
+async function answerCommand(request: Request, env: Env, userId: string, row: TokenRow, id: string) {
+  const body = await readBody(request);
+  const done = await env.DB.prepare(
+    "UPDATE revit_command SET state = ?, message = ?, done_at = ? WHERE id = ? AND user_id = ? AND taken_by = ? AND state = 'taken'",
+  ).bind(body.ok === true ? "done" : "failed", text(body.message, 300), now(), id, userId, row.id).run();
+  if (!done.meta.changes) return json({ error: "No such message taken by this computer." }, 404);
+  return json({ ok: true });
 }
