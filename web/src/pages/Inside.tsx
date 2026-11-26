@@ -7,15 +7,10 @@ import { ApiError, api } from "../api";
 import { plural } from "../format";
 import type { HomeData, PackageData, PackageRow, PackageReview } from "../types";
 import { TeamLock } from "./ProjectData";
+import type { Graph as Drawn, GraphEdge as GEdge, GraphNode as GNode } from "../../worker/products";
 
 type Who = "ai" | "rules" | "person";
-interface GNode {
-  id: string; type: "product_line" | "form" | "document" | "boq_line"; label: string; kind?: string; project?: string;
-  answer?: string | null; parts?: Record<string, string | null>; sizes?: string[]; projects?: string[]; sheet?: string;
-}
-interface GEdge { from: string; to: string; type: "submits" | "in" | "supports" | "covers" | "near"; sizes?: string[] }
-interface Graph {
-  nodes: GNode[]; edges: GEdge[];
+interface Graph extends Drawn {
   summary: { product_lines: Record<string, number>; forms: number; documents: number; boq_lines: number; came_back: number; near: number };
 }
 

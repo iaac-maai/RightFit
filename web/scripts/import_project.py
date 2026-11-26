@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WEB = ROOT / "web"
 sys.path.insert(0, str(ROOT))
 
-DPA_VERSION = "2026-11-26"  # the data processing agreement in web/legal/, as in web/worker/index.ts
+DPA_VERSION = "2026-11-26"  # the data processing agreement in web/legal/, as in web/worker/data.ts
 BUCKET = "rightfit-files"
 SITE = "https://rightfit.hackathon-team6-cubicasa-app.workers.dev"   # RightFit online, where the laptop's app links
 TYPES = {"pdf": "application/pdf", "xls": "application/vnd.ms-excel", "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",

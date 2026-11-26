@@ -8,15 +8,15 @@ import { editRoute } from "./review_edit";
 import { uploadRoute } from "./upload";
 import { googleOn, makeAuth } from "./auth";
 import {
-  deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
+  DPA_VERSION, deleteAccount, json, logged, membership, newId, now, readBody, sha256, text, type Env, type MemberRow, type User,
 } from "./data";
 import {
   isAdmin, isRole, mayInvite, mayWithdraw, rolesInvitableBy, ROLE_LABEL, visibleInvitations, visiblePeople, type Person, type Role,
 } from "./roles";
 
-// The versions of the documents a person accepts (web/legal/ carries the same dates: change them together)
+// The version of the terms a person accepts (web/legal/ carries the same date: change them together); the data
+// processing agreement's is in data.ts
 const TERMS_VERSION = "2026-11-26"; // the terms of service, read with the privacy policy
-const DPA_VERSION = "2026-11-26"; // the data processing agreement a consultant accepts for their organisation
 const INVITATION_DAYS = 14;
 
 interface InvitationRow {

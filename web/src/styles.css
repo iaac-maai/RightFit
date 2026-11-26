@@ -594,3 +594,36 @@ main { min-width: 0; }
 .g-parts dd.unknown { color: var(--label); font-style: italic; }
 @media (max-width: 1180px) { .stations { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 720px) { .field.inline { grid-template-columns: 1fr; } .small-select { margin-left: 0; } .stations { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ------------------------------------------------------------------ Product lines (the consultant's people): the products
+   that come back, one row each, opened for its forms, BOQ lines and documents. Green covers, dashed violet might. */
+.pl-row { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, .9fr) minmax(0, 1.7fr) minmax(0, 1fr); gap: 6px 16px; align-items: start; padding: 10px 14px; }
+.pl-head { padding-top: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--line-soft); }
+.product-lines { list-style: none; margin: 0; padding: 0; }
+.product-lines > li { border-top: 1px solid var(--line-soft); }
+.product-lines > li:first-child { border-top: 0; }
+.product-lines summary { cursor: pointer; list-style: none; transition: background .12s; }
+.product-lines summary::-webkit-details-marker { display: none; }
+.product-lines summary:hover, .product-lines details[open] > summary { background: var(--pale); }
+.pl-name { display: grid; gap: 2px; min-width: 0; }
+.pl-name b { font-size: 14px; overflow-wrap: anywhere; }
+.pl-missing { font-size: 12px; color: var(--label); font-style: italic; }
+.pl-sizes { font-size: 13px; overflow-wrap: anywhere; }
+.pl-forms { display: flex; flex-wrap: wrap; gap: 4px; }
+.pl-form { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; padding: 2px 6px; border: 1px solid var(--rule); border-radius: 3px; background: var(--sheet); }
+.pl-form em { font-style: normal; color: var(--label); font-size: 11.5px; }
+.pl-form .letter.sm { font-size: 11px; line-height: 16px; width: 16px; }
+.pl-boq { display: grid; gap: 3px; justify-items: start; font-size: 13px; }
+.pl-boq .covers, .pl-boq-line.covers .meta { color: var(--green); font-weight: 600; }
+.pl-boq .might { color: var(--carbon); border-bottom: 1px dashed var(--carbon); }
+.pl-more { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px 20px; padding: 6px 14px 16px; background: var(--pale); animation: rise .3s var(--ease) both; }
+.pl-more ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 5px; font-size: 13px; overflow-wrap: anywhere; }
+.pl-boq-line { padding-left: 8px; border-left: 2px solid var(--green); }
+.pl-boq-line.might { border-left: 2px dashed var(--carbon); }
+.pl-boq-line.might .meta { color: var(--carbon); }
+.pl-same { grid-column: 1 / -1; }
+.agreement { display: grid; gap: 12px; padding: 12px 14px 14px; max-width: 820px; }
+@media (max-width: 860px) {
+  .pl-row { grid-template-columns: 1fr; }
+  .pl-head { display: none; }
+}

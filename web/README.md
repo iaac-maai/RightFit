@@ -16,6 +16,7 @@ It is built like the app of the AI Methods hackathon: one Cloudflare Worker serv
 | `legal/` | the Terms of Service, Privacy Policy, Data Processing Agreement, Cookie Policy and Legal Notice the app shows; `docs/legal/` has the operator's own records |
 | `worker/project_data.ts`, `worker/team.ts` | a project's own data (packages, files, RightFit's draft reviews, the rules, BOQ lines) and the team password that opens a locked project |
 | `src/pages/Inside.tsx` | Inside RightFit, in Management: how a package goes through RightFit with its own numbers, the tools, and the knowledge graph drawn; a project opens only for an admin who is a member of it |
+| `src/pages/Products.tsx`, `worker/products.ts` | Product lines, for the consultant's people: the products that come back, with their forms, answers, documents and the BOQ lines they cover, from this project and the consultant's other projects that accepted the agreement of 26 Nov 2026; `worker/products.test.ts` tests putting the projects together |
 | `worker/upload.ts` | a package added on the site: its files into the private bucket, one at a time; the package waits to be read |
 | `worker/review_edit.ts` | a review changed online: ticks on readings, decisions on findings and AI suggestions, the review dates, the consultant's rules; each change goes to the engine; and the booster sizing |
 | `engine/` | the checks engine: a Python Worker with no address of its own that runs the laptop's review code (`app/engine.py`); `build.py` copies that code in before Wrangler bundles it |

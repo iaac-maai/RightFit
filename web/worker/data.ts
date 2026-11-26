@@ -12,6 +12,10 @@ export interface Env extends AuthEnv {
   ENGINE?: Fetcher; // the checks engine (web/engine/), through a service binding
 }
 
+// The data processing agreement a consultant accepts for their organisation (web/legal/data-processing.md carries the
+// same date: change them together)
+export const DPA_VERSION = "2026-11-26";
+
 export interface User { id: string; name: string; email: string; emailVerified: boolean; image?: string | null }
 export interface MemberRow { id: string; project_id: string; user_id: string; role: Role; company: string; invited_by: string | null; joined_at: string }
 

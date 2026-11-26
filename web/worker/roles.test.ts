@@ -1,7 +1,7 @@
 // Tests for who may invite whom and who sees whom. Run with `npm test` (Node's own test runner, no packages).
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ROLES, isRole, mayAddPackage, mayChangeReview, mayChangeRules, mayInvite, mayWithdraw, rolesInvitableBy, visibleInvitations, visiblePeople,
+import { ROLES, isRole, mayAddPackage, mayChangeReview, mayChangeRules, mayInvite, mayUseProducts, mayWithdraw, rolesInvitableBy, visibleInvitations, visiblePeople,
   type Person } from "./roles.ts";
 
 // A made-up project: the consultant brings in a designer and the contractor; the contractor two subcontractor firms,
@@ -84,4 +84,8 @@ test("only the reviewers change a review, and only the consultant changes the co
 
 test("the reviewers and the contractor add packages; a subcontractor waits for its branch", () => {
   assert.deepEqual(ROLES.filter(mayAddPackage), ["consultant", "designer", "site_supervisor", "client", "contractor"]);
+});
+
+test("only the consultant sees the products that come back and accepts a new agreement for the organisation", () => {
+  assert.deepEqual(ROLES.filter(mayUseProducts), ["consultant"]);
 });

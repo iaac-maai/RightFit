@@ -1,7 +1,7 @@
 """The knowledge graph built from a made-up register (ingest/graph.py). No real company, project or person name."""
 import openpyxl
 
-from ingest.graph import Graph, add_register
+from ingest.graph import Graph, _short, add_register
 
 
 def _register(path, rows):
@@ -29,3 +29,8 @@ def test_the_register_gives_forms_answers_and_one_product_line_but_never_its_com
     assert len(lines) == 1 and lines[0]["sizes"] == ["20", "25", "32"]   # one product line, the range of both forms
     assert r["summary"]["product_lines"]["pipe"] == 1 and r["summary"]["came_back"] == 0
     assert "Doe" not in str(r)   # the comments column is never read
+
+
+def test_a_long_boq_text_is_cut_at_a_whole_word():
+    assert _short("Teava pentru canalizare din polipropilena", 24) == "Teava pentru canalizare…"
+    assert _short("Teava PP", 24) == "Teava PP"

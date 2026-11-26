@@ -1,8 +1,9 @@
 // The project's own data online (spec/features/rightfit_online.md, section 11): its MAF packages, their files,
 // RightFit's draft review of the packages already read, and the BOQ lines, imported from the laptop by
 // web/scripts/import_project.py. Members only, and for a locked project the team password as well.
-import { json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
-import { REVIEWERS, isAdmin, mayAddPackage, mayChangeReview, mayChangeRules } from "./roles";
+import { DPA_VERSION, json, logged, membership, now, readBody, type Env, type MemberRow, type User } from "./data";
+import { ACROSS_PROJECTS_FROM, together, type Graph } from "./products";
+import { REVIEWERS, isAdmin, mayAddPackage, mayChangeReview, mayChangeRules, mayUseProducts } from "./roles";
 import { sameText, teamCookie, teamUnlocked } from "./team";
 
 const TYPES: Record<string, string> = {
@@ -49,13 +50,15 @@ export async function access(request: Request, env: Env, projectId: string, user
 
 export async function dataRoute(request: Request, env: Env, user: User, path: string, method: string): Promise<Response | null> {
   if (path === "/api/team/unlock" && method === "POST") return unlock(request, env, user);
+  const dpa = path.match(/^\/api\/projects\/([\w-]+)\/dpa$/);
+  if (dpa && method === "POST") return acceptDpa(request, env, dpa[1], user);
   const pg = path.match(/^\/api\/projects\/([\w-]+)\/pages\/(P\d+)\/(\d{1,3})\/(\d{1,4})\.png$/);
   if (pg && method === "GET") {
     const me = await access(request, env, pg[1], user);
     if (me instanceof Response) return me;
     return pageImage(env, pg[1], pg[2], pg[3], pg[4], me);
   }
-  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules|graph)(?:\/(P\d+))?(?:\/([^/]+))?$/);
+  const m = path.match(/^\/api\/projects\/([\w-]+)\/(packages|boq|files|rules|graph|products)(?:\/(P\d+))?(?:\/([^/]+))?$/);
   if (!m || method !== "GET") return null;
   const [, projectId, what, code, name] = m;
   const me = await access(request, env, projectId, user);
@@ -66,6 +69,7 @@ export async function dataRoute(request: Request, env: Env, user: User, path: st
   if (what === "boq" && !code) return boq(env, projectId, me);
   if (what === "rules" && !code) return rules(env, projectId, me);
   if (what === "graph" && !code) return graph(env, projectId, user);
+  if (what === "products" && !code) return products(request, env, projectId, user, me);
   return json({ error: "No such endpoint." }, 404);
 }
 
@@ -145,6 +149,46 @@ async function graph(env: Env, projectId: string, user: User) {
   if (!isAdmin(user, env.ADMIN_EMAILS)) return json({ error: "No such endpoint." }, 404);
   const stored = await env.BUCKET.get(`projects/${projectId}/graph.json`);
   return stored ? json(await stored.json()) : json({ error: "The graph comes with the next import from the laptop." }, 404);
+}
+
+// The products that come back, for the consultant's people (spec/features/knowledge_graph.md, sections 5 and 6): this
+// project's knowledge graph, with the product lines, forms and answers of the viewer's other projects that accepted the
+// data processing agreement with clause 1.4. Only projects the viewer is a consultant of, so nobody sees one they are
+// not in; a locked one only with the team password, as everywhere else.
+async function products(request: Request, env: Env, projectId: string, user: User, me: MemberRow) {
+  if (!mayUseProducts(me.role)) return json({ error: "The products that come back are for the consultant's people." }, 403);
+  const project = await env.DB.prepare("SELECT name, dpa_version FROM project WHERE id = ?").bind(projectId)
+    .first<{ name: string; dpa_version: string }>();
+  const { results: mine } = await env.DB.prepare(
+    "SELECT p.id, p.name, p.locked, p.dpa_version FROM member m JOIN project p ON p.id = m.project_id WHERE m.user_id = ? AND m.role = 'consultant' AND p.id <> ?",
+  ).bind(user.id, projectId).all<{ id: string; name: string; locked: number; dpa_version: string }>();
+  const unlocked = await teamUnlocked(request.headers.get("Cookie"), env.TEAM_PASSWORD);
+  const read = async (id: string) => (await env.BUCKET.get(`projects/${id}/graph.json`))?.json<Graph>() ?? null;
+  const others = (await Promise.all(mine.filter((p) => p.dpa_version >= ACROSS_PROJECTS_FROM && (!p.locked || unlocked))
+    .map(async (p) => ({ id: p.id, name: p.name, graph: await read(p.id) }))))
+    .filter((p): p is { id: string; name: string; graph: Graph } => p.graph !== null);
+  const own = await read(projectId);
+  const name = project?.name ?? "This project";
+  return json({
+    graph: together({ id: projectId, name, graph: own ?? { nodes: [], edges: [] } }, others),
+    imported: own !== null, // the graph is made on the laptop at an import; a project made only online has none yet
+    projects: [{ id: projectId, name, here: true }, ...others.map((p) => ({ id: p.id, name: p.name, here: false }))],
+    waiting: mine.filter((p) => p.dpa_version < ACROSS_PROJECTS_FROM).length,
+    dpa: { accepted: project?.dpa_version ?? "", current: DPA_VERSION, across: (project?.dpa_version ?? "") >= ACROSS_PROJECTS_FROM },
+  });
+}
+
+// POST /api/projects/:id/dpa {version}: a consultant accepts the current data processing agreement for the organisation
+async function acceptDpa(request: Request, env: Env, projectId: string, user: User) {
+  const me = await membership(env, projectId, user.id);
+  if (!me || !mayUseProducts(me.role)) return json({ error: "Only a consultant of the project accepts the agreement for the organisation." }, 403);
+  if ((await readBody(request)).version !== DPA_VERSION) return json({ error: "The agreement has changed: open it again before you accept it." }, 409);
+  const at = now();
+  await env.DB.batch([
+    env.DB.prepare("UPDATE project SET dpa_version = ?, dpa_accepted_by = ?, dpa_accepted_at = ? WHERE id = ?").bind(DPA_VERSION, user.id, at, projectId),
+    logged(env, user.id, "project.dpa_accepted", projectId, { version: DPA_VERSION }),
+  ]);
+  return json({ ok: true, version: DPA_VERSION });
 }
 
 // One page of an attachment as an image, drawn on the laptop at the import, for the marks on the quoted lines

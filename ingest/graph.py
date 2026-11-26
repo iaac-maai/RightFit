@@ -141,11 +141,19 @@ def add_boq(g, boq_files):
             if asked["kind"] not in SCOPE or not any(asked.get(p) for p in IDENTITY[asked["kind"]] if p != "producer"):
                 continue
             bid = g.node(f"boq:{n}:{ln['sheet']}:{ln['row']}", type="boq_line", kind=asked["kind"], sheet=ln["sheet"],
-                         row=ln["row"], sizes=asked["sizes"], label=" ".join(str(ln["text"]).split())[:90])
+                         row=ln["row"], sizes=asked["sizes"], label=_short(" ".join(str(ln["text"]).split()), 180))
             for lid, known in g.lines.items():
                 hit = covers(known, asked)
                 if hit:
                     g.edge(lid, bid, hit)
+
+
+def _short(text, most):
+    """The text whole when it is short enough, otherwise cut at the last whole word, with an ellipsis."""
+    if len(text) <= most:
+        return text
+    cut = text[:most - 1]
+    return (cut if text[most - 1] == " " else cut.rsplit(" ", 1)[0]) + "…"
 
 
 def add_near(g):

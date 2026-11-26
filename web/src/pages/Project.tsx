@@ -1,6 +1,6 @@
 // One project: the team drawn as the chain of who brought in whom, and inviting the next people
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { REVIEWERS, ROLE_LABEL, ROLE_NOTE, type Role } from "../../worker/roles";
+import { REVIEWERS, ROLE_LABEL, ROLE_NOTE, mayUseProducts, type Role } from "../../worker/roles";
 import { ApiError, api, go, post } from "../api";
 import { aRole, country, day, daysLeft, plural } from "../format";
 import { Icon, Modal, Monogram, PLUS } from "../ui";
@@ -9,8 +9,9 @@ import { Boq, Packages, TeamLock } from "./ProjectData";
 import { PackageView, type Step } from "./Review";
 import { Rules } from "./Rules";
 import { Booster } from "./Booster";
+import { Products } from "./Products";
 
-export type ProjectView = "team" | "packages" | "package" | "boq" | "rules" | "booster";
+export type ProjectView = "team" | "packages" | "package" | "boq" | "rules" | "booster" | "products";
 
 // The order of people under one inviter: reviewers first, then down the chain
 const TIER: Record<Role, number> = { consultant: 0, designer: 1, site_supervisor: 1, client: 1, contractor: 2, subcontractor: 3 };
@@ -102,7 +103,8 @@ export function Project({ id, view, code, step, onLoaded }: {
         <nav className="tabs" aria-label="The project">
           {([["team", "Team", `/p/${id}`], ["packages", `Packages (${project.packages})`, `/p/${id}/packages`],
              ["boq", `BOQ (${project.boqLines} lines)`, `/p/${id}/boq`], ["rules", "Rules", `/p/${id}/rules`],
-             ["booster", "Booster sizing", `/p/${id}/booster`]] as const).map(([key, label, path]) => (
+             ["booster", "Booster sizing", `/p/${id}/booster`], ["products", "Product lines", `/p/${id}/products`]] as const)
+            .filter(([key]) => key !== "products" || mayUseProducts(me.role)).map(([key, label, path]) => (
             <a key={key} href={path} onClick={go(path)} aria-current={view === key || (key === "packages" && view === "package") ? "page" : undefined}>{label}</a>
           ))}
           {Boolean(project.locked) && <span className="lock-note">Locked: opened with the team password</span>}
@@ -114,6 +116,7 @@ export function Project({ id, view, code, step, onLoaded }: {
       {view === "boq" && <Boq projectId={id} />}
       {view === "rules" && <Rules projectId={id} />}
       {view === "booster" && <Booster projectId={id} />}
+      {view === "products" && <Products projectId={id} />}
 
       {view === "team" && <div className="project-grid">
         <section className="sheet team" aria-label="The team">

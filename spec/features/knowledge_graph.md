@@ -1,6 +1,6 @@
 # Feature spec: the knowledge graph of products that come back (MAF-36)
 
-Status: 26 Nov 2026. Luca asked for it and answered the questions the same day (section 10). First kinds: cables, pipes, valves and boilers. The first part of MAF-36a is built: the product lines read from the forms, the register of the previous project and the BOQ (`ingest/products.py`, `ingest/graph.py`, with tests), drawn for admins on the Inside RightFit page (section 7). The page for the consultant comes next.
+Status: 26 Nov 2026. Luca asked for it and answered the questions the same day (section 10). First kinds: cables, pipes, valves and boilers. The first part of MAF-36a is built: the product lines read from the forms, the register of the previous project and the BOQ (`ingest/products.py`, `ingest/graph.py`, with tests), drawn for admins on the Inside RightFit page (section 7) and listed for the consultant's people on each project's Product lines page (section 6).
 
 ## 1. What it does
 
@@ -60,14 +60,15 @@ The graph is kept as tables in D1, next to the project's data. No graph database
 
 ## 5. Who sees it
 
-What the graph holds is the consultant's knowledge, not a project's. It is shown to the consultant's own people across their projects, never to a contractor or subcontractor of another project. A document stays in its project: the graph keeps its fingerprint and what was decided, and opens the document only for a member of that project. A manufacturer's declaration of performance, which the CPR obliges it to publish, can be linked from its public source. Version 2026-11-26 of the data processing agreement (clause 1.4), of the privacy policy and of the terms says so (Luca, 26 Nov 2026). A project counts across projects only once a consultant of it has accepted that version or a later one; a project opened before keeps the version it accepted until then.
+What the graph holds is the consultant's knowledge, not a project's. It is shown to the consultant's own people across their projects, never to a contractor or subcontractor of another project. A document stays in its project: the graph keeps its fingerprint and what was decided, and opens the document only for a member of that project. A manufacturer's declaration of performance, which the CPR obliges it to publish, can be linked from its public source. Version 2026-11-26 of the data processing agreement (clause 1.4), of the privacy policy and of the terms says so (Luca, 26 Nov 2026). A project counts across projects only once a consultant of it has accepted that version or a later one; a project opened before keeps the version it accepted until then, and a consultant accepts the new one on the project's Product lines page. The page puts together only projects the viewer is a consultant of, and a locked one only with the team password, so nobody sees a project they are not in. A BOQ belongs to its project: the page shows this project's BOQ lines only.
 
 ## 6. What it shows
 
 - on a package: this product line was answered B in another project, form IS 013 rev 1, on a date; its declaration of performance is the same file (same fingerprint) and still in date at delivery;
 - an earlier approval lowers what is checked again (Luca, 26 Nov 2026): the readings confirmed on the same file in an approved form count as confirmed here, marked with where they were confirmed, while the documents are still checked for the new review and delivery dates;
 - in the BOQ register (MAF-34): for each chapter, the BOQ lines covered by a product line already approved, by kind, designation and size range, and the lines still without a form;
-- per producer: forms, returns and their causes, from the register and from the reviews online.
+- per producer: forms, returns and their causes, from the register and from the reviews online;
+- the Product lines page of a project (built 26 Nov 2026), for the consultant's people only: each product line with what RightFit read, its sizes, the forms that submitted it and their answers, the documents that came with it and the lines of this project's BOQ it covers or might cover, from this project, the register of the earlier project and the consultant's other projects.
 
 ## 7. The page for admins: inside RightFit
 
@@ -95,7 +96,7 @@ The normalisers on made-up descriptions (never a real company or project name), 
 ## 10. Questions, answered by Luca on 26 Nov 2026
 
 1. Pipes: producer, material, pressure class, standard and use (drinking water or not), the series not necessarily; a data sheet usually lists many diameters.
-2. Cables: studied on our own sheets; the proposal in section 3 waits for his check.
+2. Cables: studied on our own sheets; Luca approved the proposal in section 3 the same day.
 3. An earlier approval may lower what is checked again.
 4. Boilers are in; valves too.
 5. Yes: clause 1.4 of the data processing agreement, with the privacy policy and the terms, all version 2026-11-26.
