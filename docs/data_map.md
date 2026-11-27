@@ -14,7 +14,7 @@ Unlike the hood version, which started from data we still had to collect, the MA
 | DS4 | Legal texts | The EU Publications Office (EUR-Lex no longer answers scripts), legislatie.just.ro, the BOE open data service | Luca | Web pages, PDF | Read for every rule in DS3, last on 16 Nov | Cite clause and edition | The basis of DS3 |
 | DS5 | Reviewers' checklist | Built from the comments in DS2 | Luca | CSV (`data/maf/checklist.csv`) | In Git, 11 items | Never evaluated on DS2, which it came from | Check C |
 | DS6 | Package inventory | DS1 | AI reader | CSV (`data/maf/packages.csv`) | In Git | File names only | Check D4 |
-| DS7 | Extracted values | DS1, read by the AI | Luca verifies | JSON (`data/maf/extracted/`) | In Git; 94 of 116 values and all 15 documents confirmed, 21 values not stated | Roles only, quotes of 15 words at most, no names | All checks |
+| DS7 | Extracted values | DS1, read by the AI | Luca verifies | JSON (`data/maf/extracted/`) | In Git; 95 of 116 values and all 15 documents confirmed, 21 values not stated | Roles only, quotes of 15 words at most, no names | All checks |
 | DS8 | Reference answers | Luca, before seeing the tool | Luca | Text (`data/maf/reference/`) | Written for P01 and P02 | Never used for tuning | Evaluation |
 | DS9 | Review times, by hand and with the tool | Luca | Luca | In DS8 for now | By hand: about 10 min (P01, figures only) and 3 h (P02) | | Evaluation |
 | DS10 | Overrides and approved values | Exported by the app | Reviewer | CSV | Created when used | Stay local unless anonymised | O&M file, certification consultant |

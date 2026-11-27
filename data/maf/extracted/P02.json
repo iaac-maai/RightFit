@@ -1006,14 +1006,15 @@
           "note": "not found; looked in page 1; Luca on 2026-11-27: confirmed not stated, such kits usually come with the wiring they need"
         },
         "voltage": {
-          "value": "1~ 220-240 V, 50 Hz",
+          "value": "1~ 220-240 V, 50/60 Hz",
           "unit": null,
           "source": "AHU KIT HZX-6BEJ.pdf",
           "page": 1,
           "quote": "AC 1Φ, 220V~240V/50Hz/60Hz",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "Luca: 50/60 Hz as on the data sheet (the AI read 50 Hz)",
+          "verified_on": "2026-11-28"
         }
       }
     }
