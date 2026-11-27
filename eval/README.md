@@ -8,4 +8,5 @@ Each AI part of RightFit is measured against the way it would be done without AI
 | `family_classifier/` | our family model against the family's words | 28 of 37 rows against 35: the words win |
 | `boq_matching/` | ways to find a product's BOQ line | 24 of 24 against 4 for the old rule |
 | `revisions/` | what changed between two revisions of a form | the first run, on P10 and P02 |
+| `reference_answers/` | RightFit's draft answer against Luca's reference answers | P01 and P02: B against his A for both, on confirmed readings; the gap comes from documents and checklist he did not check by hand |
 | `chatbot_baseline/` | RightFit against general AI chatbots | the protocol and the frozen test set; no run yet |
