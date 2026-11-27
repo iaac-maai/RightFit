@@ -1,5 +1,6 @@
-// The practice survey (spec/features/survey.md): a public page, no account, anonymous. The questions come from the
-// site (worker/survey_rules.ts), so they live in one place. The results page is for people signed in to RightFit.
+// The practice survey (spec/features/survey.md): a public page with the questions only, no account, anonymous. The
+// questions come from the site (worker/survey_rules.ts), so they live in one place. The live results are the Survey page
+// of RightFit online, for people signed in.
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiError, api, go, post } from "../api";
 import { day } from "../format";
@@ -32,13 +33,11 @@ export function Survey() {
   const [website, setWebsite] = useState(""); // the hidden field: people never see it, robots fill it in
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [tick, setTick] = useState(0);
   const [sent, setSent] = useState(() => { try { return localStorage.getItem(DONE) === "1"; } catch { return false; } });
 
   useEffect(() => { api<{ questions: Question[]; consent: string }>("/api/survey").then(setQs, (e: Error) => setError(e.message)); }, []);
 
   const set = (id: string, v: Value) => setAnswers((a) => ({ ...a, [id]: v }));
-  const unset = (id: string) => setAnswers(({ [id]: _, ...rest }) => rest);
   const shown = (q: Question) => !("showIf" in q && q.showIf) || q.showIf[1].includes(String(answers[q.showIf[0]] ?? ""));
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -48,7 +47,6 @@ export function Survey() {
       await post("/api/survey", { answers: visible, consent, website });
       try { localStorage.setItem(DONE, "1"); } catch { /* private browsing: fine */ }
       setSent(true);
-      setTick((t) => t + 1); // the live numbers include this answer at once
       window.scrollTo(0, 0);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Try again.");
@@ -60,7 +58,6 @@ export function Survey() {
       <Bar />
       <article className="sheet legal-text survey">
         <h1>How material approval forms go today</h1>
-        <LivePanel refresh={tick} />
         {sent ? (
           <>
             <p><b>Thank you.</b> Your answers were sent. They help us measure what checking a form before review could save.</p>
@@ -83,49 +80,46 @@ export function Survey() {
                 {qs.questions.filter(shown).map((q, i) => (
                   <fieldset key={q.id} className="survey-q">
                     <legend><span className="survey-n">{i + 1}</span> {q.text}{"optional" in q && q.optional ? <span className="meta"> (optional)</span> : null}</legend>
-                    {q.kind === "one" && (
-                      <select className="survey-select" value={(answers[q.id] as string) ?? ""} aria-label={q.text}
-                        onChange={(e) => (e.target.value === "" ? unset(q.id) : set(q.id, e.target.value))}>
-                        <option value="">Choose…</option>
-                        {q.options.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-                      </select>
+                    {(q.kind === "one" || q.kind === "many") && (
+                      <div className="survey-options">
+                        {q.options.map(([key, label]) => {
+                          const v = answers[q.id];
+                          const on = q.kind === "one" ? v === key : Array.isArray(v) && v.includes(key);
+                          return (
+                            <label key={key} className={`survey-option${on ? " on" : ""}`}>
+                              <input type={q.kind === "one" ? "radio" : "checkbox"} name={q.id} checked={on}
+                                disabled={q.kind === "many" && !on && q.max !== undefined && Array.isArray(v) && v.length >= q.max}
+                                onChange={() => {
+                                  if (q.kind === "one") set(q.id, key);
+                                  else {
+                                    const list = Array.isArray(v) ? v : [];
+                                    set(q.id, on ? list.filter((x) => x !== key) : [...list, key]);
+                                  }
+                                }} />
+                              {label}
+                            </label>
+                          );
+                        })}
+                      </div>
                     )}
-                    {q.kind === "many" && (() => {
-                      const v = Array.isArray(answers[q.id]) ? (answers[q.id] as string[]) : [];
-                      const names = q.options.filter(([key]) => v.includes(key)).map(([, label]) => label);
-                      return (
-                        <details className="survey-pick">
-                          <summary className="survey-select">{names.length ? names.join("; ") : `Choose${q.max ? ` up to ${q.max}` : ""}…`}</summary>
-                          <div className="survey-pick-list">
-                            {q.options.map(([key, label]) => {
-                              const on = v.includes(key);
-                              return (
-                                <label key={key} className={on ? "on" : undefined}>
-                                  <input type="checkbox" checked={on} disabled={!on && q.max !== undefined && v.length >= q.max}
-                                    onChange={() => set(q.id, on ? v.filter((x) => x !== key) : [...v, key])} />
-                                  {label}
-                                </label>
-                              );
-                            })}
-                          </div>
-                        </details>
-                      );
-                    })()}
                     {q.kind === "scale" && (
-                      <select className="survey-select" value={typeof answers[q.id] === "number" ? String(answers[q.id]) : ""} aria-label={q.text}
-                        onChange={(e) => (e.target.value === "" ? unset(q.id) : set(q.id, Number(e.target.value)))}>
-                        <option value="">Choose…</option>
+                      <div className="survey-scale" role="radiogroup" aria-label={q.text}>
+                        <span className="meta">{q.labels[0]}</span>
                         {Array.from({ length: q.max - q.min + 1 }, (_, k) => q.min + k).map((n) => (
-                          <option key={n} value={n}>{n}{n === q.min ? ` (${q.labels[0].toLowerCase()})` : n === q.max ? ` (${q.labels[1].toLowerCase()})` : ""}</option>
+                          <label key={n} className={`survey-option${answers[q.id] === n ? " on" : ""}`}>
+                            <input type="radio" name={q.id} checked={answers[q.id] === n} onChange={() => set(q.id, n)} />{n}
+                          </label>
                         ))}
-                      </select>
+                        <span className="meta">{q.labels[1]}</span>
+                      </div>
                     )}
                     {q.kind === "number" && (
-                      <select className="survey-select" value={typeof answers[q.id] === "number" ? String(answers[q.id]) : ""} aria-label={q.text}
-                        onChange={(e) => (e.target.value === "" ? unset(q.id) : set(q.id, Number(e.target.value)))}>
-                        <option value="">Choose…</option>
-                        {Array.from({ length: q.max - q.min + 1 }, (_, k) => q.min + k).map((n) => <option key={n} value={n}>{n} out of 10</option>)}
-                      </select>
+                      <label className="field survey-number">
+                        <input type="number" inputMode="numeric" min={q.min} max={q.max} step={1}
+                          value={typeof answers[q.id] === "number" ? (answers[q.id] as number) : ""}
+                          onChange={(e) => (e.target.value === "" ? setAnswers(({ [q.id]: _, ...rest }) => rest) : set(q.id, Number(e.target.value)))} />
+                        <span className="meta">out of 10</span>
+                      </label>
                     )}
                     {q.kind === "text" && (
                       <label className="field">
@@ -193,18 +187,7 @@ export function SurveyResults() {
           {data.admin && <> · <a href="/api/survey/results.csv">Download every answer (CSV)</a></>}
         </p>
       </header>
-      <section className="sheet"><LivePanel /></section>
-      {data.results.map((r) => {
-        return (
-          <section key={r.id} className="sheet survey-result">
-            <div className="sheet-head"><span className="lab">{r.text}</span><span className="count">{r.answered} answered</span></div>
-            <QuestionBars r={r} />
-            {r.spread && r.spread.median !== null && (
-              <p className="sheet-note">Median {r.spread.median}; the middle half answered {r.spread.low} to {r.spread.high}.</p>
-            )}
-          </section>
-        );
-      })}
+      <LivePanel />
       {data.comments && (
         <section className="sheet">
           <div className="sheet-head"><span className="lab">Comments</span><span className="count">{data.comments.length}, seen only by the people who run RightFit</span></div>
@@ -294,7 +277,7 @@ function useGlide(target: number | null, ms = 1200) {
   return shown;
 }
 
-export function LivePanel({ refresh = 0 }: { refresh?: number }) {
+export function LivePanel() {
   const [data, setData] = useState<Live | null>(null);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -304,7 +287,7 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
     const timer = window.setInterval(look, EVERY);
     document.addEventListener("visibilitychange", look);
     return () => { stop = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", look); };
-  }, [refresh]);
+  }, []);
   const timeShown = useGlide(data?.timeLost.mean ?? null);
   const moneyShown = useGlide(data?.moneyLost.mean ?? null, 1500);
 

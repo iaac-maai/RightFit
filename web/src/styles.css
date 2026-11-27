@@ -708,18 +708,7 @@ main { min-width: 0; }
 .survey-bar-track span { display: block; height: 100%; background: var(--green); border-radius: 6px; }
 .survey-bar-n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .survey-comments { list-style: none; margin: 0; padding: 10px 14px; display: grid; gap: 8px; }
-.survey-select { width: 100%; max-width: 560px; font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: inherit; }
-.survey-pick { max-width: 560px; }
-.survey-pick > summary { cursor: pointer; list-style: none; }
-.survey-pick > summary::after { content: "▾"; float: right; color: var(--ink-2); }
-.survey-pick[open] > summary { border-color: var(--green); }
-.survey-pick-list { display: grid; gap: 2px; margin-top: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-.survey-pick-list label { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
-.survey-pick-list label.on { background: #edf7ee; }
-.survey-pick-list input { accent-color: var(--green); }
 /* The live results at the top of the survey: two headline numbers, the rest smaller */
-.legal-text.survey { max-width: 1000px; }
-.legal-text.survey > p, .survey-form { max-width: 720px; }
 .live { --ink-l: #5d6b63; display: grid; gap: 14px; padding: 20px; border: 1px solid #dbe3de; border-radius: 6px; background: #f4f7f5; }
 .live p, .live li { max-width: none; margin: 0; }
 .live-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 14px; }

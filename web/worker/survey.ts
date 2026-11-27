@@ -6,10 +6,6 @@ import { CONSENT, QUESTIONS, SURVEY_VERSION, checkAnswers, live, summarise, toCs
 // Before any session: the questions, and an answer
 export async function surveyOpenRoute(request: Request, env: Env, path: string, method: string): Promise<Response | null> {
   if (path === "/api/survey" && method === "GET") return json({ version: SURVEY_VERSION, questions: QUESTIONS, consent: CONSENT });
-  // the live numbers at the top of the survey page, for anyone: sums only, never a comment or one person's answers
-  if (path === "/api/survey/live" && method === "GET") {
-    return json(live(await rows(env)), 200, { "Cache-Control": "no-store" });
-  }
   if (path === "/api/survey" && method === "POST") {
     const raw = await request.text();
     if (raw.length > 20_000) return json({ error: "The answer is too long." }, 413);
@@ -33,6 +29,8 @@ async function rows(env: Env) {
 // With a session: the results (anyone signed in), the comments and the CSV (admins)
 export async function surveyRoute(env: Env, path: string, method: string, admin: boolean): Promise<Response | null> {
   if (method !== "GET") return null;
+  // the live numbers of the Survey page: sums only, never a comment or one person's answers
+  if (path === "/api/survey/live") return json(live(await rows(env)), 200, { "Cache-Control": "no-store" });
   if (path === "/api/survey/results") {
     const all = await rows(env);
     return json({
