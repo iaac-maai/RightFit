@@ -82,7 +82,7 @@ AI reads, rules decide. The reading is probabilistic, so every AI part is measur
 | What kind of document each PDF page is | Our own classifier, trained from scratch | Keyword search | 62 % of pages right against 35 %, on 184 locked pages of real packages |
 | Which product family a form's row belongs to | Our second classifier, trained from scratch on 21 rows | The family's words (keyword rule) | 28 of 37 locked rows right, against 35 for the words: the words win until there are more labelled rows |
 | Which products each document covers | AI matching | Text matching | The same answer on all 51 pairs; the AI also says how a document covers a product |
-| Reading values from the documents | AI reader | A person | Not measured yet: 1 of 116 values confirmed so far |
+| Reading values from the documents | AI reader | A person | Not measured yet: 94 of 116 values confirmed, 21 not stated in the documents |
 | Turning a rule typed in words, or a BOQ line, into items to check | AI, labelled as AI output | | Not measured; the reviewer sees each item before it counts |
 | The whole review | RightFit | General AI chatbots | The protocol was written before any run (`eval/chatbot_baseline/`); no run yet |
 
@@ -193,7 +193,7 @@ It has been tried in Revit 2026 on a test room, not yet on the project's model, 
 
 ## Where we are (21 Nov 2026)
 
-- Two packages are read: P01, a set of Grundfos pumps, and P02, an air handling unit with its outdoor units, already at revision 4. Of what the AI read, 1 of 116 values and 2 of 15 documents are confirmed so far, so most results are still what a check would say.
+- Two packages are read: P01, a set of Grundfos pumps, and P02, an air handling unit with its outdoor units, already at revision 4. Of what the AI read, 94 of 116 values and all 15 documents are confirmed; 21 values are not stated in the documents and stay unclear.
 - 48 more packages from the same project are on our laptops, and since 21 Nov in RightFit online as well. The app lists them; none is read yet.
 - All 28 legal rules in `data/maf/rules.csv` have been read in the official text, the last nine on 16 Nov. The other four are reviewers' practice and one engineer's input, and each rule shows which it is.
 - On 17 Nov the rule watch started asking the official sources whether the act behind a rule changed (all 28 unchanged on its first run), the reviewer's decisions moved into the project folder, a resubmission began to show what changed since the previous revision, and our second own model started naming a product's family from its form row, though the family words still beat it (35 against 28 of 37 rows). Jeff's fit check in Revit was merged the same day; see above.

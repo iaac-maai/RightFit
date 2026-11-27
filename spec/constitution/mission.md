@@ -89,7 +89,7 @@ Every AI part is measured against the plain way of doing the same job, and the r
 |---|---|---|
 | Our page classifier, trained from scratch | Keyword search | First version, on real package pages: 25 % right against 27 %. On manuals with declarations inside: 87 % against 45 %. It didn't beat the keywords on real packages. The second version also trains on real packages: on 184 locked pages of the second batch it gets 62 % right against 35 %, and finds 69 % of the data sheet pages against 9 % |
 | AI matching of documents to products | Text matching | The same answer on all 51 pairs. So far the AI only adds how a document covers a product |
-| AI reading of packages into values | A person reading them | Not measured yet: 1 of 116 values has been confirmed |
+| AI reading of packages into values | A person reading them | Not measured yet: on 28 Nov Luca confirmed 94 of 116 values and found 21 not stated in the documents |
 | A rule typed in words, or a BOQ line, turned into items to check | A person filling in the form by hand | Not measured. The reviewer sees each item, labelled AI, before it counts |
 | The whole review | Luca by hand, and general chatbots | By hand: about 10 minutes for P01 (figures only) and 3 hours for P02. Chatbots: the protocol and a frozen test set of 21 unseen packages are written (`eval/chatbot_baseline/`), no run yet |
 

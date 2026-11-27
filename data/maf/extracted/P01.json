@@ -134,16 +134,18 @@
           "kind": "range",
           "page": 1,
           "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         },
         {
           "item": "P01-4",
           "kind": "range",
           "page": 1,
           "quote": "the products Unilift AP, APB, KP, to which the declaration below relates",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-11"
@@ -175,8 +177,9 @@
           "kind": "exact model",
           "page": 1,
           "quote": "UNILIFT AP12.40.06.3",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -208,8 +211,9 @@
           "kind": "exact model",
           "page": 1,
           "quote": "UNILIFT AP12.50.11.3",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -241,8 +245,9 @@
           "kind": "exact model",
           "page": 1,
           "quote": "Hydro Multi-E 2 CME 15-2 U2 A-A-A-A-A",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -274,8 +279,9 @@
           "kind": "exact model",
           "page": 1,
           "quote": "DPK.15.80.30.5.0D",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"

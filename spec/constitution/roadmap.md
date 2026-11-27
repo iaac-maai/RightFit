@@ -21,7 +21,7 @@ Full version for 12 Nov 2026, brought up to date on 16 Nov 2026. It is built on 
 
 We have the feature spec, the rules and checklist tables, two packages read into JSON, the checks with 107 tests, one application for the whole review, the checks as MCP tools, and Luca's reference answers for both packages. Since 12 Nov the application works per project, reads the project's BOQ, takes the consultant's own rules, follows the law in force on the review date, and checks the drinking water approval and the liquid temperature of pumps. Luca has also set two engineering inputs: no tolerance on the duty point, and the control panel for pumps as a consultant's rule, not a legal one. The midterm on 6 Nov showed the pump workflow, and the jury's main comment was that RightFit has to differ clearly from a general chatbot.
 
-What's missing is Luca's check of what the AI read (1 of 116 values and 2 of 15 documents so far), so every result is what a check would say once its readings are confirmed, and the comparison with his answers is still on unverified values. All 28 legal rules have been read on the official text, the last nine on 16 Nov; the other four are practice or an engineer's input. 48 more packages from the same project came in on 6 Nov; the app lists them and none is read yet. The chatbot test has its protocol and a frozen test set, and no run.
+Luca checked what the AI read on 28 Nov: 94 of 116 values and all 15 documents are confirmed, and 21 values are confirmed as not stated in the documents, so they stay unclear. The comparison with his answers can now run on confirmed values. All 28 legal rules have been read on the official text, the last nine on 16 Nov; the other four are practice or an engineer's input. 48 more packages from the same project came in on 6 Nov; the app lists them and none is read yet. The chatbot test has its protocol and a frozen test set, and no run.
 
 ## 3. Phases
 
@@ -43,7 +43,7 @@ The hood features (image search, keyword baseline, re-ranking from a designer's 
 
 | ID | Feature | How it works | Status |
 |---|---|---|---|
-| MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; 1 of their 116 values confirmed so far. The 25 test set packages of the second batch on the laptop were read on 27 Nov and kept out of Git: the 5 timed packages are a project in the app, the 20 accuracy packages stay out of it until Luca's reference answers (P18's zip is incomplete); none confirmed yet; issues #10, #14 |
+| MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; 94 of their 116 values and all 15 documents confirmed on 28 Nov, 21 values confirmed as not stated. The 25 test set packages of the second batch on the laptop were read on 27 Nov and kept out of Git: the 5 timed packages are a project in the app, the 20 accuracy packages stay out of it until Luca's reference answers (P18's zip is incomplete); none confirmed yet; issues #10, #14 |
 | MAF-02 | Reading the form (.xls), roles only | Plain Python | Done |
 | MAF-03 | Document checks D1–D4 | Rules | Done, tested; since 12 Nov D1 also knows the documents of nine families of the second batch |
 | MAF-04 | Value checks V1, V2, V3 and ecodesign E1 | Rules | Done, tested; no tolerance on the duty point (Luca) |

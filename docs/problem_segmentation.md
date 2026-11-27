@@ -46,7 +46,7 @@ The check codes in the last column (D1, V1, C...) are the ones in `spec/features
 | 2.2 | Say what each document is and which products it covers, and how (exact model, range table, range), never from the file name | AI + Human | AI reader, Luca checks | Read and matched, not verified |
 | 2.3 | Read the values each family needs, with page and a short quote | AI + Human | AI reader, Luca checks | Read, not verified |
 | 2.4 | Mark a value that isn't there as `unclear`, with where we looked | Rule | AI reader | Done |
-| 2.5 | Verify each value in the app | Human | Luca | Started: 1 of 116 values and 2 of 15 documents |
+| 2.5 | Verify each value in the app | Human | Luca | Done for P01 and P02 on 28 Nov: 94 of 116 values and all 15 documents; 21 values not stated |
 
 ### 3. Set the context
 
@@ -107,4 +107,4 @@ The AI reads the attachments (2.2, 2.3), makes a first pass at the rules (3.4), 
 
 ## 4. What runs today
 
-Both packages go through every check, for Romania and for Spain. Because almost nothing has been verified yet (1 of 116 values), nearly every pass and flag still shows as `unclear` together with the result it would give. The next step is 2.5, then 7.2 again on verified values.
+Both packages go through every check, for Romania and for Spain. Since Luca's check on 28 Nov (94 of 116 values confirmed), most passes and flags count as results; what is not stated in the documents stays `unclear`. The next step is 7.2 again on verified values.

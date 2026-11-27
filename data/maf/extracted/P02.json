@@ -114,8 +114,9 @@
           "kind": "exact model",
           "page": 29,
           "quote": "Type XES#AHUEZ096096GBVAA096096GBVA",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -151,8 +152,9 @@
           "kind": "range table row",
           "page": 1,
           "quote": "AVW-54HKFHH2",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -205,16 +207,18 @@
           "kind": "exact model",
           "page": 4,
           "quote": "AVW-48HKFHH2, AVW-54HKFHH2",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         },
         {
           "item": "P02-3",
           "kind": "exact model",
           "page": 8,
           "quote": "HZX-2BEJ, HZX-4BEJ, HZX-6BEJ, HZX-10BEJ, HZX-20BEJ, HZX-30BEJ",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -282,8 +286,9 @@
           "kind": "range table row",
           "page": 1,
           "quote": "HZX-6 BEJ",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -316,8 +321,9 @@
           "kind": "related",
           "page": 1,
           "quote": "RLT-Geräte-Auslegungs-Software „LPlus“",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -351,8 +357,9 @@
           "kind": "range",
           "page": 1,
           "quote": "Range Name / Nom de Gamme : CAIRplus",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -384,16 +391,18 @@
           "kind": "exact model",
           "page": 4,
           "quote": "54HKFHH2 Hisense pc 2 L+ Series(Eurovent)",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         },
         {
           "item": "P02-3",
           "kind": "exact model",
           "page": 4,
           "quote": "HZX-6BEJ Hisense pc 2",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
@@ -425,16 +434,18 @@
           "kind": "exact model",
           "page": 4,
           "quote": "54HKFHH2 Hisense pc 2 L+ Series(Eurovent)",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         },
         {
           "item": "P02-3",
           "kind": "exact model",
           "page": 4,
           "quote": "HZX-6BEJ Hisense pc 2",
-          "status": "extracted",
-          "checked_by": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "verified_on": "2026-11-27"
         }
       ],
       "verified_on": "2026-11-27"
