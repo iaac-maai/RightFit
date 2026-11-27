@@ -143,3 +143,74 @@ export function toCsv(rows: { day: string; answers: Answers }[]) {
   };
   return [["day", ...ids].join(","), ...rows.map((r) => [r.day, ...ids.map((id) => cell(r.answers[id]))].join(","))].join("\n") + "\n";
 }
+
+// ---- The live numbers at the top of the survey page (spec/features/survey.md §4) ----
+// An answer is a range ("30 to 60 minutes"). To give an average, each range counts at its middle, in one unit. An open
+// range ("Over 4 hours") counts at its lower bound, so an average that includes one is marked "at least". "Don't know"
+// counts nowhere. These middles only turn people's ranges into one number; they are not data about equipment.
+export const MIDDLES: Record<string, { title: string; unit: "minutes" | "days" | "euros" | "rounds"; values: Record<string, [number, boolean]> }> = {
+  review_time: { title: "Reviewing one equipment submittal", unit: "minutes", values: {
+    lt15: [7.5, false], "15to30": [22.5, false], "30to60": [45, false], "1to2h": [90, false], "2to4h": [180, false], gt4h: [240, true] } },
+  prepare_time: { title: "Preparing one equipment submittal", unit: "minutes", values: {
+    lt30: [15, false], "30to60": [45, false], "1to2h": [90, false], "2to4h": [180, false], "4to8h": [360, false], gt1d: [480, true] } },
+  rounds: { title: "Rounds until a submittal is approved", unit: "rounds", values: {
+    "1": [1, false], "2": [2, false], "3": [3, false], "4plus": [4, true] } },
+  delay: { title: "Delay each time a submittal is returned", unit: "days", values: {
+    lt3d: [1.5, false], "3to7d": [5, false], "1to2w": [10.5, false], "2to4w": [21, false], gt1m: [30, true] } },
+  misfit_cost: { title: "Fixing equipment that did not fit on site, one case", unit: "euros", values: {
+    lt1k: [500, false], "1to5k": [3000, false], "5to20k": [12500, false], "20to100k": [60000, false], gt100k: [100000, true] } },
+};
+
+export interface LiveRange { id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null }
+export interface Live {
+  n: number; lastDay: string | null;
+  ranges: LiveRange[];
+  returned: { answered: number; mean: number | null; min: number | null; max: number | null };
+  misfit: { answered: number; atLeastOnce: number };
+  useful: { id: string; title: string; answered: number; mean: number | null }[];
+  reasons: { label: string; n: number }[];
+  roles: { label: string; n: number }[];
+}
+
+const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+const optionsOf = (id: string) => {
+  const q = QUESTIONS.find((x) => x.id === id);
+  return q && (q.kind === "one" || q.kind === "many") ? q.options : [];
+};
+
+// What everyone answered so far, as a few numbers. Never the comments, never one person's answers.
+export function live(rows: { day: string; answers: Answers }[]): Live {
+  const all = rows.map((r) => r.answers);
+  const ranges = Object.entries(MIDDLES).map(([id, m]): LiveRange => {
+    const opts = optionsOf(id);
+    const picked = all.map((a) => a[id]).filter((v): v is string => typeof v === "string" && v in m.values);
+    const order = picked.map((k) => opts.findIndex(([key]) => key === k)).sort((a, b) => a - b);
+    return {
+      id, title: m.title, unit: m.unit, answered: picked.length,
+      mean: mean(picked.map((k) => m.values[k][0])),
+      atLeast: picked.some((k) => m.values[k][1]),
+      lowest: order.length ? opts[order[0]][1] : null,
+      highest: order.length ? opts[order[order.length - 1]][1] : null,
+    };
+  });
+  const returned = all.map((a) => a.returned).filter((v): v is number => typeof v === "number");
+  const misfit = all.map((a) => a.site_misfit).filter((v) => typeof v === "string" && v !== "na");
+  const count = (id: string, top?: number) => {
+    const flat = all.flatMap((a) => (Array.isArray(a[id]) ? (a[id] as string[]) : typeof a[id] === "string" ? [a[id] as string] : []));
+    const list = optionsOf(id).map(([key, label]) => ({ label, n: flat.filter((x) => x === key).length })).filter((c) => c.n > 0);
+    list.sort((a, b) => b.n - a.n);
+    return top ? list.slice(0, top) : list;
+  };
+  return {
+    n: rows.length, lastDay: rows.length ? rows.map((r) => r.day).sort().at(-1)! : null,
+    ranges,
+    returned: { answered: returned.length, mean: mean(returned), min: returned.length ? Math.min(...returned) : null, max: returned.length ? Math.max(...returned) : null },
+    misfit: { answered: misfit.length, atLeastOnce: misfit.filter((v) => v !== "never").length },
+    useful: [["useful_check", "A check of the documents and data before review"], ["useful_fit", "Seeing whether it fits in the building model"]].map(([id, title]) => {
+      const xs = all.map((a) => a[id]).filter((v): v is number => typeof v === "number");
+      return { id, title, answered: xs.length, mean: mean(xs) };
+    }),
+    reasons: count("reasons", 3),
+    roles: count("role"),
+  };
+}

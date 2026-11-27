@@ -1,11 +1,15 @@
 // The practice survey (spec/features/survey.md): the public page asks for the questions and sends an anonymous answer;
 // signed-in people read the results, and the admins the comments and a CSV. The rules are in survey_rules.ts.
 import { json, newId, now, readBody, type Env } from "./data";
-import { CONSENT, QUESTIONS, SURVEY_VERSION, checkAnswers, summarise, toCsv, type Answers } from "./survey_rules";
+import { CONSENT, QUESTIONS, SURVEY_VERSION, checkAnswers, live, summarise, toCsv, type Answers } from "./survey_rules";
 
 // Before any session: the questions, and an answer
 export async function surveyOpenRoute(request: Request, env: Env, path: string, method: string): Promise<Response | null> {
   if (path === "/api/survey" && method === "GET") return json({ version: SURVEY_VERSION, questions: QUESTIONS, consent: CONSENT });
+  // the live numbers at the top of the survey page, for anyone: sums only, never a comment or one person's answers
+  if (path === "/api/survey/live" && method === "GET") {
+    return json(live(await rows(env)), 200, { "Cache-Control": "no-store" });
+  }
   if (path === "/api/survey" && method === "POST") {
     const raw = await request.text();
     if (raw.length > 20_000) return json({ error: "The answer is too long." }, 413);

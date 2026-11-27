@@ -708,3 +708,25 @@ main { min-width: 0; }
 .survey-bar-track span { display: block; height: 100%; background: var(--green); border-radius: 6px; }
 .survey-bar-n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .survey-comments { list-style: none; margin: 0; padding: 10px 14px; display: grid; gap: 8px; }
+.survey-select { width: 100%; max-width: 560px; font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: inherit; }
+.survey-pick { max-width: 560px; }
+.survey-pick > summary { cursor: pointer; list-style: none; }
+.survey-pick > summary::after { content: "▾"; float: right; color: var(--ink-2); }
+.survey-pick[open] > summary { border-color: var(--green); }
+.survey-pick-list { display: grid; gap: 2px; margin-top: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.survey-pick-list label { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.survey-pick-list label.on { background: #edf7ee; }
+.survey-pick-list input { accent-color: var(--green); }
+/* The live results at the top of the survey */
+.live { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #f6f8f6; }
+.live-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.live-dot { width: 9px; height: 9px; border-radius: 50%; background: #2e9e4f; animation: live-pulse 1.6s ease-in-out infinite; }
+@keyframes live-pulse { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.live-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.live-tile { display: grid; gap: 3px; align-content: start; padding: 10px 12px; background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+.live-value { font-size: 20px; font-weight: 700; color: var(--green); font-variant-numeric: tabular-nums; }
+.live-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.live-note { font-size: 12px; color: var(--ink-2); line-height: 1.35; }
+.live-line { margin: 0; font-size: 13px; line-height: 1.45; }
+.live-foot { margin: 0; font-size: 12px; }
