@@ -717,12 +717,10 @@ main { min-width: 0; }
 .survey-pick-list label { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
 .survey-pick-list label.on { background: #edf7ee; }
 .survey-pick-list input { accent-color: var(--green); }
-/* The live results at the top of the survey: two headline numbers, the rest smaller, on a sheet with a fine grid */
+/* The live results at the top of the survey: two headline numbers, the rest smaller */
 .legal-text.survey { max-width: 1000px; }
 .legal-text.survey > p, .survey-form { max-width: 720px; }
-.live { --ink-l: #5d6b63; --grid: rgba(16, 58, 44, 0.055); display: grid; gap: 14px; padding: 20px; border: 1px solid #cfd8d2; border-radius: 4px;
-  background-color: #fbfcfa; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size: 16px 16px; }
+.live { --ink-l: #5d6b63; display: grid; gap: 14px; padding: 20px; border: 1px solid #dbe3de; border-radius: 6px; background: #f4f7f5; }
 .live p, .live li { max-width: none; margin: 0; }
 .live-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 14px; }
 .live-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }

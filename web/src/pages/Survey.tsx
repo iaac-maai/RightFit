@@ -210,7 +210,7 @@ export function SurveyResults() {
 }
 
 // ---- The live numbers (spec/features/survey.md §4): what everyone answered so far, asked again every few seconds ----
-// Two headline numbers first, time lost and money lost, then the rest smaller, on a sheet with a fine grid and line icons.
+// Two headline numbers first, time lost and money lost, then the rest smaller, with line icons.
 interface LiveRange {
   id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null;
   scale: string[]; lowIndex: number | null; highIndex: number | null; meanAt: number | null;
