@@ -43,7 +43,7 @@ The hood features (image search, keyword baseline, re-ranking from a designer's 
 
 | ID | Feature | How it works | Status |
 |---|---|---|---|
-| MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; 1 of 116 values confirmed so far; issues #10, #14 |
+| MAF-01 | Reading a package into sourced values | The AI reads; a person verifies each value | Done for P01 and P02; 1 of their 116 values confirmed so far. The 25 test set packages of the second batch on the laptop were read on 27 Nov and kept out of Git: the 5 timed packages are a project in the app, the 20 accuracy packages stay out of it until Luca's reference answers (P18's zip is incomplete); none confirmed yet; issues #10, #14 |
 | MAF-02 | Reading the form (.xls), roles only | Plain Python | Done |
 | MAF-03 | Document checks D1–D4 | Rules | Done, tested; since 12 Nov D1 also knows the documents of nine families of the second batch |
 | MAF-04 | Value checks V1, V2, V3 and ecodesign E1 | Rules | Done, tested; no tolerance on the duty point (Luca) |
