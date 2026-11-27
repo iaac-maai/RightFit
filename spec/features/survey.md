@@ -33,7 +33,10 @@ To say what RightFit saves, we need to know how the work goes today without it. 
 The introduction says what the survey asks about and does not describe the tool, so that the two usefulness questions are not answered out of courtesy.
 
 ## 4. Results
-**Live results, at the top of `/survey`, for everyone who opens it** (since 27 Nov 2026). The page asks `GET /api/survey/live` again every 5 seconds while it is on screen, and at once after a person sends, so a new answer shows within seconds. It shows sums only, never a comment or one person's answers:
+**Live results, at the top of `/survey`, for everyone who opens it** (since 27 Nov 2026). The page asks `GET /api/survey/live` again every 5 seconds while it is on screen, and at once after a person sends, so a new answer shows within seconds. It shows sums only, never a comment or one person's answers. First, large, the two headline numbers:
+- **Time lost per submittal**, in days: for each person who answered both, the extra rounds (rounds until approval minus the first) times the delay each return causes; the average, the lowest and the highest, and how many answered. "4 or more" rounds or "over a month" make it "at least".
+- **Money lost per misfit on site**: the average cost of fixing one case of approved equipment that did not fit once on site, with the lowest and highest range chosen.
+Then, smaller:
 - for the ranges (own time to review one submittal, own time to prepare one, rounds until approval, delay per return, cost of fixing one misfit): the average, the lowest and the highest range chosen, and how many answered. The average counts each range at its middle; an open range ("Over 4 hours", "4 or more", "Over €100,000") counts at its lower bound and makes the average "at least"; "Don't know" counts nowhere. The middles are in `MIDDLES` in `web/worker/survey_rules.ts`; they only turn people's ranges into one number;
 - C at the first submission: the average, lowest and highest out of 10;
 - how many of those it applies to saw approved equipment not fit on site in their last 3 projects;

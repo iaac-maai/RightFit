@@ -210,14 +210,15 @@ export function SurveyResults() {
 }
 
 // ---- The live numbers (spec/features/survey.md §4): what everyone answered so far, asked again every few seconds ----
-// Drawn like a sheet of drawings: a fine grid, line icons, and each range as a dimension line from the lowest answer to
-// the highest, with the average marked on it.
+// Two headline numbers first, time lost and money lost, then the rest smaller, on a sheet with a fine grid and line icons.
 interface LiveRange {
   id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null;
   scale: string[]; lowIndex: number | null; highIndex: number | null; meanAt: number | null;
 }
+interface Lost { answered: number; mean: number | null; atLeast: boolean; low: number | null; high: number | null }
 interface Live {
   n: number; lastDay: string | null; ranges: LiveRange[];
+  timeLost: Lost; moneyLost: Lost & { lowest: string | null; highest: string | null };
   returned: { answered: number; mean: number | null; min: number | null; max: number | null };
   misfit: { answered: number; atLeastOnce: number };
   useful: { id: string; title: string; answered: number; mean: number | null }[];
@@ -238,6 +239,8 @@ const ICONS: Record<string, string> = {
   useful_check: "M10 6.5h10 M10 12h10 M10 17.5h10 M3.5 6.5l1.5 1.5 2.5-3 M3.5 12l1.5 1.5 2.5-3 M3.5 17.5l1.5 1.5 2.5-3",
   useful_fit: "M12 3l8 4.5v9L12 21l-8-4.5v-9z M12 12l8-4.5 M12 12v9 M12 12L4 7.5",
   reasons: "M9 14L4 9l5-5 M4 9h10.5a5.5 5.5 0 0 1 0 11H11",
+  time_lost: "M7 3h10 M7 21h10 M8 3c0 5 8 5 8 9s-8 4-8 9 M16 3c0 5-8 5-8 9s8 4 8 9 M10 18.5h4",
+  money_lost: "M16.5 6.8a6.5 6.5 0 1 0 0 10.4 M5 10.3h8.5 M5 13.7h8.5 M19 15l2.5 2.5 M21.5 15L19 17.5",
   roles: "M9 11a3.2 3.2 0 1 0 0-6.4a3.2 3.2 0 1 0 0 6.4 M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M16.5 11.5a2.6 2.6 0 1 0 0-5.2 M17.5 14.3c2 .5 3.5 2.4 3.5 4.7",
 };
 function Icon({ name }: { name: string }) {
@@ -260,29 +263,6 @@ function amount(unit: string, x: number) {
   return [`${Math.round(x * 10) / 10}`, unit];
 }
 
-// A dimension line, as on a drawing: ticks for each answer, the span from the lowest to the highest answer with
-// slash ends, and a marker where the average falls
-function Dimension({ steps, low, high, at, ends }: { steps: number; low: number | null; high: number | null; at: number | null; ends?: [string, string] }) {
-  const x = (i: number) => 8 + (i * 224) / Math.max(1, steps - 1);
-  return (
-    <div className="live-dim">
-      <svg viewBox="0 0 240 34" preserveAspectRatio="none" aria-hidden="true">
-        <line x1="8" y1="22" x2="232" y2="22" className="dim-base" />
-        {Array.from({ length: steps }, (_, i) => <line key={i} x1={x(i)} y1="19" x2={x(i)} y2="25" className="dim-tick" />)}
-        {low !== null && high !== null && (
-          <>
-            <line x1={x(low)} y1="22" x2={x(high)} y2="22" className="dim-span" />
-            {[low, high].map((i, k) => <line key={k} x1={x(i) - 4} y1="26" x2={x(i) + 4} y2="18" className="dim-span" />)}
-          </>
-        )}
-        {at !== null && <path d={`M${x(at)} 15 l-5 -8 h10 z`} className="dim-mean" />}
-      </svg>
-      {ends && <div className="live-dim-ends"><span>{ends[0]}</span><span>{ends[1]}</span></div>}
-    </div>
-  );
-}
-
-const answers = (n: number) => `${n} ${n === 1 ? "answer" : "answers"}`;
 
 export function LivePanel({ refresh = 0 }: { refresh?: number }) {
   const [data, setData] = useState<Live | null>(null);
@@ -297,84 +277,67 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
 
   if (!data) return null;
   const share = data.misfit.answered ? data.misfit.atLeastOnce / data.misfit.answered : 0;
-  const maxReason = Math.max(1, ...data.reasons.map((r) => r.n));
+  const r = (id: string) => data.ranges.find((x) => x.id === id)!;
+  const small = (id: string, label: string) => {
+    const x = r(id);
+    const [num, unit] = x.mean === null ? ["–", ""] : amount(x.unit, x.mean);
+    return { id, label, value: <>{x.mean !== null && x.atLeast ? "≥ " : x.mean !== null ? "≈ " : ""}{num}{unit && <em> {unit}</em>}</>, n: x.answered };
+  };
+  const smalls = [
+    small("review_time", "own time to review one submittal"),
+    small("prepare_time", "own time to prepare one"),
+    small("rounds", "rounds until approved"),
+    small("delay", "delay each time it comes back"),
+    { id: "returned", label: "out of 10 get C at the first submission", n: data.returned.answered,
+      value: <>{data.returned.mean === null ? "–" : <>≈ {Math.round(data.returned.mean * 10) / 10}<em> / 10</em></>}</> },
+    { id: "misfit", label: "saw approved equipment not fit on site", n: data.misfit.answered,
+      value: <>{data.misfit.answered ? <>{Math.round(share * 100)}<em> %</em></> : "–"}</> },
+    ...data.useful.map((u) => ({ id: u.id, label: u.id === "useful_check" ? "find a check before review useful" : "find seeing the fit in the model useful", n: u.answered,
+      value: <>{u.mean === null ? "–" : <>{Math.round(u.mean * 10) / 10}<em> / 5</em></>}</> })),
+  ];
+  const t = data.timeLost, m = data.moneyLost;
+  const days = (x: number) => `${x < 10 ? Math.round(x * 2) / 2 : Math.round(x)}`;
+  const euros = (x: number) => `€${(Math.round(x / 100) * 100).toLocaleString("en-GB")}`;
   return (
     <section className="live" aria-live="polite" aria-label="Live results">
       <header className="live-head">
-        <div>
-          <span className="live-eyebrow"><span className="live-dot" aria-hidden="true" />Live · updates by itself</span>
-          <h2>What people report so far</h2>
-        </div>
-        <div className="live-count">
-          <b>{data.n}</b>
-          <span>{data.n === 1 ? "answer" : "answers"}{data.lastDay ? <><br />last on {day(data.lastDay)}</> : null}</span>
-        </div>
+        <span className="live-eyebrow"><span className="live-dot" aria-hidden="true" />Live results</span>
+        <span className="live-sub">{data.n ? <>from <b>{data.n}</b> {data.n === 1 ? "person" : "people"} so far · updates by itself</> : "no answer yet: yours will be the first"}</span>
       </header>
 
-      {data.n === 0 ? <p className="live-empty">No answer yet. Yours will be the first.</p> : (
+      <div className="live-heroes">
+        <article className="live-hero">
+          <Icon name="time_lost" />
+          <p className="live-hero-label">Time lost per submittal</p>
+          <p className="live-hero-value">{t.mean === null ? "–" : <>{t.atLeast ? <small>at least</small> : <small>about</small>}{days(t.mean)}<em>days</em></>}</p>
+          <p className="live-hero-how">waiting on resubmissions: extra review rounds × the delay each one causes</p>
+          <p className="live-hero-n">{t.answered ? <>answers from {days(t.low!)} to {days(t.high!)} days · {t.answered} {t.answered === 1 ? "answer" : "answers"}</> : "no answer yet"}</p>
+        </article>
+        <article className="live-hero">
+          <Icon name="money_lost" />
+          <p className="live-hero-label">Money lost per misfit on site</p>
+          <p className="live-hero-value">{m.mean === null ? "–" : <>{m.atLeast ? <small>at least</small> : <small>about</small>}{euros(m.mean)}</>}</p>
+          <p className="live-hero-how">to fix one approved item that did not fit once it reached site</p>
+          <p className="live-hero-n">{m.answered ? <>answers from “{m.lowest}” to “{m.highest}” · {m.answered} {m.answered === 1 ? "answer" : "answers"}</> : "no answer yet"}</p>
+        </article>
+      </div>
+
+      {data.n > 0 && (
         <>
-          <div className="live-grid">
-            {data.ranges.map((r) => {
-              const [num, unit] = r.mean === null ? ["–", ""] : amount(r.unit, r.mean);
-              return (
-                <article key={r.id} className="live-card">
-                  <div className="live-card-head"><Icon name={r.id} /><h3>{r.title}</h3></div>
-                  <p className="live-value">{r.mean !== null && <small>{r.atLeast ? "at least" : "about"}</small>}{num}<em>{unit}</em></p>
-                  {r.answered ? <Dimension steps={r.scale.length} low={r.lowIndex} high={r.highIndex} at={r.meanAt} ends={[r.lowest!, r.highest!]} />
-                    : <p className="live-note">No answer yet</p>}
-                  <p className="live-note">{r.answered ? answers(r.answered) : ""}</p>
-                </article>
-              );
-            })}
-            <article className="live-card">
-              <div className="live-card-head"><Icon name="returned" /><h3>Get C (revise and resubmit) at the first submission</h3></div>
-              <p className="live-value">{data.returned.mean !== null && <small>about</small>}{data.returned.mean === null ? "–" : Math.round(data.returned.mean * 10) / 10}<em>/ 10</em></p>
-              {data.returned.answered ? <Dimension steps={11} low={data.returned.min} high={data.returned.max} at={data.returned.mean} ends={[`${data.returned.min} of 10`, `${data.returned.max} of 10`]} />
-                : <p className="live-note">No answer yet</p>}
-              <p className="live-note">{data.returned.answered ? answers(data.returned.answered) : ""}</p>
-            </article>
-            <article className="live-card">
-              <div className="live-card-head"><Icon name="misfit" /><h3>Saw approved equipment not fit on site, in their last 3 projects</h3></div>
-              <div className="live-ring-row">
-                <svg className="live-ring" viewBox="0 0 44 44" aria-hidden="true">
-                  <circle cx="22" cy="22" r="18" className="ring-base" />
-                  <circle cx="22" cy="22" r="18" className="ring-fill" strokeDasharray={`${share * 113.1} 113.1`} transform="rotate(-90 22 22)" />
-                </svg>
-                <p className="live-value">{data.misfit.answered ? Math.round(share * 100) : "–"}<em>%</em></p>
+          <div className="live-smalls">
+            {smalls.map((x) => (
+              <div key={x.id} className="live-small" title={`${x.n} ${x.n === 1 ? "answer" : "answers"}`}>
+                <Icon name={x.id} />
+                <div><b>{x.value}</b><span>{x.label}</span></div>
               </div>
-              <p className="live-note">{data.misfit.answered ? `${data.misfit.atLeastOnce} of ${data.misfit.answered}, at least once` : "No answer yet"}</p>
-            </article>
-            {data.useful.map((u) => (
-              <article key={u.id} className="live-card">
-                <div className="live-card-head"><Icon name={u.id} /><h3>How useful: {u.title.toLowerCase()}</h3></div>
-                <p className="live-value">{u.mean === null ? "–" : Math.round(u.mean * 10) / 10}<em>/ 5</em></p>
-                <div className="live-blocks" aria-hidden="true">
-                  {[1, 2, 3, 4, 5].map((k) => <span key={k} style={{ ["--fill" as string]: `${Math.max(0, Math.min(1, (u.mean ?? 0) - (k - 1))) * 100}%` }} />)}
-                </div>
-                <p className="live-note">{u.answered ? answers(u.answered) : "No answer yet"}</p>
-              </article>
             ))}
           </div>
-
-          <div className="live-lower">
-            <article className="live-card">
-              <div className="live-card-head"><Icon name="reasons" /><h3>Why forms come back most</h3></div>
-              <ol className="live-reasons">
-                {data.reasons.map((r) => (
-                  <li key={r.label}><span>{r.label}</span><span className="live-reason-bar"><i style={{ width: `${(r.n / maxReason) * 100}%` }} /></span><b>{r.n}</b></li>
-                ))}
-              </ol>
-            </article>
-            <article className="live-card">
-              <div className="live-card-head"><Icon name="roles" /><h3>Who answered</h3></div>
-              <ul className="live-chips">{data.roles.map((r) => <li key={r.label}>{r.label}<b>{r.n}</b></li>)}</ul>
-            </article>
-          </div>
-
+          {data.reasons.length > 0 && (
+            <p className="live-line"><Icon name="reasons" /><span><b>Why forms come back most:</b> {data.reasons.map((x) => `${x.label} (${x.n})`).join(" · ")}</span></p>
+          )}
           <p className="live-foot">
-            People's own estimates, not measurements. Each answer is a range; an average counts each range at its middle, and an
-            open range such as “Over 4 hours” at its lower bound, which makes that average “at least”. “Don't know” is left out.
-            The line under each number runs from the lowest answer to the highest; ▼ marks the average.
+            People's own estimates, not measurements. Answers are ranges: averages use each range's middle; “at least” when an
+            open range such as “over a month” is included; “don't know” is left out.
           </p>
         </>
       )}

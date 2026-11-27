@@ -120,6 +120,10 @@ test("the live numbers: ranges count at their middle, an open range makes it 'at
   assert.equal(l.useful[1].answered, 1);
   assert.deepEqual(l.reasons[0], { label: "Missing documents or certificates", n: 2 });
   assert.deepEqual(l.roles[0], { label: "MEP engineer who reviews submittals (consultant, supervisor)", n: 2 });
+  // time lost: person 1, 2 rounds x 10.5 days = 10.5; person 2, at least 4 rounds but delay "don't know": left out
+  assert.deepEqual(l.timeLost, { answered: 1, mean: 10.5, atLeast: false, low: 10.5, high: 10.5 });
+  assert.equal(l.moneyLost.answered, 1);
+  assert.equal(l.moneyLost.mean, 12500);
   assert.ok(!JSON.stringify(l).includes("secret"));
 });
 
@@ -129,4 +133,17 @@ test("every range answer has a middle, so none is lost from an average", () => {
     assert.ok(q.kind === "one");
     for (const [key] of q.options) if (key !== "dont_know") assert.ok(key in m.values, `${id}: ${key}`);
   }
+});
+
+test("time lost: approved the first time loses nothing, an open answer makes it 'at least'", () => {
+  const l = live([
+    { day: "2026-11-27", answers: { rounds: "1", delay: "gt1m" } },
+    { day: "2026-11-27", answers: { rounds: "3", delay: "3to7d" } },
+    { day: "2026-11-27", answers: { rounds: "4plus", delay: "lt3d" } },
+  ]);
+  assert.equal(l.timeLost.answered, 3);
+  assert.equal(l.timeLost.low, 0);
+  assert.equal(l.timeLost.high, 10);
+  assert.equal(l.timeLost.mean, (0 + 10 + 4.5) / 3);
+  assert.equal(l.timeLost.atLeast, true);
 });

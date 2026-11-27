@@ -167,8 +167,13 @@ export interface LiveRange {
   id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null;
   scale: string[]; lowIndex: number | null; highIndex: number | null; meanAt: number | null;
 }
+// The two headline numbers. Time lost: for each person who gave both, the extra rounds (rounds until approval, minus
+// the first) times the delay each return causes, in days. Money lost: the cost of fixing one case of approved
+// equipment that did not fit on site. Both are worked out from people's own answers, never added to.
+export interface Lost { answered: number; mean: number | null; atLeast: boolean; low: number | null; high: number | null }
 export interface Live {
   n: number; lastDay: string | null;
+  timeLost: Lost; moneyLost: Lost & { lowest: string | null; highest: string | null };
   ranges: LiveRange[];
   returned: { answered: number; mean: number | null; min: number | null; max: number | null };
   misfit: { answered: number; atLeastOnce: number };
@@ -216,8 +221,21 @@ export function live(rows: { day: string; answers: Answers }[]): Live {
     list.sort((a, b) => b.n - a.n);
     return top ? list.slice(0, top) : list;
   };
+  const perPerson: [number, boolean][] = [];
+  for (const a of all) {
+    const r = MIDDLES.rounds.values[a.rounds as string], d = MIDDLES.delay.values[a.delay as string];
+    if (r && d) perPerson.push([(r[0] - 1) * d[0], (r[1] && r[0] > 1) || (d[1] && r[0] > 1)]);
+  }
+  const days = perPerson.map(([x]) => x);
+  const cost = all.map((a) => MIDDLES.misfit_cost.values[a.misfit_cost as string]).filter(Boolean);
+  const money = ranges.find((x) => x.id === "misfit_cost")!;
   return {
     n: rows.length, lastDay: rows.length ? rows.map((r) => r.day).sort().at(-1)! : null,
+    timeLost: { answered: days.length, mean: mean(days), atLeast: perPerson.some(([, open]) => open),
+      low: days.length ? Math.min(...days) : null, high: days.length ? Math.max(...days) : null },
+    moneyLost: { answered: cost.length, mean: mean(cost.map(([x]) => x)), atLeast: cost.some(([, open]) => open),
+      low: cost.length ? Math.min(...cost.map(([x]) => x)) : null, high: cost.length ? Math.max(...cost.map(([x]) => x)) : null,
+      lowest: money.lowest, highest: money.highest },
     ranges,
     returned: { answered: returned.length, mean: mean(returned), min: returned.length ? Math.min(...returned) : null, max: returned.length ? Math.max(...returned) : null },
     misfit: { answered: misfit.length, atLeastOnce: misfit.filter((v) => v !== "never").length },
