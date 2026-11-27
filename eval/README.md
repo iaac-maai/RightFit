@@ -4,7 +4,7 @@ Each AI part of RightFit is measured against the way it would be done without AI
 
 | Folder | What it compares | Result so far |
 |---|---|---|
-| `page_classifier/` | our page classifier against a keyword search | 62 % of pages right against 35 % (version 2) |
+| `page_classifier/` | our page classifier against a keyword search | version 2: 62 % of pages right against 35 % on the locked second batch, 68 % against 27 % on set A |
 | `family_classifier/` | our family model against the family's words | 28 of 37 rows against 35: the words win |
 | `boq_matching/` | ways to find a product's BOQ line | 24 of 24 against 4 for the old rule |
 | `revisions/` | what changed between two revisions of a form | the first run, on P10 and P02 |
