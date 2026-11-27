@@ -54,13 +54,14 @@ def read_form(path):
         "works_group": right_of("Grupa Lucrari"),
     }
 
-    # Item rows sit between the "Producator / Brand" header and "Pozitie in BOQ".
+    # Item rows sit between the "Producator / Brand" header and "Pozitie in BOQ". A row with a name but no model is kept,
+    # with an empty model, so the product still reaches the BOQ matching and the product graph.
     header, _ = _find(sheet, "Producator / Brand", col=9)
     boq, _ = _find(sheet, "Pozitie in BOQ", col=1)
     form["items_raw"] = [
         {"name": _text(sheet, r, 4), "brand": _text(sheet, r, 9),
          "model": _text(sheet, r, 11), "origin": _text(sheet, r, 13)}
-        for r in range(header + 1, boq) if _text(sheet, r, 11)
+        for r in range(header + 1, boq) if _text(sheet, r, 4) or _text(sheet, r, 11)
     ]
     form["boq_ref"] = _text(sheet, boq, 4).rstrip(" :")
 

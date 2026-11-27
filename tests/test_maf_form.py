@@ -24,3 +24,13 @@ def test_keeps_roles_only():
     names = [n.strip().lower() for n in (ROOT / "data/raw/NAMES.txt").read_text().splitlines()
              if n.strip() and not n.startswith("#")]
     assert not [n for n in names if n in text]
+
+
+
+def test_keeps_a_product_row_with_no_model():
+    # P23, not P51: P51 is in the locked chatbot test set
+    form_file = next((ROOT / "data/raw/P23").glob("*.xls"), None)
+    if form_file is None:
+        pytest.skip("the P23 form is local only")
+    rows = read_form(form_file)["items_raw"]
+    assert len(rows) == 1 and rows[0]["model"] == "" and rows[0]["name"] == "Cablu FTP CAT 6A"

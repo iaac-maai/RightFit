@@ -35,7 +35,7 @@ def families():
 
 def form_rows(xls):
     """The product rows of a form, from the columns read_form uses. read_form stops on some batch 2 headers (a date typed
-    as a number, a revision written REV00) and skips rows that give no model, so the rows are read here directly."""
+    as a number, a revision written REV00), so the rows are read here directly."""
     sheet = xlrd.open_workbook(xls).sheet_by_index(0)
     header, _ = _find(sheet, "Producator / Brand", col=9)
     end, _ = _find(sheet, "Pozitie in BOQ", col=1)
