@@ -17,7 +17,8 @@ from mcp.server import MCPServer  # noqa: E402
 from mcp.server.mcpserver.exceptions import ToolError  # noqa: E402
 from mcp.types import ToolAnnotations  # noqa: E402
 
-from checks.maf.rules import CHAINS  # noqa: E402
+from checks.maf.checks import DOC_LABELS, covers, norm, same_brand  # noqa: E402
+from checks.maf.rules import CHAINS, library  # noqa: E402
 
 # The PDF and machine learning libraries are imported inside the tools: they take seconds to load, and an agent gives up
 # on a server that does not answer at once.
@@ -136,6 +137,36 @@ def compare_revisions(package: str) -> dict:
     (form, revision), (_, earlier) = form_of(folder), form_of(previous)
     return {"package": package, "form": form, "revision": revision, "previous_package": previous.name,
             "previous_revision": earlier, "attachments": compare(previous, folder)}
+
+
+@server.tool(annotations=READ_ONLY)
+def find_manufacturer_document(brand: str, model: str = "", doc_type: str | None = None) -> dict:
+    """Whether the manufacturer publishes a document for a product, from RightFit's library of manufacturer documents
+    (data/maf/library.json): use it when a package lacks a document. brand and model are as the form gives them (for
+    example Grundfos and "Hydro Multi-E 3 CRIE 10-3"); with no model, every entry of the brand comes back. doc_type
+    is a kind of document such as eu_declaration_of_conformity, data_sheet or declaration_of_performance, or empty
+    for every kind. An entry matches as in check D1 of review_package: the same brand, and a model it covers inside
+    the model given.
+
+    published gives each document found on the manufacturer's official site with its link, page, date, the models
+    it covers and the directives and standards it cites; not_found gives the searches that found nothing. Entries
+    with confirmed false were found by the AI reader and no person has checked them yet. The library is small and
+    is not searched online: no entry means nobody has looked yet, not that the manufacturer publishes nothing."""
+    if doc_type and doc_type not in DOC_LABELS:
+        raise ToolError(f"doc_type must be one of {', '.join(DOC_LABELS)}, or empty for every kind")
+    if not norm(brand):
+        raise ToolError("brand must name the manufacturer, as the form gives it")
+    item = {"id": "asked", "brand": brand, "model": model}
+
+    def hit(e):
+        return (not doc_type or e["doc_type"] == doc_type) and same_brand(e, item) and (not norm(model) or covers(e, item))
+
+    def labelled(e):   # the laptop path of the downloaded copy means nothing to an agent
+        return {**{k: x for k, x in e.items() if k != "local_file"}, "confirmed": e.get("status") == "verified"}
+    lib = library()
+    return {"brand": brand, "model": model, "doc_type": doc_type,
+            "published": [labelled(e) for e in lib["documents"] if hit(e)],
+            "not_found": [labelled(e) for e in lib["not_found"] if hit(e)]}
 
 
 _model = None

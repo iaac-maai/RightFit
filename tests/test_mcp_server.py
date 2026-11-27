@@ -7,15 +7,16 @@ import anyio
 import pytest
 from mcp import Client, StdioServerParameters
 
+from app import mcp_server
 from app.mcp_server import MODEL, RAW, server
 from app.review_server import boq_links, review
-from checks.maf.rules import load
+from checks.maf.rules import library, load
 from ingest import rule_watch
 from model.page_classifier import CLASSES
 from model.train_pages import MODEL_PATH
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOLS = ["classify_pages", "compare_revisions", "list_packages", "list_rules", "review_package", "watch_rules"]
+TOOLS = ["classify_pages", "compare_revisions", "find_manufacturer_document", "list_packages", "list_rules", "review_package", "watch_rules"]
 
 
 def call(tool, **args):
@@ -27,7 +28,7 @@ def call(tool, **args):
     return anyio.run(go)
 
 
-def test_the_agent_sees_six_tools_and_all_of_them_only_read():
+def test_the_agent_sees_seven_tools_and_all_of_them_only_read():
     async def go():
         async with Client(server) as client:
             return (await client.list_tools()).tools
@@ -85,6 +86,39 @@ def test_watch_rules_answers_for_every_legal_rule_and_changes_none(monkeypatch):
     assert [r["rule_id"] for r in got] == [r["rule_id"] for r in load("rules.csv") if r["status"] not in rule_watch.NOT_LAW]
     assert {r["result"] for r in got} == {"not_checked"}   # with no answer, nothing is called unchanged
     assert table.read_bytes() == before
+
+
+def test_the_library_says_where_the_maker_publishes_a_missing_declaration():
+    error, text = call("find_manufacturer_document", brand="Grundfos", model="Hydro Multi-E 3 CRIE 10-3",
+                       doc_type="eu_declaration_of_conformity")
+    got = json.loads(text)
+    raw = next(e for e in library()["documents"] if e["covers"] == ["Hydro Multi-E"])
+    assert not error and got["published"] == [{**{k: x for k, x in raw.items() if k != "local_file"},
+                                               "confirmed": raw["status"] == "verified"}]
+    assert {"url", "issue_date", "covers", "page"} <= got["published"][0].keys()
+
+
+def test_entries_nobody_checked_say_so(monkeypatch):
+    entry = {"brand": "Wilo", "doc_type": "data_sheet", "covers": ["Stratos"], "url": "https://example.org/a.pdf"}
+    monkeypatch.setattr(mcp_server, "library", lambda: {"not_found": [], "documents": [
+        {**entry, "status": "extracted", "found_by": "AI reader"}, {**entry, "covers": ["Stratos MAXO"], "status": "verified"}]})
+    got = json.loads(call("find_manufacturer_document", brand="WILO", model="Stratos MAXO 25/0.5-6")[1])["published"]
+    assert [e["confirmed"] for e in got] == [False, True]
+
+
+def test_the_library_also_says_what_was_searched_and_not_found():
+    got = json.loads(call("find_manufacturer_document", brand="FläktGroup", model="CAIRplus SX 1.2")[1])
+    assert not got["published"] and [e["covers"] for e in got["not_found"]] == [["CAIRplus"]]
+    # Another maker, another kind of document or a product nobody looked for gives nothing rather than a guess.
+    assert not json.loads(call("find_manufacturer_document", brand="Wilo", model="DPK 50")[1])["published"]
+    assert not json.loads(call("find_manufacturer_document", brand="Grundfos", model="Hydro Multi-E",
+                               doc_type="data_sheet")[1])["published"]
+    assert len(json.loads(call("find_manufacturer_document", brand="Grundfos")[1])["published"]) == 2
+
+
+def test_the_library_refuses_an_unknown_kind_or_an_empty_brand():
+    assert call("find_manufacturer_document", brand="Grundfos", doc_type="declaration")[0]
+    assert call("find_manufacturer_document", brand=" - ")[0]
 
 
 @pytest.mark.skipif(not (RAW / "P02").is_dir() or not (RAW / "P10").is_dir(),

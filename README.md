@@ -225,7 +225,7 @@ The AI parts on the laptop (reading a package, a rule typed in words, what a BOQ
 
 ## For agents
 
-`app/mcp_server.py` gives any agent that speaks MCP six read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, compare a package with the previous revision of its form, and ask the official sources whether the act behind each legal rule changed since it was read. No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
+`app/mcp_server.py` gives any agent that speaks MCP seven read-only tools: list the packages, review one, list the rules with their status, classify a package's pages, compare a package with the previous revision of its form, ask the official sources whether the act behind each legal rule changed since it was read, and say whether a manufacturer publishes a document a package lacks, from RightFit's library of manufacturer documents (`data/maf/library.json`). No tool can confirm a reading or approve a package; that stays with the reviewer. The project's `.mcp.json` tells the agent how to start it, and `.codex/config.toml` does the same for a second agent client.
 
 ## How the repository is organised
 
