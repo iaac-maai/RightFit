@@ -1,6 +1,6 @@
 // The practice survey (spec/features/survey.md): a public page, no account, anonymous. The questions come from the
 // site (worker/survey_rules.ts), so they live in one place. The results page is for people signed in to RightFit.
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ApiError, api, go, post } from "../api";
 import { day } from "../format";
 
@@ -264,6 +264,28 @@ function amount(unit: string, x: number) {
 }
 
 
+// A number that counts up to its value the first time, and glides to the new value when an answer comes in.
+// People who ask their system for less motion see the value at once.
+function useGlide(target: number | null, ms = 1200) {
+  const [shown, setShown] = useState(0);
+  const now = useRef(0);
+  useEffect(() => {
+    if (target === null) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) { now.current = target; setShown(target); return; }
+    const from = now.current, start = performance.now();
+    let frame = 0;
+    const step = (t: number) => {
+      const k = Math.min(1, (t - start) / ms);
+      now.current = from + (target - from) * (1 - Math.pow(1 - k, 3)); // fast first, gentle at the end
+      setShown(now.current);
+      if (k < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [target, ms]);
+  return shown;
+}
+
 export function LivePanel({ refresh = 0 }: { refresh?: number }) {
   const [data, setData] = useState<Live | null>(null);
   useEffect(() => {
@@ -274,6 +296,8 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
     document.addEventListener("visibilitychange", look);
     return () => { stop = true; window.clearInterval(timer); document.removeEventListener("visibilitychange", look); };
   }, [refresh]);
+  const timeShown = useGlide(data?.timeLost.mean ?? null);
+  const moneyShown = useGlide(data?.moneyLost.mean ?? null, 1500);
 
   if (!data) return null;
   const share = data.misfit.answered ? data.misfit.atLeastOnce / data.misfit.answered : 0;
@@ -281,18 +305,18 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
   const small = (id: string, label: string) => {
     const x = r(id);
     const [num, unit] = x.mean === null ? ["–", ""] : amount(x.unit, x.mean);
-    return { id, label, value: <>{x.mean !== null && x.atLeast ? "≥ " : x.mean !== null ? "≈ " : ""}{num}{unit && <em> {unit}</em>}</>, n: x.answered };
+    return { id, label, value: <>{x.mean !== null && x.atLeast ? "≥ " : x.mean !== null ? "≈ " : ""}{num}{unit && <em> {unit}</em>}</>, n: x.answered, at: `${num}${unit}` };
   };
   const smalls = [
     small("review_time", "own time to review one submittal"),
     small("prepare_time", "own time to prepare one"),
     small("rounds", "rounds until approved"),
     small("delay", "delay each time it comes back"),
-    { id: "returned", label: "out of 10 get C at the first submission", n: data.returned.answered,
+    { id: "returned", label: "out of 10 get C at the first submission", n: data.returned.answered, at: String(data.returned.mean),
       value: <>{data.returned.mean === null ? "–" : <>≈ {Math.round(data.returned.mean * 10) / 10}<em> / 10</em></>}</> },
-    { id: "misfit", label: "saw approved equipment not fit on site", n: data.misfit.answered,
+    { id: "misfit", label: "saw approved equipment not fit on site", n: data.misfit.answered, at: String(share),
       value: <>{data.misfit.answered ? <>{Math.round(share * 100)}<em> %</em></> : "–"}</> },
-    ...data.useful.map((u) => ({ id: u.id, label: u.id === "useful_check" ? "find a check before review useful" : "find seeing the fit in the model useful", n: u.answered,
+    ...data.useful.map((u) => ({ id: u.id, label: u.id === "useful_check" ? "find a check before review useful" : "find seeing the fit in the model useful", n: u.answered, at: String(u.mean),
       value: <>{u.mean === null ? "–" : <>{Math.round(u.mean * 10) / 10}<em> / 5</em></>}</> })),
   ];
   const t = data.timeLost, m = data.moneyLost;
@@ -302,21 +326,21 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
     <section className="live" aria-live="polite" aria-label="Live results">
       <header className="live-head">
         <span className="live-eyebrow"><span className="live-dot" aria-hidden="true" />Live results</span>
-        <span className="live-sub">{data.n ? <>from <b>{data.n}</b> {data.n === 1 ? "person" : "people"} so far · updates by itself</> : "no answer yet: yours will be the first"}</span>
+        <span className="live-sub">{data.n ? <>from <b key={data.n} className="live-pop">{data.n}</b> {data.n === 1 ? "person" : "people"} so far · updates by itself</> : "no answer yet: yours will be the first"}</span>
       </header>
 
       <div className="live-heroes">
-        <article className="live-hero">
-          <Icon name="time_lost" />
+        <article className="live-hero" style={{ ["--i" as string]: 0 }}>
+          <span key={String(t.mean)} className="live-hero-icon live-flip"><Icon name="time_lost" /></span>
           <p className="live-hero-label">Time lost per submittal</p>
-          <p className="live-hero-value">{t.mean === null ? "–" : <>{t.atLeast ? <small>at least</small> : <small>about</small>}{days(t.mean)}<em>days</em></>}</p>
+          <p className="live-hero-value">{t.mean === null ? "–" : <>{t.atLeast ? <small>at least</small> : <small>about</small>}{days(timeShown)}<em>days</em></>}</p>
           <p className="live-hero-how">waiting on resubmissions: extra review rounds × the delay each one causes</p>
           <p className="live-hero-n">{t.answered ? <>answers from {days(t.low!)} to {days(t.high!)} days · {t.answered} {t.answered === 1 ? "answer" : "answers"}</> : "no answer yet"}</p>
         </article>
-        <article className="live-hero">
-          <Icon name="money_lost" />
+        <article className="live-hero" style={{ ["--i" as string]: 1 }}>
+          <span key={String(m.mean)} className="live-hero-icon live-drop"><Icon name="money_lost" /></span>
           <p className="live-hero-label">Money lost per misfit on site</p>
-          <p className="live-hero-value">{m.mean === null ? "–" : <>{m.atLeast ? <small>at least</small> : <small>about</small>}{euros(m.mean)}</>}</p>
+          <p className="live-hero-value">{m.mean === null ? "–" : <>{m.atLeast ? <small>at least</small> : <small>about</small>}{euros(moneyShown)}</>}</p>
           <p className="live-hero-how">to fix one approved item that did not fit once it reached site</p>
           <p className="live-hero-n">{m.answered ? <>answers from “{m.lowest}” to “{m.highest}” · {m.answered} {m.answered === 1 ? "answer" : "answers"}</> : "no answer yet"}</p>
         </article>
@@ -325,10 +349,10 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
       {data.n > 0 && (
         <>
           <div className="live-smalls">
-            {smalls.map((x) => (
-              <div key={x.id} className="live-small" title={`${x.n} ${x.n === 1 ? "answer" : "answers"}`}>
+            {smalls.map((x, i) => (
+              <div key={x.id} className="live-small" style={{ ["--i" as string]: i + 2 }} title={`${x.n} ${x.n === 1 ? "answer" : "answers"}`}>
                 <Icon name={x.id} />
-                <div><b>{x.value}</b><span>{x.label}</span></div>
+                <div><b key={x.at} className="live-pop">{x.value}</b><span>{x.label}</span></div>
               </div>
             ))}
           </div>
