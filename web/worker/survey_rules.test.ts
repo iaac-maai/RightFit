@@ -124,6 +124,7 @@ test("the live numbers: ranges count at their middle, an open range makes it 'at
   assert.deepEqual(l.timeLost, { answered: 1, mean: 10.5, atLeast: false, low: 10.5, high: 10.5 });
   assert.equal(l.moneyLost.answered, 1);
   assert.equal(l.moneyLost.mean, 12500);
+  assert.equal(l.results.length, QUESTIONS.length - 1); // every question but the comment
   assert.ok(!JSON.stringify(l).includes("secret"));
 });
 

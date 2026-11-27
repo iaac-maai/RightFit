@@ -180,6 +180,7 @@ export interface Live {
   useful: { id: string; title: string; answered: number; mean: number | null }[];
   reasons: { label: string; n: number }[];
   roles: { label: string; n: number }[];
+  results: QuestionResult[]; // every question's answers, counted (the fold-out under the live numbers); never the comments
 }
 
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
@@ -245,5 +246,6 @@ export function live(rows: { day: string; answers: Answers }[]): Live {
     }),
     reasons: count("reasons", 3),
     roles: count("role"),
+    results: summarise(all),
   };
 }

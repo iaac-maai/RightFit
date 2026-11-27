@@ -159,6 +159,22 @@ interface Result {
 }
 interface Results { n: number; firstDay: string | null; lastDay: string | null; results: Result[]; comments: { day: string; text: string }[] | null; admin: boolean }
 
+// One question's answers as bars: each answer, how many chose it, and its share of those who answered
+function QuestionBars({ r }: { r: Result }) {
+  const max = Math.max(1, ...(r.counts ?? []).map((c) => c.n));
+  return (
+    <div className="survey-bars">
+      {(r.counts ?? []).map((c) => (
+        <div key={c.key} className="survey-bar">
+          <span className="survey-bar-label">{c.label}</span>
+          <span className="survey-bar-track"><span style={{ width: `${(c.n / max) * 100}%` }} /></span>
+          <span className="survey-bar-n">{c.n}{r.answered ? ` · ${Math.round((c.n / r.answered) * 100)}%` : ""}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function SurveyResults() {
   const [data, setData] = useState<Results | null>(null);
   const [error, setError] = useState("");
@@ -179,19 +195,10 @@ export function SurveyResults() {
       </header>
       <section className="sheet"><LivePanel /></section>
       {data.results.map((r) => {
-        const max = Math.max(1, ...(r.counts ?? []).map((c) => c.n));
         return (
           <section key={r.id} className="sheet survey-result">
             <div className="sheet-head"><span className="lab">{r.text}</span><span className="count">{r.answered} answered</span></div>
-            <div className="survey-bars">
-              {(r.counts ?? []).map((c) => (
-                <div key={c.key} className="survey-bar">
-                  <span className="survey-bar-label">{c.label}</span>
-                  <span className="survey-bar-track"><span style={{ width: `${(c.n / max) * 100}%` }} /></span>
-                  <span className="survey-bar-n">{c.n}{r.answered ? ` · ${Math.round((c.n / r.answered) * 100)}%` : ""}</span>
-                </div>
-              ))}
-            </div>
+            <QuestionBars r={r} />
             {r.spread && r.spread.median !== null && (
               <p className="sheet-note">Median {r.spread.median}; the middle half answered {r.spread.low} to {r.spread.high}.</p>
             )}
@@ -223,6 +230,7 @@ interface Live {
   misfit: { answered: number; atLeastOnce: number };
   useful: { id: string; title: string; answered: number; mean: number | null }[];
   reasons: { label: string; n: number }[]; roles: { label: string; n: number }[];
+  results: Result[];
 }
 
 const EVERY = 5000; // milliseconds between two looks at the numbers, while the page is on screen
@@ -288,6 +296,7 @@ function useGlide(target: number | null, ms = 1200) {
 
 export function LivePanel({ refresh = 0 }: { refresh?: number }) {
   const [data, setData] = useState<Live | null>(null);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     let stop = false;
     const look = () => { if (!document.hidden) api<Live>("/api/survey/live").then((d) => { if (!stop) setData(d); }, () => {}); };
@@ -359,6 +368,21 @@ export function LivePanel({ refresh = 0 }: { refresh?: number }) {
           {data.reasons.length > 0 && (
             <p className="live-line"><Icon name="reasons" /><span><b>Why forms come back most:</b> {data.reasons.map((x) => `${x.label} (${x.n})`).join(" · ")}</span></p>
           )}
+          <button type="button" className={`live-fold${open ? " open" : ""}`} aria-expanded={open} aria-controls="live-answers" onClick={() => setOpen((o) => !o)}>
+            <span>{open ? "Hide" : "See"} the answers to every question</span>
+            <span className="meta">{data.n} {data.n === 1 ? "person" : "people"}, counted · no one's answers shown one by one</span>
+            <svg className="live-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </button>
+          <div id="live-answers" className={`live-answers${open ? " open" : ""}`}>
+            <div>
+              {data.results.map((r, i) => (
+                <section key={r.id} className="live-q">
+                  <h4><span className="survey-n">{i + 1}</span>{r.text}<span className="meta"> · {r.answered} answered</span></h4>
+                  <QuestionBars r={r} />
+                </section>
+              ))}
+            </div>
+          </div>
           <p className="live-foot">
             People's own estimates, not measurements. Answers are ranges: averages use each range's middle; “at least” when an
             open range such as “over a month” is included; “don't know” is left out.

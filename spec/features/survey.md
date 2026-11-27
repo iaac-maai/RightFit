@@ -44,6 +44,8 @@ Then, smaller:
 - the three most common reasons, and who answered, by role.
 The panel says these are people's own estimates, not measurements, and how the averages are worked out. It shows what today's work costs as people report it, not what RightFit saves: the survey asks no one what a tool would save, and the panel never says "saved". Showing the results before a person answers can sway their answers; the team chose to show them anyway (docs/decisions.md, 27 Nov 2026).
 
+Under the live numbers, a bar opens and folds a list of every question with its answers counted (how many chose each answer, and the share), for everyone, never one person's answers or the comments.
+
 **The answers are dropdowns**: one dropdown per question; the reasons (up to 3) open as a dropdown list with ticks.
 
 `/survey/results`, for anyone signed in to RightFit: how many answered, and for each question the count of each answer and its share; for the number of C answers out of 10 the median and the middle half. The comments and a CSV of every answer are for admins only. Each result says "as reported by N people, from <first day> to <last day>", and that answers are estimates.
