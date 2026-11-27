@@ -161,7 +161,12 @@ export const MIDDLES: Record<string, { title: string; unit: "minutes" | "days" |
     lt1k: [500, false], "1to5k": [3000, false], "5to20k": [12500, false], "20to100k": [60000, false], gt100k: [100000, true] } },
 };
 
-export interface LiveRange { id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null }
+// scale: the answers in order (without "Don't know"); lowIndex and highIndex: the lowest and highest chosen on it;
+// meanAt: where the average falls on the same scale, between two answers' middles (for the drawing on the page)
+export interface LiveRange {
+  id: string; title: string; unit: string; answered: number; mean: number | null; atLeast: boolean; lowest: string | null; highest: string | null;
+  scale: string[]; lowIndex: number | null; highIndex: number | null; meanAt: number | null;
+}
 export interface Live {
   n: number; lastDay: string | null;
   ranges: LiveRange[];
@@ -182,12 +187,22 @@ const optionsOf = (id: string) => {
 export function live(rows: { day: string; answers: Answers }[]): Live {
   const all = rows.map((r) => r.answers);
   const ranges = Object.entries(MIDDLES).map(([id, m]): LiveRange => {
-    const opts = optionsOf(id);
+    const opts = optionsOf(id).filter(([key]) => key in m.values);
     const picked = all.map((a) => a[id]).filter((v): v is string => typeof v === "string" && v in m.values);
     const order = picked.map((k) => opts.findIndex(([key]) => key === k)).sort((a, b) => a - b);
+    const avg = mean(picked.map((k) => m.values[k][0]));
+    const mids = opts.map(([key]) => m.values[key][0]);
+    let meanAt: number | null = null;
+    if (avg !== null) {
+      meanAt = mids.length - 1;
+      for (let i = 0; i < mids.length - 1; i++) {
+        if (avg <= mids[i + 1]) { meanAt = i + Math.max(0, (avg - mids[i]) / (mids[i + 1] - mids[i])); break; }
+      }
+    }
     return {
+      scale: opts.map(([, label]) => label), lowIndex: order.length ? order[0] : null, highIndex: order.length ? order[order.length - 1] : null, meanAt,
       id, title: m.title, unit: m.unit, answered: picked.length,
-      mean: mean(picked.map((k) => m.values[k][0])),
+      mean: avg,
       atLeast: picked.some((k) => m.values[k][1]),
       lowest: order.length ? opts[order[0]][1] : null,
       highest: order.length ? opts[order[order.length - 1]][1] : null,

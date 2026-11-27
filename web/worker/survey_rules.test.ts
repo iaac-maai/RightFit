@@ -106,6 +106,10 @@ test("the live numbers: ranges count at their middle, an open range makes it 'at
   assert.equal(r("review_time").atLeast, false);
   assert.equal(r("review_time").lowest, "30 to 60 minutes");
   assert.equal(r("review_time").highest, "1 to 2 hours");
+  assert.equal(r("review_time").scale.length, 6);
+  assert.equal(r("review_time").lowIndex, 2);
+  assert.equal(r("review_time").highIndex, 3);
+  assert.equal(r("review_time").meanAt, 2.5); // 67.5 minutes: halfway between 45 and 90
   assert.equal(r("delay").answered, 1);
   assert.equal(r("rounds").mean, 3);
   assert.equal(r("rounds").atLeast, true);
