@@ -4,8 +4,9 @@ import { test } from "node:test";
 import { COMMENT_MAX, QUESTIONS, checkAnswers, spread, summarise, toCsv } from "./survey_rules.ts";
 
 const full = {
-  role: "mep_reviewer", country: "RO", experience: "5to10", involvement: "review", review_time: "30to60", returned: 3,
-  delay: "1to2w", reasons: ["missing_docs", "size_fit"], site_misfit: "once", misfit_cost: "5to20k", useful: 4, comment: "  Good   idea ",
+  role: "mep_reviewer", country: "RO", experience: "5to10", involvement: "review", volume: "6to15", review_time: "30to60",
+  returned: 3, rounds: "2", delay: "1to2w", reasons: ["missing_docs", "size_fit"], site_misfit: "once", misfit_cost: "5to20k",
+  useful_check: 4, useful_fit: 5, comment: "  Good   idea ",
 };
 
 test("a full answer is kept, cleaned", () => {
@@ -24,7 +25,7 @@ test("an answer outside the options, or a number out of range, is refused", () =
   assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, role: "astronaut" } }), "string");
   assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, reasons: ["spec", "made_up"] } }), "string");
   assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, returned: 11 } }), "string");
-  assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, useful: 2.5 } }), "string");
+  assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, useful_check: 2.5 } }), "string");
 });
 
 test("a required question can't be skipped, an optional one can", () => {
@@ -39,6 +40,23 @@ test("a required question can't be skipped, an optional one can", () => {
 test("the cost question is dropped for someone who never saw a misfit", () => {
   const a = checkAnswers({ consent: true, answers: { ...full, site_misfit: "never", misfit_cost: "gt100k" } });
   assert.ok(typeof a !== "string" && a.misfit_cost === undefined);
+});
+
+test("at most 3 reasons", () => {
+  assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, reasons: ["spec", "code", "expired", "other"] } }), "string");
+  assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, reasons: ["spec", "code", "expired"] } }), "object");
+});
+
+test("the time questions follow what the person does with submittals", () => {
+  const reviewer = checkAnswers({ consent: true, answers: { ...full, prepare_time: "1to2h" } });
+  assert.ok(typeof reviewer !== "string" && reviewer.prepare_time === undefined && reviewer.review_time === "30to60");
+  assert.equal(typeof checkAnswers({ consent: true, answers: { ...full, involvement: "both" } }), "string"); // preparing time missing
+  const both = checkAnswers({ consent: true, answers: { ...full, involvement: "both", prepare_time: "4to8h" } });
+  assert.ok(typeof both !== "string" && both.prepare_time === "4to8h" && both.review_time === "30to60");
+  const { volume, review_time, ...neither } = full;
+  assert.ok(volume && review_time);
+  const n = checkAnswers({ consent: true, answers: { ...neither, involvement: "neither" } });
+  assert.ok(typeof n !== "string" && n.volume === undefined && n.review_time === undefined);
 });
 
 test("the comment is cut to 500 characters", () => {

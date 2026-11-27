@@ -5,7 +5,7 @@ import { ApiError, api, go, post } from "../api";
 import { day } from "../format";
 
 type Question =
-  | { id: string; kind: "one" | "many"; text: string; options: [string, string][]; optional?: boolean; showIf?: [string, string[]] }
+  | { id: string; kind: "one" | "many"; text: string; options: [string, string][]; optional?: boolean; showIf?: [string, string[]]; max?: number }
   | { id: string; kind: "number"; text: string; min: number; max: number; optional?: boolean }
   | { id: string; kind: "scale"; text: string; min: number; max: number; labels: [string, string] }
   | { id: string; kind: "text"; text: string; optional: true; hint: string };
@@ -65,9 +65,9 @@ export function Survey() {
         ) : (
           <>
             <p>
-              We are three students at IAAC, Barcelona, building <b>RightFit</b>, a tool that checks material approval forms (submittals)
-              for MEP equipment before they are signed, and shows whether the equipment fits in the building model. To know what it could
-              save, we need to know how the work goes today. About <b>3 minutes</b>, 12 questions.
+              We are three students at IAAC, Barcelona. We want to understand how material approval forms (submittals) for MEP
+              equipment go today: how long they take, how often they come back and why. About <b>3 minutes</b>
+              {qs ? <>, up to {qs.questions.length} questions</> : null}.
             </p>
             <p className="meta">
               Anonymous: no name, email, company or IP address is collected; only the day you answered and your answers are kept.
@@ -87,6 +87,7 @@ export function Survey() {
                           return (
                             <label key={key} className={`survey-option${on ? " on" : ""}`}>
                               <input type={q.kind === "one" ? "radio" : "checkbox"} name={q.id} checked={on}
+                                disabled={q.kind === "many" && !on && q.max !== undefined && Array.isArray(v) && v.length >= q.max}
                                 onChange={() => {
                                   if (q.kind === "one") set(q.id, key);
                                   else {
