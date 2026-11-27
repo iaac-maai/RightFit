@@ -116,7 +116,7 @@ Each top folder has a short README that says what is in it. We create a folder o
 ## 6. Open questions [O]
 
 - The Python version and environment manager. We have tested with Python 3.14 so far.
-- Which model reads the packages, what it costs, and whether real packages may be sent to it. The manufacturer documents are public; the forms and the project headers on some pages are not. What already goes to an online model is in `mission.md` §9.
+- Which model reads the packages and what it costs. The manufacturer documents are public; the forms and the project headers on some pages are not. What already goes to an online model is in `mission.md` §9. Answered on 27 Nov 2026: real packages may be sent to the AI reader (Luca).
 - Answered on 20 Nov 2026, where the application runs: both. The review app stays on the laptop, and RightFit online, the project space where the parties meet, runs on Cloudflare, with the checks on Cloudflare as well since 21 Nov 2026, in a Python Worker (`spec/features/rightfit_online.md`).
 - Which agent the team uses with the MCP server.
 

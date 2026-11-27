@@ -317,6 +317,15 @@ def test_checklist_blocking_rows_are_marked_blocking():
     assert (r["result"], r["blocking"]) == ("flag", True)
 
 
+def test_a_product_the_form_gives_no_model_for_is_named_by_its_name():
+    tray = {**item("I9", "other", ""), "name": "Cable tray"}   # the readings keep an empty model
+    reason = c.r_reminders(pkg([PUMP, tray], []), ctx("RO"))[0]["reason"]
+    assert "Cable tray" in reason and "UNILIFT_AP1250113" in reason   # a product with a model keeps its model
+    every = c.run_all(pkg([tray], [doc("x.pdf", "data_sheet", ["E"])]), ctx("RO"))
+    assert all(r["params"].get("item") != "" for r in every)   # no comment with a blank for the product
+    assert not c.covers(doc("x.pdf", "data_sheet", ["E"]), tray)   # an empty model matches no document
+
+
 def test_reminders_change_with_the_location():
     items = [PUMP, ahu()]
     ro = c.r_reminders(pkg(items, []), ctx("RO"))

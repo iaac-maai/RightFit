@@ -124,7 +124,7 @@ def review(pkg, location="RO", review_date=None, delivery_date=None, dismissed=N
     lines = list(dict.fromkeys([c for _, c in ordered if c] + [f["suggested_comment"] for f in accepted]))
     number = {line: n for n, line in enumerate(lines, 1)}   # the comment number in the answer, shown as a delta
     items = {i["id"]: i for i in pkg["items"]}
-    item_label = {i["id"]: f"{i['name']} ({i['model']})" for i in pkg["items"]}
+    item_label = {i["id"]: f"{i['name']} ({i['model'] or 'no model on the form'})" for i in pkg["items"]}
     rule_table, _, checklist_rows = given["data"] if given else tables()
     checklist = {row["id"]: row for row in checklist_rows}
     consultant = {row["rule_id"]: row for row in (data["consultant"] if given else load(CONSULTANT.name))}

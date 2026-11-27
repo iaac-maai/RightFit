@@ -59,7 +59,7 @@ def list_packages() -> dict:
         pkg = json.loads(path.read_text())
         readings = [x for i in pkg["items"] for x in i["values"].values()]
         read.append({"package": pkg["package"], "form": f"{pkg['form']['form_no']} rev {pkg['form']['revision']}",
-                     "products": [f"{i['name']} ({i['model']})" for i in pkg["items"]],
+                     "products": [f"{i['name']} ({i['model'] or 'no model on the form'})" for i in pkg["items"]],
                      "documents": len(pkg["documents"]),
                      "readings_confirmed": f"{sum(x['status'] == 'verified' for x in readings)} of {len(readings)}"})
     folders = sorted(p.name for p in RAW.glob("P*") if re.fullmatch(r"P\d+", p.name) and p.is_dir()) if RAW.exists() else []

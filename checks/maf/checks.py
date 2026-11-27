@@ -73,10 +73,15 @@ def matches(doc, item):
     """
     if "matches" in doc:
         return [m for m in doc["matches"] if m["item"] == item["id"] and m["kind"] in COVERING]
-    names = [norm(item["model"])] + ([norm(item["range"])] if item.get("range") else [])
+    names = [norm(n) for n in (item["model"], item.get("range")) if n]   # a missing model or range is not compared
     if any(c and any(c in n for n in names) for c in map(norm, doc.get("covers", []))):
         return [{"item": item["id"], "kind": "exact model", "status": doc.get("status", "extracted")}]
     return []
+
+
+def label_of(item):
+    """How a product is named in results and comments: its model, or its name when the form gives no model."""
+    return item["model"] or item.get("name") or item["id"]
 
 
 def covers(doc, item):
@@ -138,7 +143,7 @@ def same_brand(entry, item):
 def missing_document(pkg, ctx, item, doc_type, ids, blocking):
     """A required document is not in the package. Say whether the manufacturer publishes it (MAF-11)."""
     reason = f"no {label(doc_type)} names {item['model']}"
-    params = {"item": item["model"], "doc_type": doc_type}
+    params = {"item": label_of(item), "doc_type": doc_type}
     published = [e for e in ctx["library"]["documents"]
                  if e["doc_type"] == doc_type and same_brand(e, item) and covers(e, item)]
     searched = [e for e in ctx["library"]["not_found"]
@@ -162,7 +167,7 @@ def d2_declarations_match(pkg, ctx):
     need = [i for i in pkg["items"] if any(r["document"] == DECL for r in
                                            documents_for(ctx["family_docs"], ctx["location"], i["family"], MAF_STAGES))]
     decls = [d for d in pkg["documents"] if d["doc_type"] == DECL]
-    without = [i["model"] for i in need if not any(covers(d, i) for d in decls)]
+    without = [label_of(i) for i in need if not any(covers(d, i) for d in decls)]
     ids = active_ids("EU-MACH-DOC;EU-MACH-REG;EU-LVD-DOC", ctx["rules"], ctx["review_date"])
     out = []
     for d in decls:
@@ -281,7 +286,7 @@ def v1_duty_point(pkg, ctx):
             (ok if enough else short).append(text)
         if not inputs:
             continue
-        params = {"item": item["model"], "got": "; ".join(short), "req": ""}
+        params = {"item": label_of(item), "got": "; ".join(short), "req": ""}
         if missing:
             out.append(result("V1", "unclear", f"not found in the data sheet: {', '.join(missing)}", item=item["id"],
                               rules=["ENG-DUTY-TOL"], code="V1.missing", params=params))
@@ -301,7 +306,7 @@ def v2_pressure(pkg, ctx):
         if item["family"] != "pump":
             continue
         pn = val(item, "max_pressure")
-        params = {"item": item["model"], "got": fmt(pn), "req": f"{need} bar"}
+        params = {"item": label_of(item), "got": fmt(pn), "req": f"{need} bar"}
         if need is None:
             seen = fmt(pn) if has(pn) else "not found"
             out.append(result("V2", "info", f"no requirement given; data sheet: {seen}", item=item["id"],
@@ -346,7 +351,7 @@ def v3_liquid_temperature(pkg, ctx):
             if law:
                 need, rules = (None, max(float(r["value"]) for r in law)), [r["rule_id"] for r in law]
         req = "" if need is None else (f"at least {need[1]:g} °C" if need[0] is None else f"{need[0]} .. {need[1]} °C")
-        params = {"item": item["model"], "got": fmt(got), "req": req}
+        params = {"item": label_of(item), "got": fmt(got), "req": req}
         if need is None:
             seen = fmt(got) if has(got) else "not found"
             out.append(result("V3", "info", f"no project temperature given; data sheet: {seen}", item=item["id"],
@@ -367,7 +372,7 @@ def no_rule(check, item, what):
 
 def missing_value(check, item, what, v):
     return result(check, "unclear", f"{what} not found ({v.get('note') or 'no note'})", item=item["id"],
-                  code=f"{check}.missing", params={"item": item["model"], "what": what})
+                  code=f"{check}.missing", params={"item": label_of(item), "what": what})
 
 
 def e1_ecodesign(pkg, ctx):
@@ -393,7 +398,7 @@ def e1_ecodesign(pkg, ctx):
             out.append(result("E1", "pass" if eff["value"] >= limit else "flag",
                               f"heat recovery {fmt(eff)}, at least {limit:g} % required", [eff, kind],
                               item=item["id"], rules=[r["rule_id"] for r in hrs], code="E1.hrs",
-                              params={"item": item["model"], "got": eff["value"], "req": f"{limit:g}"}))
+                              params={"item": label_of(item), "got": eff["value"], "req": f"{limit:g}"}))
 
         sfp, limit = val(item, "sfp_int"), val(item, "sfp_int_limit")
         sfp_rules = rules("ahu.sfp_int")
@@ -405,7 +410,7 @@ def e1_ecodesign(pkg, ctx):
             out.append(result("E1", "pass" if sfp["value"] <= limit["value"] else "flag",
                               f"SFPint {fmt(sfp)}, limit {fmt(limit)}", [sfp, limit], item=item["id"],
                               rules=[r["rule_id"] for r in sfp_rules], code="E1.sfp",
-                              params={"item": item["model"], "got": sfp["value"], "req": limit["value"]}))
+                              params={"item": label_of(item), "got": sfp["value"], "req": limit["value"]}))
 
         warning, fw_rules = val(item, "filter_warning"), rules("ahu.filter_warning")
         if not fw_rules:
@@ -416,7 +421,7 @@ def e1_ecodesign(pkg, ctx):
             out.append(result("E1", "pass" if warning["value"] is True else "flag",
                               f"filter warning: {fmt(warning)}", [warning], item=item["id"],
                               rules=[r["rule_id"] for r in fw_rules], code="E1.filter",
-                              params={"item": item["model"]}))
+                              params={"item": label_of(item)}))
     return out
 
 
@@ -483,7 +488,7 @@ def c_checklist(pkg, ctx):
             code = f"C.{row['id']}{params.pop('variant', '')}"
             out.append(result("C", verdict, f"{row['id']} {row['item']}: {reason} (register {row['source_rows']})",
                               inputs, item=item["id"], rules=[row["id"]], code=code,
-                              params={"item": item["model"], **params}, blocking=row["blocking"] == "yes"))
+                              params={"item": label_of(item), **params}, blocking=row["blocking"] == "yes"))
     return out
 
 
@@ -513,7 +518,7 @@ def h1_drinking_water(pkg, ctx):
         else:
             out.append(result("H1", "flag", f"no approval for contact with drinking water names {item['model']} "
                               f"(it is used as a {application['value']})", [application], item=item["id"], rules=ids,
-                              code="H1.missing", params={"item": item["model"]}))
+                              code="H1.missing", params={"item": label_of(item)}))
     return out
 
 
@@ -575,7 +580,7 @@ def p_consultant_rules(pkg, ctx):
                 verdict = "info" if rule["effect"] == "info" else "flag"
             inputs += [application] if rule["application"] else []
             out.append(result("P", verdict, f"the consultant asks: {rule['text']}; {reason}", inputs, item=item["id"],
-                              rules=[rule["rule_id"]], code="P.rule", params={"item": item["model"], "text": rule["text"]},
+                              rules=[rule["rule_id"]], code="P.rule", params={"item": label_of(item), "text": rule["text"]},
                               blocking=rule["effect"] == "C"))
     return out
 
@@ -596,14 +601,14 @@ def q_boq_lines(pkg, ctx):
         link = links.get(item["id"])
         if not link:
             out.append(result("Q", "unclear", "no line of the BOQ has this product's duty under the form's BOQ code",
-                              item=item["id"], code="Q.none", params={"item": item["model"]}))
+                              item=item["id"], code="Q.none", params={"item": label_of(item)}))
             continue
         where = f"BOQ {link['sheet']}, row {link['row']}"
         if link.get("how") == "text":   # no position on the form and no duty: the weakest match, so it says so
             where += " (matched by text only; check it is the right line)"
         if link.get("requirements") is None:
             out.append(result("Q", "unclear", f"{where}: what the line asks has not been read yet", item=item["id"],
-                              code="Q.unread", params={"item": item["model"], "where": where}))
+                              code="Q.unread", params={"item": label_of(item), "where": where}))
             continue
         for ask in link["requirements"]:
             # What the AI read in the BOQ line is an input like any reading: unconfirmed until the reviewer looks.
@@ -617,7 +622,7 @@ def q_boq_lines(pkg, ctx):
                 verdict, reason = "info", f"the designer's estimate, not a limit; {reason}"
             out.append(result("Q", verdict, f"{where} asks: {ask['text']} (\"{ask['quote']}\"); {reason}",
                               inputs + [line], item=item["id"], code="Q.rule",
-                              params={"item": item["model"], "text": ask["text"], "where": where}))
+                              params={"item": label_of(item), "text": ask["text"], "where": where}))
     return out
 
 
@@ -629,7 +634,7 @@ def r_reminders(pkg, ctx):
     for row in ctx["family_docs"]:
         if row["when"] != "delivery" or row["jurisdiction"] not in CHAINS[ctx["location"]]:
             continue
-        models = [i["model"] for i in pkg["items"] if for_family(row["family"], i["family"])]
+        models = [label_of(i) for i in pkg["items"] if for_family(row["family"], i["family"])]
         if models:
             out.append(result("R", "info", f"at delivery: {label(row['document'])} for {', '.join(models)}",
                               rules=active_ids(row["rule_id"], ctx["rules"], ctx["review_date"])))
