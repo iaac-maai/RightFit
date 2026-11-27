@@ -62,6 +62,7 @@ The board is private to the team. Its columns are Backlog, Ready, In progress, W
 2. **The public repository scan** of the added lines: no name from the local names list, no prices, no client data, and no wording saying a tool wrote the work.
 3. **A code review** (`/code-review`): medium, or high when the change touches `checks/`, sign-in, roles or project data in `web/`.
 4. **Then the session merges its branch into `main`, pushes, and closes its issue** (`Closes #<issue>` in the commit message). There are no pull requests.
+5. **RightFit online then updates itself** when the change touches `web/` or the code the checks engine is built from (`app/engine.py`, `app/review_core.py`, `app/booster.py`, `checks/maf/`, `checks/pumps/`). GitHub runs `npm test`, `npm run check` and the engine's build, applies the new migrations in `web/migrations/` (each runs once), deploys the engine, then the site (`.github/workflows/online.yml`). A teammate's pull request gets the same tests before it is merged. A new migration takes the next number and the same change goes into `web/schema.sql`; a migration that already ran is never edited.
 
 Some changes wait for Luca's word before they reach `main`. These are changes to `checks/`, `data/maf/rules.csv`, `data/space/rules.csv`, the reference answers in `data/maf/reference/` and the legal documents in `web/legal/`.
 

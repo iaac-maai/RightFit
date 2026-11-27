@@ -47,7 +47,11 @@ The page opens at the address Vite prints. Google sign-in shows only when `GOOGL
 
 ## Online (Luca's Cloudflare account)
 
-Live since 20 Nov 2026 at https://rightfit.hackathon-team6-cubicasa-app.workers.dev, with the database `rightfit-db` in Western Europe. The secrets `BETTER_AUTH_SECRET` and `ADMIN_EMAILS` are set; `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` wait for the Google client. The steps, for a new account or a new database:
+Live since 20 Nov 2026 at https://rightfit.hackathon-team6-cubicasa-app.workers.dev, with the database `rightfit-db` in Western Europe.
+
+Since 27 Nov 2026 it updates itself: a push to `main` that touches `web/` or the engine's code runs the tests, applies the new migrations (`npx wrangler d1 migrations apply rightfit-db --remote`; Cloudflare's `d1_migrations` table keeps which ran, and 0001 to 0007 were recorded there on 27 Nov), deploys the engine, then the site (`.github/workflows/online.yml`). It needs the repository secret `CLOUDFLARE_API_TOKEN` (a Cloudflare token that may edit Workers and D1) and the variable `CLOUDFLARE_ACCOUNT_ID`. A new migration takes the next number in `migrations/`, and the same change goes into `schema.sql`. A database made from `schema.sql` must have every file in `migrations/` recorded in `d1_migrations` before its first automatic deploy.
+
+The secrets `BETTER_AUTH_SECRET` and `ADMIN_EMAILS` are set; `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` wait for the Google client. The steps, for a new account or a new database:
 
 ```bash
 npx wrangler d1 create rightfit-db --location weur   # put the id it prints in wrangler.jsonc
