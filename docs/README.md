@@ -10,6 +10,7 @@
 | `jurisdictions.md` | how the rules are picked by country and date, and how they are kept current |
 | `maf_status_reasons.md` | why a package gets A, B or C |
 | `maf_register_findings.md` | what the register of 80 past forms tells us |
+| `narrative.md` | the story for the final presentation, each result with its file (draft) |
 | `agent_test_2026-10-28.md` | the first test with an agent, on 28 Oct 2026 (IAAC deliverable) |
 | `images/` | the pictures of the main README |
 
