@@ -708,3 +708,86 @@ main { min-width: 0; }
 .survey-bar-track span { display: block; height: 100%; background: var(--green); border-radius: 6px; }
 .survey-bar-n { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
 .survey-comments { list-style: none; margin: 0; padding: 10px 14px; display: grid; gap: 8px; }
+.survey-select { width: 100%; max-width: 560px; font: inherit; padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: inherit; }
+.survey-pick { max-width: 560px; }
+.survey-pick > summary { cursor: pointer; list-style: none; }
+.survey-pick > summary::after { content: "▾"; float: right; color: var(--ink-2); }
+.survey-pick[open] > summary { border-color: var(--green); }
+.survey-pick-list { display: grid; gap: 2px; margin-top: 6px; padding: 6px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.survey-pick-list label { display: flex; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.survey-pick-list label.on { background: #edf7ee; }
+.survey-pick-list input { accent-color: var(--green); }
+/* The live results at the top of the survey: two headline numbers, the rest smaller */
+.legal-text.survey { max-width: 1000px; }
+.legal-text.survey > p, .survey-form { max-width: 720px; }
+.live { --ink-l: #5d6b63; display: grid; gap: 14px; padding: 20px; border: 1px solid #dbe3de; border-radius: 6px; background: #f4f7f5; }
+.live p, .live li { max-width: none; margin: 0; }
+.live-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 14px; }
+.live-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--green); }
+.live-sub { font-size: 13px; color: var(--ink-l); }
+.live-sub b { color: var(--ink); }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #2e9e4f; animation: live-pulse 1.8s ease-out infinite; }
+@keyframes live-pulse { 0% { box-shadow: 0 0 0 0 rgba(46, 158, 79, 0.45); } 100% { box-shadow: 0 0 0 9px rgba(46, 158, 79, 0); } }
+@media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+.live-icon { flex: none; width: 26px; height: 26px; color: var(--green); }
+.live-heroes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .live-heroes { grid-template-columns: 1fr; } }
+.live-hero { display: grid; gap: 4px; align-content: start; padding: 20px 22px; background: #fff; border: 1px solid #d3dcd6; border-top: 4px solid var(--green); border-radius: 3px; }
+.live-hero:nth-child(2) { border-top-color: #c9712a; }
+.live-hero-icon { display: inline-flex; width: 34px; margin-bottom: 4px; }
+.live-hero .live-icon { width: 34px; height: 34px; }
+.live-hero:nth-child(2) .live-icon { color: #c9712a; }
+.live-hero-label { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #26332c; }
+.live-hero-value { display: flex; align-items: baseline; gap: 8px; font-size: 48px; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; color: var(--green); font-variant-numeric: tabular-nums; }
+.live-hero:nth-child(2) .live-hero-value { color: #b3611f; }
+.live-hero-value small { font-size: 14px; font-weight: 500; letter-spacing: 0; color: var(--ink-l); }
+.live-hero-value em { font-style: normal; font-size: 20px; font-weight: 600; letter-spacing: 0; color: var(--ink-l); }
+.live-hero-how { font-size: 14px; color: #34423a; line-height: 1.4; }
+.live-hero-n { margin-top: 6px !important; padding-top: 8px; border-top: 1px dashed #d3dcd6; font-size: 12px; color: var(--ink-l); }
+.live-smalls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 760px) { .live-smalls { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.live-small { display: flex; gap: 9px; align-items: flex-start; padding: 10px 11px; background: #fff; border: 1px solid #dde4df; border-radius: 3px; }
+.live-small .live-icon { width: 22px; height: 22px; margin-top: 2px; }
+.live-small div { display: grid; gap: 1px; }
+.live-small b { font-size: 18px; font-weight: 700; color: #26332c; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.live-small b em { font-style: normal; font-size: 12px; font-weight: 600; color: var(--ink-l); }
+.live-small span { font-size: 11.5px; line-height: 1.3; color: var(--ink-l); }
+.live-line { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: #34423a; }
+.live-line .live-icon { width: 20px; height: 20px; }
+.live-foot { font-size: 11px; line-height: 1.45; color: var(--ink-l); border-top: 1px dashed #cfd8d2; padding-top: 9px; }
+/* Motion: the cards rise in one after another, the big numbers count up (in Survey.tsx), a number that changes
+   flashes, the hourglass turns and the euro drops when a new answer moves them. None of it for people who ask for less motion. */
+@keyframes live-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes live-pop { 0% { color: #2e9e4f; transform: scale(1.12); } 100% { transform: none; } }
+@keyframes live-flip { 0% { transform: rotate(0); } 60%, 100% { transform: rotate(180deg); } }
+@keyframes live-drop { 0% { transform: translateY(-10px); opacity: 0; } 60% { transform: translateY(2px); opacity: 1; } 100% { transform: none; } }
+.live-hero, .live-small { animation: live-rise 0.55s cubic-bezier(.2, .7, .3, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.live-pop { display: inline-block; animation: live-pop 0.7s ease-out; transform-origin: left center; }
+.live-flip { animation: live-flip 1.1s ease-in-out; }
+.live-drop { animation: live-drop 0.8s ease-out; }
+.live-small { transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
+.live-small:hover { border-color: #b8c7bd; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 58, 44, 0.07); }
+.live-hero { transition: box-shadow 0.2s; }
+.live-hero:hover { box-shadow: 0 6px 18px rgba(16, 58, 44, 0.08); }
+@media (prefers-reduced-motion: reduce) {
+  .live-hero, .live-small, .live-pop, .live-flip, .live-drop { animation: none; }
+  .live-small:hover { transform: none; }
+}
+/* The fold-out under the live numbers: every question's answers, counted */
+.live-fold { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 13px 16px; font: inherit; font-weight: 600;
+  text-align: left; color: #fff; background: var(--green); border: 0; border-radius: 4px; cursor: pointer; transition: filter 0.2s; }
+.live-fold:hover { filter: brightness(1.15); }
+.live-fold:focus-visible { outline: 3px solid #9fd3ae; outline-offset: 2px; }
+.live-fold .meta { color: rgba(255, 255, 255, 0.75); font-weight: 400; font-size: 12.5px; }
+.live-chev { width: 20px; height: 20px; transition: transform 0.3s ease; }
+.live-fold.open .live-chev { transform: rotate(180deg); }
+.live-answers { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.45s ease; }
+.live-answers.open { grid-template-rows: 1fr; }
+.live-answers > div { overflow: hidden; display: grid; gap: 10px; }
+.live-answers.open > div { padding-top: 2px; }
+.live-q { background: #fff; border: 1px solid #dde4df; border-radius: 3px; }
+.live-q h4 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px; padding: 11px 14px 0; font-size: 13.5px; line-height: 1.4; }
+.live-q .survey-bars { display: grid; gap: 6px; padding: 10px 14px 12px; }
+.live-q .survey-bar-track span { transition: width 0.6s ease; }
+@media (max-width: 640px) { .live-fold { grid-template-columns: 1fr auto; } .live-fold .meta { grid-column: 1; } .live-chev { grid-row: 1; grid-column: 2; } }
+@media (prefers-reduced-motion: reduce) { .live-answers, .live-chev { transition: none; } }

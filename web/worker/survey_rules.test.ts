@@ -1,7 +1,7 @@
 // The practice survey's rules (survey_rules.ts). Run with `npm test`.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { COMMENT_MAX, QUESTIONS, checkAnswers, spread, summarise, toCsv } from "./survey_rules.ts";
+import { COMMENT_MAX, MIDDLES, QUESTIONS, checkAnswers, live, spread, summarise, toCsv } from "./survey_rules.ts";
 
 const full = {
   role: "mep_reviewer", country: "RO", experience: "5to10", involvement: "review", volume: "6to15", review_time: "30to60",
@@ -89,4 +89,62 @@ test("the CSV has one row per answer, with quotes where needed", () => {
   const [head, row] = csv.trim().split("\n");
   assert.ok(head.startsWith("day,role,country"));
   assert.ok(row.includes('"spec; code"') && row.includes('"He said ""no"""'));
+});
+
+test("the live numbers: ranges count at their middle, an open range makes it 'at least', don't know counts nowhere", () => {
+  const rows = [
+    { day: "2026-11-27", answers: { role: "mep_reviewer", review_time: "30to60", delay: "1to2w", rounds: "2", returned: 2, site_misfit: "never", useful_check: 4, useful_fit: 5, reasons: ["missing_docs", "spec"], comment: "secret" } },
+    { day: "2026-11-28", answers: { role: "contractor", review_time: "1to2h", delay: "dont_know", rounds: "4plus", returned: 6, site_misfit: "few", misfit_cost: "5to20k", useful_check: 2, reasons: ["missing_docs"] } },
+    { day: "2026-11-28", answers: { role: "mep_reviewer", review_time: "dont_know", site_misfit: "na" } },
+  ];
+  const l = live(rows);
+  assert.equal(l.n, 3);
+  assert.equal(l.lastDay, "2026-11-28");
+  const r = (id: string) => l.ranges.find((x) => x.id === id)!;
+  assert.equal(r("review_time").answered, 2);
+  assert.equal(r("review_time").mean, (45 + 90) / 2);
+  assert.equal(r("review_time").atLeast, false);
+  assert.equal(r("review_time").lowest, "30 to 60 minutes");
+  assert.equal(r("review_time").highest, "1 to 2 hours");
+  assert.equal(r("review_time").scale.length, 6);
+  assert.equal(r("review_time").lowIndex, 2);
+  assert.equal(r("review_time").highIndex, 3);
+  assert.equal(r("review_time").meanAt, 2.5); // 67.5 minutes: halfway between 45 and 90
+  assert.equal(r("delay").answered, 1);
+  assert.equal(r("rounds").mean, 3);
+  assert.equal(r("rounds").atLeast, true);
+  assert.equal(r("prepare_time").mean, null);
+  assert.deepEqual(l.returned, { answered: 2, mean: 4, min: 2, max: 6 });
+  assert.deepEqual(l.misfit, { answered: 2, atLeastOnce: 1 });
+  assert.equal(l.useful[0].mean, 3);
+  assert.equal(l.useful[1].answered, 1);
+  assert.deepEqual(l.reasons[0], { label: "Missing documents or certificates", n: 2 });
+  assert.deepEqual(l.roles[0], { label: "MEP engineer who reviews submittals (consultant, supervisor)", n: 2 });
+  // time lost: person 1, 2 rounds x 10.5 days = 10.5; person 2, at least 4 rounds but delay "don't know": left out
+  assert.deepEqual(l.timeLost, { answered: 1, mean: 10.5, atLeast: false, low: 10.5, high: 10.5 });
+  assert.equal(l.moneyLost.answered, 1);
+  assert.equal(l.moneyLost.mean, 12500);
+  assert.equal(l.results.length, QUESTIONS.length - 1); // every question but the comment
+  assert.ok(!JSON.stringify(l).includes("secret"));
+});
+
+test("every range answer has a middle, so none is lost from an average", () => {
+  for (const [id, m] of Object.entries(MIDDLES)) {
+    const q = QUESTIONS.find((x) => x.id === id)!;
+    assert.ok(q.kind === "one");
+    for (const [key] of q.options) if (key !== "dont_know") assert.ok(key in m.values, `${id}: ${key}`);
+  }
+});
+
+test("time lost: approved the first time loses nothing, an open answer makes it 'at least'", () => {
+  const l = live([
+    { day: "2026-11-27", answers: { rounds: "1", delay: "gt1m" } },
+    { day: "2026-11-27", answers: { rounds: "3", delay: "3to7d" } },
+    { day: "2026-11-27", answers: { rounds: "4plus", delay: "lt3d" } },
+  ]);
+  assert.equal(l.timeLost.answered, 3);
+  assert.equal(l.timeLost.low, 0);
+  assert.equal(l.timeLost.high, 10);
+  assert.equal(l.timeLost.mean, (0 + 10 + 4.5) / 3);
+  assert.equal(l.timeLost.atLeast, true);
 });
