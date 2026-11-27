@@ -29,19 +29,24 @@ def test_the_engine_gives_the_laptops_review():
 
 
 def test_a_tick_confirms_one_reading_under_the_reviewers_name():
-    item = next(i for i in P01["items"] if any(v["status"] != "verified" and v["value"] not in (None, "") for v in i["values"].values()))
-    key = next(k for k, v in item["values"].items() if v["status"] != "verified" and v["value"] not in (None, ""))
-    before = ask()["view"]["counts"]["to_confirm"]
-    out = ask({"op": "confirm", "targets": [{"kind": "value", "item": item["id"], "key": key, "verified": True}]})
+    # P01's readings are all confirmed by now, so one is put back to what the AI left before the tick
+    pkg = copy.deepcopy(P01)
+    item = pkg["items"][0]
+    key = next(k for k, v in item["values"].items() if v["value"] not in (None, ""))
+    item["values"][key].update(status="extracted", checked_by=None, verified_on=None)
+    before = ask(pkg=pkg)["view"]["counts"]["to_confirm"]
+    out = ask({"op": "confirm", "targets": [{"kind": "value", "item": item["id"], "key": key, "verified": True}]}, pkg=pkg)
     entry = next(i for i in out["pkg"]["items"] if i["id"] == item["id"])["values"][key]
     assert (entry["status"], entry["checked_by"]) == ("verified", "Ana Test")
     assert out["view"]["counts"]["to_confirm"] == before - 1
 
 
 def test_a_reading_confirmed_from_another_package_keeps_where_and_loses_it_when_unticked():
-    doc = next(d for d in P01["documents"] if d["status"] != "verified")
+    pkg = copy.deepcopy(P01)
+    doc = pkg["documents"][0]
+    doc.update(status="extracted", checked_by=None, verified_on=None)   # P01's documents are all confirmed by now
     where = "this project, P09 (MAF IS 015 rev 0), confirmed by Ana on 2026-11-11"
-    out = ask({"op": "confirm", "targets": [{"kind": "document", "file": doc["file"], "verified": True, "from": where}]})
+    out = ask({"op": "confirm", "targets": [{"kind": "document", "file": doc["file"], "verified": True, "from": where}]}, pkg=pkg)
     shown = next(d for d in out["view"]["documents"] if d["file"] == doc["file"])
     assert (shown["status"], shown["checked_by"], shown["confirmed_in"]) == ("verified", "Ana Test", where)
     again = ask({"op": "confirm", "targets": [{"kind": "document", "file": doc["file"], "verified": False}]}, pkg=out["pkg"])

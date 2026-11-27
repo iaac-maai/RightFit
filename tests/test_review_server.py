@@ -57,10 +57,17 @@ def test_unknown_decisions_and_targets_are_refused():
 
 
 def test_passes_count_only_on_confirmed_readings():
-    v = review(fresh())
-    assert v["counts"]["passed"] < v["counts"]["would_pass"]   # almost nothing in P02 is confirmed yet
+    def unconfirmed():
+        # P02 as the AI left it: every reading put back to extracted, so no check may pass
+        pkg = fresh()
+        for e in [v for i in pkg["items"] for v in i["values"].values()] + pkg["documents"]:
+            if e["status"] == "verified":
+                e.update(status="extracted", checked_by=None, verified_on=None)
+        return pkg
+    confirmed, v = review(fresh()), review(unconfirmed())
+    assert v["counts"]["passed"] < confirmed["counts"]["passed"]
     problem = next(r for r in v["results"] if r["verdict"] == "flag")
-    v2 = review(fresh(), dismissed={problem["key"]: "ok"})
+    v2 = review(unconfirmed(), dismissed={problem["key"]: "ok"})
     assert v2["counts"]["passed"] == v["counts"]["passed"] and v2["counts"]["dismissed"] == 1
 
 

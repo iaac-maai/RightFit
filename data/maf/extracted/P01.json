@@ -166,8 +166,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT UNILIFT_AP1240063",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": null,
       "matches": [
         {
@@ -178,7 +178,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
@@ -198,8 +199,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT UNILIFT_AP1250113",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": null,
       "matches": [
         {
@@ -210,7 +211,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
@@ -230,8 +232,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT Hydro Multi-E 2 CME 15-2 U2",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": null,
       "matches": [
         {
@@ -242,7 +244,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
@@ -262,8 +265,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT DPK15803050D",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "pages 5 and 10 show a control panel wiring diagram",
       "matches": [
         {
@@ -274,7 +277,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     }
   ],
   "items": [
@@ -292,9 +296,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "application": {
           "value": "booster",
@@ -302,9 +307,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare apa menajera - Alimentare cu apa",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_flow": {
           "value": 15,
@@ -312,9 +318,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_head": {
           "value": 50,
@@ -322,9 +329,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "1 Electropompa Activa: Q=15 mc/h; H=50 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "product_no": {
           "value": "92761855",
@@ -332,9 +340,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 1,
           "quote": "Nr. Produs: 92761855",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "number_of_pumps": {
           "value": 2,
@@ -342,9 +351,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 4,
           "quote": "Număr de pompe: 2",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "flow": {
           "value": 15,
@@ -352,9 +362,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Debitul curent calculat: 15 m³/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "head": {
           "value": 50,
@@ -362,9 +373,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Înălţimea de pompare rezultată pentru pompă: 50 m",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "power": {
           "value": 4,
@@ -372,9 +384,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Putere (P2) pompă principală: 4 kW",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "P2 per pump"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "P2 per pump",
+          "verified_on": "2026-11-27"
         },
         "voltage": {
           "value": "3 x 380-415 V, 50 Hz",
@@ -382,9 +395,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Tensiune nominală: 3 x 380-415 V",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "starting_method": {
           "value": "electronic",
@@ -392,9 +406,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Metodă de pornire: electronic",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "max_pressure": {
           "value": 10,
@@ -402,9 +417,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Presiune de funcţionare maximă: 10 bar",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "liquid_temp_range": {
           "value": "5 .. 60",
@@ -412,9 +428,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Gama temperaturii lichidului: 5 .. 60 °C",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "controller_included": {
           "value": true,
@@ -422,9 +439,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 1,
           "quote": "Regulatorul intern PI reglează numărul de pompe de funcționare",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "bms_protocol": {
           "value": "LON, Profibus, Modbus, SMS/GSM/GPRS, GRM, BACnet, BACnet IP, Modbus TCP, PROFINET",
@@ -432,9 +450,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 1,
           "quote": "Protocoale de comunicare disponibile:",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "bms_included": {
           "value": false,
@@ -442,9 +461,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 1,
           "quote": "Protocoale de comunicare disponibile:",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "protocols are listed as available; the sheet does not say a module is included"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "protocols are listed as available; the sheet does not say a module is included",
+          "verified_on": "2026-11-27"
         },
         "motor_efficiency_class": {
           "value": "IE5",
@@ -452,9 +472,10 @@
           "source": "Q=15mch@H=50mCA___92761855_MultiCME.pdf",
           "page": 2,
           "quote": "Clasa de eficiență IE: IE5",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         }
       }
     },
@@ -472,9 +493,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "application": {
           "value": "stormwater",
@@ -482,9 +504,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare pentru ape pluviale P1/P2",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_flow": {
           "value": 38,
@@ -492,9 +515,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_head": {
           "value": 15,
@@ -502,9 +526,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Grup de pompare pentru ape pluviale P1/P2: Q=38mc/h; H=15 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "product_no": {
           "value": "99478794",
@@ -512,9 +537,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 1,
           "quote": "Nr. Produs: 99478794",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "flow": {
           "value": 38.13,
@@ -522,9 +548,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 1,
           "quote": "Debitul curent calculat: 38.13 m³/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "head": {
           "value": 15.11,
@@ -532,9 +559,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 1,
           "quote": "Înălţimea de pompare rezultată pentru pompă: 15.11 m",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "power": {
           "value": 3,
@@ -542,9 +570,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 2,
           "quote": "Putere nominală - P2: 3 kW",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "P2 per pump"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "P2 per pump",
+          "verified_on": "2026-11-27"
         },
         "voltage": {
           "value": "3 x 380-415 V, 50 Hz",
@@ -552,9 +581,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 2,
           "quote": "Tensiune nominală: 3 x 380-415 V",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "starting_method": {
           "value": "DOL",
@@ -562,9 +592,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 2,
           "quote": "Metodă de pornire: DOL",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "max_pressure": {
           "value": 5.7,
@@ -572,9 +603,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 2,
           "quote": "Presiune de funcţionare maximă: 5.7 bar",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "outlet flange PN 10 (page 2)"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "outlet flange PN 10 (page 2)",
+          "verified_on": "2026-11-27"
         },
         "liquid_temp_range": {
           "value": "0 .. 40",
@@ -582,9 +614,10 @@
           "source": "Q=38mch@H=15mCA___99478794_DPK15803050D.pdf",
           "page": 1,
           "quote": "Gama temperaturii lichidului: 0 .. 40 °C",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "controller_included": {
           "value": null,
@@ -594,7 +627,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-10 (a panel wiring diagram is shown on pages 5 and 10, not stated as supplied; the form lists no panel)"
+          "note": "not found; looked in pages 1-10 (a panel wiring diagram is shown on pages 5 and 10, not stated as supplied; the form lists no panel); Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_protocol": {
           "value": null,
@@ -604,7 +637,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-10"
+          "note": "not found; looked in pages 1-10; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_included": {
           "value": null,
@@ -614,7 +647,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-10"
+          "note": "not found; looked in pages 1-10; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "motor_efficiency_class": {
           "value": null,
@@ -624,7 +657,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 2 and 6 (motor efficiency 86.6 % given, no IE class)"
+          "note": "not found; looked in pages 2 and 6 (motor efficiency 86.6 % given, no IE class); Luca on 2026-11-27: confirmed not stated, the motor efficiency class is probably not relevant for drainage, stormwater and fire pumps; still to be checked"
         }
       }
     },
@@ -642,9 +675,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "application": {
           "value": "drainage",
@@ -652,9 +686,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_flow": {
           "value": 3,
@@ -662,9 +697,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_head": {
           "value": 10,
@@ -672,9 +708,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=3 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "product_no": {
           "value": "96001975",
@@ -682,9 +719,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 1,
           "quote": "Nr. Produs: 96001975",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "flow": {
           "value": 3.39,
@@ -692,9 +730,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 1,
           "quote": "Debitul curent calculat: 3.39 l/s",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "head": {
           "value": 12.8,
@@ -702,9 +741,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 1,
           "quote": "Înălţimea de pompare rezultată pentru pompă: 12.8 m",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "power": {
           "value": 1.2,
@@ -712,9 +752,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 2,
           "quote": "Putere nominală - P2: 1.2 kW",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "P2"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "P2",
+          "verified_on": "2026-11-27"
         },
         "voltage": {
           "value": "3 x 400 V, 50 Hz",
@@ -722,9 +763,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 2,
           "quote": "Tensiune nominală: 3 x 400 V",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "starting_method": {
           "value": null,
@@ -734,7 +776,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6"
+          "note": "not found; looked in pages 1-6; Luca on 2026-11-27: confirmed not stated, the starting method is not stated"
         },
         "max_pressure": {
           "value": null,
@@ -744,7 +786,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6 (maximum installation depth 7 m given)"
+          "note": "not found; looked in pages 1-6 (maximum installation depth 7 m given); Luca on 2026-11-27: confirmed not stated, normal for a submersible pump: a check valve follows each pump, so the pump body sees at most the water column of the sump"
         },
         "liquid_temp_range": {
           "value": "0 .. 55",
@@ -752,9 +794,10 @@
           "source": "Q=3ls@H=10mCA__96001975_UNILIFT_AP1250113.pdf",
           "page": 1,
           "quote": "Gama temperaturii lichidului: 0 .. 55 °C",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "controller_included": {
           "value": null,
@@ -764,7 +807,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6 (built-in motor protection: none; thermal protection: external, page 4)"
+          "note": "not found; looked in pages 1-6 (built-in motor protection: none; thermal protection: external, page 4); Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "float_switch": {
           "value": null,
@@ -774,7 +817,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6 (no float or level switch mentioned)"
+          "note": "not found; looked in pages 1-6 (no float or level switch mentioned); Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_protocol": {
           "value": null,
@@ -784,7 +827,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6"
+          "note": "not found; looked in pages 1-6; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_included": {
           "value": null,
@@ -794,7 +837,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6"
+          "note": "not found; looked in pages 1-6; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "motor_efficiency_class": {
           "value": null,
@@ -804,7 +847,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-6"
+          "note": "not found; looked in pages 1-6; Luca on 2026-11-27: confirmed not stated, the motor efficiency class is probably not relevant for drainage, stormwater and fire pumps; still to be checked"
         }
       }
     },
@@ -822,9 +865,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "application": {
           "value": "drainage",
@@ -832,9 +876,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_flow": {
           "value": 1,
@@ -842,9 +887,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_head": {
           "value": 10,
@@ -852,9 +898,10 @@
           "source": "MAF_IS_015_Pompe si grup pompare sanitare.xls",
           "page": 1,
           "quote": "Electropompa submersibila evacuare ape accidentale Q=1 l/s; H=10 mCA",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "product_no": {
           "value": "96001652",
@@ -862,9 +909,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 1,
           "quote": "Nr. Produs: 96001652",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "flow": {
           "value": 1.08,
@@ -872,9 +920,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 1,
           "quote": "Debitul curent calculat: 1.08 l/s",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "head": {
           "value": 11.56,
@@ -882,9 +931,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 1,
           "quote": "Înălţimea de pompare rezultată pentru pompă: 11.56 m",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "power": {
           "value": 0.6,
@@ -892,9 +942,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 2,
           "quote": "Putere nominală - P2: 0.6 kW",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "P2"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "P2",
+          "verified_on": "2026-11-27"
         },
         "voltage": {
           "value": "3 x 400 V, 50 Hz",
@@ -902,9 +953,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 2,
           "quote": "Tensiune nominală: 3 x 400 V",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "starting_method": {
           "value": null,
@@ -914,7 +966,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7"
+          "note": "not found; looked in pages 1-7; Luca on 2026-11-27: confirmed not stated, the starting method is not stated"
         },
         "max_pressure": {
           "value": null,
@@ -924,7 +976,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7 (maximum installation depth 7 m given)"
+          "note": "not found; looked in pages 1-7 (maximum installation depth 7 m given); Luca on 2026-11-27: confirmed not stated, normal for a submersible pump: a check valve follows each pump, so the pump body sees at most the water column of the sump"
         },
         "liquid_temp_range": {
           "value": "0 .. 55",
@@ -932,9 +984,10 @@
           "source": "Q=1ls@H=10mCA___96001652_UNILIFT_AP1240063.pdf",
           "page": 1,
           "quote": "Gama temperaturii lichidului: 0 .. 55 °C",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "controller_included": {
           "value": null,
@@ -944,7 +997,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7 (built-in motor protection: none; thermal protection: external, page 4)"
+          "note": "not found; looked in pages 1-7 (built-in motor protection: none; thermal protection: external, page 4); Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "float_switch": {
           "value": null,
@@ -954,7 +1007,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7 (no float or level switch mentioned)"
+          "note": "not found; looked in pages 1-7 (no float or level switch mentioned); Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_protocol": {
           "value": null,
@@ -964,7 +1017,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7"
+          "note": "not found; looked in pages 1-7; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "bms_included": {
           "value": null,
@@ -974,7 +1027,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7"
+          "note": "not found; looked in pages 1-7; Luca on 2026-11-27: confirmed not stated, the pump itself has no controller; a separate control panel carries the controller and the BMS integration"
         },
         "motor_efficiency_class": {
           "value": null,
@@ -984,7 +1037,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 1-7"
+          "note": "not found; looked in pages 1-7; Luca on 2026-11-27: confirmed not stated, the motor efficiency class is probably not relevant for drainage, stormwater and fire pumps; still to be checked"
         }
       }
     }

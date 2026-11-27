@@ -105,8 +105,8 @@
         "Regulation (EU) 1253/2014"
       ],
       "listed_as": "FISA TEHNICA CTA",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "one double-deck unit (1 pc), supply 9000 m3/h and return 7000 m3/h; printed with LPlus 5.72.0.8; page 30 is a separate humidifier casing drawing (3500 m3/h, LPlus 5.71.9.4, 2025-08-11); the header block of every page names people: keep it out of quotes",
       "matches": [
         {
@@ -117,7 +117,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
@@ -141,8 +142,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT UNITATE EXTERNA",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "range table; covers lists the brochure page 32 table only, page 31 shows another range table; image only, read from a rendered page",
       "matches": [
         {
@@ -153,7 +154,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Declaration of Conformity_ All Products_for 202403.pdf",
@@ -194,8 +196,8 @@
         "2014/68/EU"
       ],
       "listed_as": null,
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "covers transcribes only the L+ series (page 4) and the AHU kit HZX-BEJ line (page 8) of a 9-page model list; not listed in the form",
       "matches": [
         {
@@ -214,7 +216,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "Declaration of Conformity_Hisense AC_EN+IT - 20220506.pdf",
@@ -242,10 +245,11 @@
         "2014/68/EU"
       ],
       "listed_as": "Declaratie conformitate HISENSE",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "matched to the form label by its page count (10); date printed on page 5, the file name says 20220506",
-      "matches": []
+      "matches": [],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "AHU KIT HZX-6BEJ.pdf",
@@ -269,8 +273,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "FT KIT AHU HISENSE",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "range table; image only",
       "matches": [
         {
@@ -281,7 +285,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "TUV.pdf",
@@ -302,8 +307,8 @@
         "RLT-Richtlinie Zertifizierung 2017-11"
       ],
       "listed_as": "TUV CTA",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "certifies the selection software, not the units",
       "matches": [
         {
@@ -314,7 +319,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "FG_Eurovent certificate for CAIRplus_certificates_en (1).pdf",
@@ -336,8 +342,8 @@
         "ECP AHU"
       ],
       "listed_as": "CERTIFICAT EUROVENT CTA",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "certificate 07.02.469, range CAIRplus; certified software LPlus 5.71.9.6/105, the data sheet was printed with LPlus 5.72.0.8",
       "matches": [
         {
@@ -348,7 +354,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "19.03 DX project +6C.pdf",
@@ -368,8 +375,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "RAPORT DE SIMULARE 6grC",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "winter outdoor 6 °C DB",
       "matches": [
         {
@@ -388,7 +395,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     },
     {
       "file": "19.03 DX project -15C.pdf",
@@ -408,8 +416,8 @@
       "valid_until": null,
       "cites": [],
       "listed_as": "RAPORT DE SIMULARE -15grC",
-      "status": "extracted",
-      "checked_by": null,
+      "status": "verified",
+      "checked_by": "Luca",
       "notes": "winter outdoor -15 °C DB",
       "matches": [
         {
@@ -428,7 +436,8 @@
           "status": "extracted",
           "checked_by": null
         }
-      ]
+      ],
+      "verified_on": "2026-11-27"
     }
   ],
   "items": [
@@ -446,9 +455,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "Centrala de tratare a aerului cu baterie in detenta directa",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "quantity": {
           "value": 1,
@@ -467,9 +477,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "Z096096GBVA 9000 m³/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "duty_airflow_extract": {
           "value": 7000,
@@ -477,9 +488,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "A096096GBVA 7000 m³/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "airflow_supply": {
           "value": 9000,
@@ -487,9 +499,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "volume flow 9000 m 3/h 7000 m 3/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "airflow_extract": {
           "value": 7000,
@@ -497,9 +510,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "volume flow 9000 m 3/h 7000 m 3/h",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "external_pressure_supply": {
           "value": 200,
@@ -507,9 +521,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "External pressure Suction side/Pressure side 0/200 Pa 150/0 Pa",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "external_pressure_extract": {
           "value": 150,
@@ -517,9 +532,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "External pressure Suction side/Pressure side 0/200 Pa 150/0 Pa",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "hrs_type": {
           "value": "rotary heat exchanger",
@@ -527,9 +543,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Type of HRS Rotary heat exchanger",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "hrs_efficiency": {
           "value": 76,
@@ -537,9 +554,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Thermal Eﬀiciency of HRS eta/eta limit 76/73 %",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "page 4 also prints temperature efficiency HRS 76 %, heat recovery class H2 as of EN 13053"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "page 4 also prints temperature efficiency HRS 76 %, heat recovery class H2 as of EN 13053",
+          "verified_on": "2026-11-27"
         },
         "sfp_int": {
           "value": 868,
@@ -547,9 +565,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Specific fan power of ventilation components SFPint/SFPint limit 868/890 W/(m 3/s)",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "sfp_int_limit": {
           "value": 890,
@@ -557,9 +576,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Specific fan power of ventilation components SFPint/SFPint limit 868/890 W/(m 3/s)",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "filter_supply": {
           "value": "ISO Coarse (outdoor air, p. 16) + ePM1 60 % (supply, p. 22)",
@@ -567,9 +587,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 22,
           "quote": "class ISO 16890 ePM1/60%",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "filter_extract": {
           "value": "ePM1 60 %",
@@ -577,9 +598,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 8,
           "quote": "class ISO 16890 ePM1/60%",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "filter_warning": {
           "value": true,
@@ -587,9 +609,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Filter change notification is ensured via Isyteq control - to comply with ErP.",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "energy_class": {
           "value": "Eurovent C (2016) winter, C (2023) summer; RLT not given",
@@ -597,9 +620,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "AHU Energy Eﬀiciency Class Winter C (2016)",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "dimensions": {
           "value": "7080 x 1080 x 2240",
@@ -607,9 +631,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 29,
           "quote": "Length/Width/Height mm 7080/1080/2240",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "weight": {
           "value": 2077,
@@ -617,9 +642,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 29,
           "quote": "Weight kg 2077",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "sound_power": {
           "value": null,
@@ -629,7 +655,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in pages 10 and 21 (printed per fan and per opening; not mapped to supply or extract yet)"
+          "note": "not found; looked in pages 10 and 21 (printed per fan and per opening; not mapped to supply or extract yet); Luca on 2026-11-27: confirmed not stated, to be found by extrapolation"
         },
         "voltage": {
           "value": "3 x 400 V, 50 Hz",
@@ -637,9 +663,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "Rated current consumption of all electrical components 89A (3x400 V / 50 Hz)",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "Luca: does not cover the DX outdoor units and their control module, nor the frost protection of the humidifier water supply; not decisive for the form, but the engineer has to account for it",
+          "verified_on": "2026-11-27"
         },
         "power": {
           "value": "3.03 + 1.68",
@@ -647,9 +674,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 4,
           "quote": "Real power input 3.03 kW 1.68 kW",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "fan real power input, supply + return"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "fan real power input, supply + return; Luca: fan powers only; the humidifier, electric heater and DX units are not included",
+          "verified_on": "2026-11-27"
         },
         "starting_method": {
           "value": "EC fans, speed controlled",
@@ -657,9 +685,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 5,
           "quote": "Drive type: - speed controlled",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "bms_protocol": {
           "value": "Modbus TCP/IP, Modbus RS485, BACnet TCP/IP, BACnet MSTP",
@@ -667,9 +696,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 27,
           "quote": "Interface for the connection to BMS or DDC systems:",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "bms_included": {
           "value": true,
@@ -677,9 +707,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 27,
           "quote": "- BACnet TCP/IP onboard",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "onboard the ISYteq 4.0 controller in the mounted cabinet"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "onboard the ISYteq 4.0 controller in the mounted cabinet",
+          "verified_on": "2026-11-27"
         },
         "motor_efficiency_class": {
           "value": "IE5",
@@ -687,9 +718,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 21,
           "quote": "EC motor eﬀiciency class IE5",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "dx_refrigerant": {
           "value": "R32",
@@ -697,9 +729,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 18,
           "quote": "type of refrigerant R32",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "the outdoor unit sheet and both DX reports say R410A"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "the outdoor unit sheet and both DX reports say R410A",
+          "verified_on": "2026-11-27"
         },
         "dx_cooling_capacity": {
           "value": 29.2,
@@ -707,9 +740,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 18,
           "quote": "total kW 29.2",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "evaporator, total"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "evaporator, total",
+          "verified_on": "2026-11-27"
         },
         "dx_heating_capacity": {
           "value": 45.7,
@@ -717,9 +751,10 @@
           "source": "Fisa tehnica CTA 19.03.2026.pdf",
           "page": 18,
           "quote": "total kW 45.7",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "condenser, total; target 38.2 kW"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "condenser, total; target 38.2 kW",
+          "verified_on": "2026-11-27"
         }
       }
     },
@@ -737,9 +772,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "2x unitate exterioara HISENSE AVW-54HKFHH2 , INCLUSIV kit AHU KIT,",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "quantity": {
           "value": 2,
@@ -747,9 +783,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "2x unitate exterioara HISENSE AVW-54HKFHH2",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "cooling_capacity": {
           "value": 15.5,
@@ -757,9 +794,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Capacity kW 15.5",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "rated, per unit"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "rated, per unit",
+          "verified_on": "2026-11-27"
         },
         "heating_capacity": {
           "value": 18.0,
@@ -767,9 +805,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Capacity kW 18.0",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "rated, per unit"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "rated, per unit",
+          "verified_on": "2026-11-27"
         },
         "heating_capacity_minus15": {
           "value": 12.666,
@@ -777,9 +816,10 @@
           "source": "19.03 DX project -15C.pdf",
           "page": 5,
           "quote": "System actual heating capacity (W) 12666",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "per circuit at -15 °C outdoor"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "per circuit at -15 °C outdoor",
+          "verified_on": "2026-11-27"
         },
         "refrigerant": {
           "value": "R410A",
@@ -787,9 +827,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Refrigerant Type R410A",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "refrigerant_charge": {
           "value": 4.1,
@@ -797,9 +838,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Before Shipment kg 4.1",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "the DX reports say 4 kg factory charge plus 1.36 kg per circuit"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "the DX reports say 4 kg factory charge plus 1.36 kg per circuit",
+          "verified_on": "2026-11-27"
         },
         "gwp": {
           "value": null,
@@ -809,7 +851,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in page 1 (range table) and both DX reports"
+          "note": "not found; looked in page 1 (range table) and both DX reports; Luca on 2026-11-27: confirmed not stated, the tool could look up the refrigerant's GWP when the documents do not give it, or use a database"
         },
         "seer": {
           "value": 8.0,
@@ -817,9 +859,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "SEER 8.00",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "scop": {
           "value": 4.55,
@@ -827,9 +870,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "SCOP 4.55",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "voltage": {
           "value": "3~ 380-415 V, 50/60 Hz",
@@ -837,9 +881,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "AC 3Φ, 380-415V/50/60Hz",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "weight": {
           "value": 114,
@@ -847,9 +892,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Net kg 114",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "dimensions": {
           "value": "1380 x 950 x 370",
@@ -857,9 +903,10 @@
           "source": "Hisense seria L AVW-HJFHH-HKFHH.pdf",
           "page": 1,
           "quote": "Outer Dimensions Height 1380",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         }
       }
     },
@@ -877,9 +924,10 @@
           "source": "MAF_IV_004_CTA rev04.xls",
           "page": 1,
           "quote": "INCLUSIV kit AHU KIT",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "quantity": {
           "value": 2,
@@ -887,9 +935,10 @@
           "source": "19.03 DX project +6C.pdf",
           "page": 4,
           "quote": "HZX-6BEJ Hisense pc 2",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "the form gives no number"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "the form gives no number; Luca: the form gives no number; the contractor should state it on the form",
+          "verified_on": "2026-11-27"
         },
         "compatible_outdoor_units": {
           "value": "AVW-54HKFHH2",
@@ -897,9 +946,10 @@
           "source": "19.03 DX project +6C.pdf",
           "page": 5,
           "quote": "ODU model AVW-54HKFHH2 IDU quantity 1",
-          "status": "extracted",
-          "checked_by": null,
-          "note": "pairing from the selection report; the kit sheet names no unit"
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": "pairing from the selection report; the kit sheet names no unit; Luca: could be checked by the tool",
+          "verified_on": "2026-11-27"
         },
         "allowed_capacity_cooling": {
           "value": "11.2 / 14.0 / 16.0",
@@ -907,9 +957,10 @@
           "source": "AHU KIT HZX-6BEJ.pdf",
           "page": 1,
           "quote": "Allowed Heat Exchanger Capacity (H/M/L)",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "allowed_hx_volume": {
           "value": "1.92 - 3.89",
@@ -917,9 +968,10 @@
           "source": "AHU KIT HZX-6BEJ.pdf",
           "page": 1,
           "quote": "Heat Exchanger Volume Min Max",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "control": {
           "value": "inlet air, outlet air or duty signal (0-10 V, 0-5 V, 4-20 mA); wired controller HYXE-VA01A standard",
@@ -927,9 +979,10 @@
           "source": "AHU KIT HZX-6BEJ.pdf",
           "page": 1,
           "quote": "AHU kit can provide 3 kinds of control type for AHU application",
-          "status": "extracted",
-          "checked_by": null,
-          "note": null
+          "status": "verified",
+          "checked_by": "Luca",
+          "note": null,
+          "verified_on": "2026-11-27"
         },
         "communication": {
           "value": null,
@@ -939,7 +992,7 @@
           "quote": null,
           "status": "unclear",
           "checked_by": null,
-          "note": "not found; looked in page 1"
+          "note": "not found; looked in page 1; Luca on 2026-11-27: confirmed not stated, such kits usually come with the wiring they need"
         },
         "voltage": {
           "value": "1~ 220-240 V, 50 Hz",
