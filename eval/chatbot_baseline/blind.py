@@ -4,7 +4,12 @@ The protocol is eval/chatbot_baseline/protocol.md. The chatbots' answers and eve
 the laptop in data/raw/chatbot_baseline/ (git-ignored, like the packages); only results.md goes into Git.
 
 Files in data/raw/chatbot_baseline/:
-  P01_bot1_run1.txt ...  each chatbot answer as it came, one file per run (bot1 is Claude.ai, bot2 is ChatGPT)
+  P01_bot1_run1.txt ...  each chatbot answer as it came, one file per run (bot1 is Claude.ai, bot2 is ChatGPT,
+                         bot3 is Gemini, bot4 is Perplexity)
+  split.csv              the answers split by hand: package, source, group, anchor, file, page, quote, by_hand;
+                         one row per finding, anchor is the first words of the finding in the answer (add " #2"
+                         for its second place); a rightfit row gives the group of the RightFit finding whose
+                         wording starts with the anchor
   findings.csv           every single finding: package, source, group, what, file, page, quote, by_hand
                          source is rightfit or bot1_run1, bot2_run2 ...; findings of one package that say the
                          same thing share a group; what is cut to 25 words, never rewritten; by_hand is yes or no
@@ -15,12 +20,14 @@ Files in data/raw/chatbot_baseline/:
 
 From the repository root:
   python3 -m eval.chatbot_baseline.blind rightfit   puts RightFit's findings for P01 and P02 into findings.csv
+  python3 -m eval.chatbot_baseline.blind bots       puts the chatbots' findings from split.csv into findings.csv
   python3 -m eval.chatbot_baseline.blind judge      writes judge.csv
   python3 -m eval.chatbot_baseline.blind score      checks pages and quotes, reads the marks, prints the tables
 """
 import csv
 import json
 import random
+import re
 import sys
 import unicodedata
 from pathlib import Path
@@ -35,7 +42,7 @@ RAW = ROOT / "data" / "raw"
 RUNS = RAW / "chatbot_baseline"
 EXTRACTED = ROOT / "data" / "maf" / "extracted"
 PACKAGES = ("P01", "P02")
-BOTS = {"bot1": "Claude.ai", "bot2": "ChatGPT"}
+BOTS = {"bot1": "Claude.ai", "bot2": "ChatGPT", "bot3": "Gemini", "bot4": "Perplexity"}
 FIELDS = ["package", "source", "group", "what", "file", "page", "quote", "by_hand"]
 JUDGE_FIELDS = ["id", "package", "what", "file", "page", "quote", "mark"]
 MARKS = {"real": "real", "not": "not", "?": "can't tell"}
@@ -59,6 +66,38 @@ def rightfit_findings(package, location="RO"):
         rows.append({"package": package, "source": "rightfit", "group": "", "what": cut(what),
                      "file": file, "page": page, "quote": "", "by_hand": ""})
     return rows
+
+
+def from_answer(text, anchor):
+    """The finding the anchor starts, in the chatbot's own words: up to the end of its table cell or line,
+    cut to 25 words. Markdown marks (** and `) are dropped first."""
+    anchor, _, nth = anchor.partition(" #")
+    text = text.replace("**", "").replace("`", "")
+    i = -1
+    for _ in range(int(nth or 1)):
+        i = text.find(anchor, i + 1)
+        if i < 0:
+            raise ValueError(f"not in the answer: {anchor!r}")
+    return cut(re.split(r"[|\n]", text[i:])[0])
+
+
+def bot_findings(split, rightfit, runs=RUNS):
+    """The chatbots' findings from split.csv, and the RightFit findings with the groups split.csv gives them."""
+    rightfit = [dict(f) for f in rightfit]
+    rows = []
+    for s in split:
+        if s["source"] == "rightfit":
+            f = next((f for f in rightfit if f["package"] == s["package"] and not f["group"]
+                      and f["what"].startswith(s["anchor"])), None)
+            if f is None:
+                raise ValueError(f"no ungrouped RightFit finding starts with {s['anchor']!r}")
+            f["group"] = s["group"]
+            continue
+        text = (runs / f"{s['package']}_{s['source']}.txt").read_text(encoding="utf-8")
+        rows.append({"package": s["package"], "source": s["source"], "group": s["group"],
+                     "what": from_answer(text, s["anchor"]), "file": s["file"], "page": s["page"],
+                     "quote": s["quote"], "by_hand": s["by_hand"]})
+    return rightfit + rows
 
 
 def groups(findings):
@@ -181,6 +220,9 @@ def main(step):
     if step == "rightfit":   # RightFit's rows are written again; every other row is kept as it is
         kept = [f for f in read(findings_csv) if f["source"] != "rightfit"] if findings_csv.exists() else []
         write(findings_csv, kept + [f for p in PACKAGES for f in rightfit_findings(p)], FIELDS)
+    elif step == "bots":   # every chatbot row is written again from split.csv
+        rightfit = [f for f in read(findings_csv) if f["source"] == "rightfit"]
+        write(findings_csv, bot_findings(read(RUNS / "split.csv"), rightfit), FIELDS)
     elif step == "judge":
         rows, _ = judge_list(read(findings_csv))
         write(RUNS / "judge.csv", rows, JUDGE_FIELDS)
@@ -205,7 +247,7 @@ def main(step):
         for f in hand:
             print(f"  {f['package']} {f['source']} {f['file']} p. {f['page']}: {f['quote']!r}")
     else:
-        sys.exit("usage: python3 -m eval.chatbot_baseline.blind rightfit | judge | score")
+        sys.exit("usage: python3 -m eval.chatbot_baseline.blind rightfit | bots | judge | score")
 
 
 if __name__ == "__main__":

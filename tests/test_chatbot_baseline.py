@@ -1,7 +1,7 @@
 import pymupdf
 import pytest
 
-from eval.chatbot_baseline.blind import cut, judge_list, page_and_quote, rightfit_findings, run_differences, score
+from eval.chatbot_baseline.blind import bot_findings, cut, from_answer, judge_list, page_and_quote, rightfit_findings, run_differences, score
 
 
 def finding(source, group="", what="x", file="", page="", quote="", package="P01"):
@@ -69,3 +69,23 @@ def test_score_refuses_marks_that_belong_to_another_list():
     judge[0]["mark"] = "maybe"
     with pytest.raises(ValueError, match="must be"):
         score(findings, judge, [])
+
+
+def test_from_answer_keeps_the_chatbots_words_up_to_the_end_of_the_cell():
+    text = "|1|Form|**No BOQ** item numbers given.|rule|\n2. **Wrong** `DoC` attached\nmore\n|2|x|No BOQ again|"
+    assert from_answer(text, "No BOQ") == "No BOQ item numbers given."
+    assert from_answer(text, "No BOQ #2") == "No BOQ again"
+    assert from_answer(text, "Wrong") == "Wrong DoC attached"
+    with pytest.raises(ValueError):
+        from_answer(text, "missing")
+
+
+def test_bot_findings_reads_the_answer_and_groups_rightfit(tmp_path):
+    (tmp_path / "P01_bot1_run1.txt").write_text("|1|No declaration for the set.|")
+    split = [{"package": "P01", "source": "bot1_run1", "group": "doc", "anchor": "No declaration", "file": "f.pdf",
+              "page": "1", "quote": "q", "by_hand": ""},
+             {"package": "P01", "source": "rightfit", "group": "doc", "anchor": "No EU", "file": "", "page": "",
+              "quote": "", "by_hand": ""}]
+    rows = bot_findings(split, [finding("rightfit", what="No EU declaration")], tmp_path)
+    assert [(r["source"], r["group"], r["what"]) for r in rows] == [
+        ("rightfit", "doc", "No EU declaration"), ("bot1_run1", "doc", "No declaration for the set.")]
